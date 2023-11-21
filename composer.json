@@ -1,5 +1,5 @@
 {
-  "name": "KumaCMS",
+  "name": "ponycool/kumacms",
   "description": "基于Codeigniter4和React的快速建站系统",
   "license": "MIT",
   "type": "project",
@@ -11,7 +11,8 @@
   },
   "require": {
     "php": "^7.4 || ^8.0",
-    "codeigniter4/framework": "^4.0"
+    "codeigniter4/framework": "^4.0",
+    "mrclay/minify": "^3.0"
   },
   "require-dev": {
     "fakerphp/faker": "^1.9",
