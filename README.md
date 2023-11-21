@@ -1,6 +1,5 @@
 ## 酷码CMS
 
-
 ## 描述
 
 基于Codeigniter4和React的快速建站系统
@@ -53,6 +52,10 @@ helpful if it requires external setup, such as starting a Selenium server for te
 ## Authors and acknowledgment
 
 Show your appreciation to those who have contributed to the project.
+
+## 鸣谢
+
+[CodeIgniter4](https://github.com/codeigniter4/CodeIgniter4)
 
 ## License
 
