@@ -28,6 +28,24 @@ Use examples liberally, and show the expected output if you can. It's helpful to
 usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably
 include in the README.
 
+## 二次开发
+
+#### 生成实体
+
+```shell
+php spark entity:generate
+```
+
+#### 生成模型
+
+```shell
+php spark model:generate
+```
+
+#### 生成服务
+```shell
+php spark service:generate
+```
 ## Support
 
 Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address,
