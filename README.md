@@ -56,6 +56,7 @@ Show your appreciation to those who have contributed to the project.
 ## 鸣谢
 
 [CodeIgniter4](https://github.com/codeigniter4/CodeIgniter4)
+[Twig](https://twig.symfony.com/)
 
 ## License
 
