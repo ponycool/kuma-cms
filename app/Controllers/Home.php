@@ -5,8 +5,8 @@ namespace App\Controllers;
 
 class Home extends Web
 {
-    public function index(): string
+    public function index(): void
     {
-        return view('welcome_message');
+        $this->render();
     }
 }
