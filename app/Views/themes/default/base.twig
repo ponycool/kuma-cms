@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    {# 头部 #}
+    {% block head %}
+        {% include 'Head.twig' %}
+    {% endblock %}
+    {# CSS #}
+    {% block css %}
+    {% endblock %}
+    {# JS-Plugins #}
+    {% block js %}
+    {% endblock %}
+</head>
+<body>
+{# 主体 #}
+{% block content %}
+{% endblock %}
+{# 脚本 #}
+{% block script %}
+{% endblock %}
+</body>
+</html>
