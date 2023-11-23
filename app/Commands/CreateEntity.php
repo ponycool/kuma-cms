@@ -94,12 +94,12 @@ EOF;
         // 构造casts
         $data .= "    protected $" . "casts = [" . PHP_EOL;
         if ($this->fieldExists($fields, 'deleted')) {
-            $data .= "        'deleted' => 'boolean'".PHP_EOL;
+            $data .= "        'deleted' => 'boolean'" . PHP_EOL;
         }
         $data .= "    ];" . PHP_EOL;
 
         // 构造方法
-        $data .= PHP_EOL . PHP_EOL;
+        $data .= PHP_EOL;
         $data .= "    public function __construct(array $" . "data = null)" . PHP_EOL;
         $data .= "    {" . PHP_EOL;
         $data .= "        parent::__construct($" . "data);";
