@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: Pony
  * Date: 2023/11/23
- * Time: 06:20 上午
+ * Time: 06:41 上午
  */
 declare(strict_types=1);
 
@@ -19,7 +19,6 @@ class Setting extends Base
     protected $dates = [
     ];
     protected $casts = [
-        'deleted' => 'boolean'
     ];
 
     public function __construct(array $data = null)
