@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: Pony
- * Date: 2023/11/22
- * Time: 08:10 上午
+ * Date: 2023/11/23
+ * Time: 07:43 上午
  */
 declare(strict_types=1);
 
@@ -26,7 +26,6 @@ class AccountModel extends BaseModel
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
     protected $deletedField = 'deleted_at';
-    protected $dateFormat = 'datetime';
     protected $validationRules = [
     ];
     protected $validationMessages = [
