@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: Pony
  * Date: 2023/11/23
- * Time: 06:41 上午
+ * Time: 07:44 上午
  */
 declare(strict_types=1);
 
@@ -16,9 +16,12 @@ class Setting extends Base
     protected string $value;
     protected string $created_at;
     protected string $updated_at;
+    protected string $deleted_at;
+    protected int $deleted;
     protected $dates = [
     ];
     protected $casts = [
+        'deleted' => 'boolean'
     ];
 
     public function __construct(array $data = null)
@@ -97,6 +100,22 @@ class Setting extends Base
     public function getUpdatedAt(): string
     {
         return $this->updated_at;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeletedAt(): string
+    {
+        return $this->deleted_at;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDeleted(): int
+    {
+        return $this->deleted;
     }
 
 }
