@@ -93,10 +93,10 @@ EOF;
 
         // 构造casts
         $data .= "    protected $" . "casts = [" . PHP_EOL;
-        $data .= <<<EOF
-        'deleted' => 'boolean'
-    ];
-EOF;
+        if ($this->fieldExists($fields, 'deleted')) {
+            $data .= "        'deleted' => 'boolean'".PHP_EOL;
+        }
+        $data .= "    ];" . PHP_EOL;
 
         // 构造方法
         $data .= PHP_EOL . PHP_EOL;
