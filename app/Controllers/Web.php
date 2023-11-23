@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Enums\Setting;
-use App\Services\SettingService;
 use App\Traits\TemplateTrait;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
