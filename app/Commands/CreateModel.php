@@ -66,8 +66,12 @@ class CreateModel extends BaseCommand
         $data .= "    protected $" . "useTimestamps = true;" . PHP_EOL;
         $data .= "    protected $" . "createdField = 'created_at';" . PHP_EOL;
         $data .= "    protected $" . "updatedField = 'updated_at';" . PHP_EOL;
-        $data .= "    protected $" . "deletedField = 'deleted_at';" . PHP_EOL;
-        $data .= "    protected $" . "dateFormat = 'datetime';" . PHP_EOL;
+        if ($this->fieldExists($fields, 'deleted_at')) {
+            $data .= "    protected $" . "deletedField = 'deleted_at';" . PHP_EOL;
+        }
+        if ($this->fieldExists($fields, 'datetime')) {
+            $data .= "    protected $" . "dateFormat = 'datetime';" . PHP_EOL;
+        }
         $data .= "    protected $" . "validationRules = [" . PHP_EOL;
         if ($table === 'setting') {
             $data .= <<<EOF
