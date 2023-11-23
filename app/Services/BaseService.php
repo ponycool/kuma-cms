@@ -115,9 +115,10 @@ class BaseService
      */
     public function getSelectFields(): array
     {
-        $selectFields = [
-            'id',
-        ];
+        $selectFields = [];
+        if ($this->table !== 'setting') {
+            $selectFields[] = 'id';
+        }
         $model = $this->getModel();
         return array_merge_recursive(
             $selectFields,
