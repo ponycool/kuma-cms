@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: Pony
  * Date: 2023/11/23
- * Time: 07:44 上午
+ * Time: 07:49 上午
  */
 declare(strict_types=1);
 
@@ -11,7 +11,6 @@ namespace App\Entities;
 
 class Setting extends Base
 {
-    protected int $id = 0;
     protected string $key;
     protected string $value;
     protected string $created_at;
