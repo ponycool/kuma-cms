@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Enums\Setting;
+use App\Services\SettingService;
 use App\Traits\TemplateTrait;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -47,7 +49,7 @@ class Web extends Base
         $this->setTemplate('Home');
 
         // 设置默认主题
-        $this->setTheme('default');
+        $this->setTheme(self::getSettings()[Setting::theme->value] ?? 'default');
 
         // 设置全局数据
         $this->setData([]);
