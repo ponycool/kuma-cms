@@ -20,7 +20,6 @@ class Web extends Base
 {
     use TemplateTrait;
 
-    protected readonly string $themePath;
     // 模版
     protected string $template;
 
@@ -41,9 +40,6 @@ class Web extends Base
     {
         parent::initController($request, $response, $logger);
 
-        // 主题路径
-        $this->themePath = APPPATH . 'Views/themes/';
-
         // 设置默认模版
         $this->setTemplate('Home');
 
@@ -58,9 +54,9 @@ class Web extends Base
             ->setDescription('')
             ->setKeywords('');
 
-        // 开发环境下需同步静态资源
+        // 开发环境下需热同步静态资源
         if ('development' === ENVIRONMENT) {
-
+            $this->syncStaticAssets($this->getTheme());
         }
     }
 
