@@ -7,8 +7,9 @@
  */
 declare(strict_types=1);
 
-namespace App\Controllers\Api\Admin;
+namespace App\Controllers\Api;
 
+use App\Controllers\Api\Admin\Base;
 use App\Enums\Code;
 use CodeIgniter\HTTP\ResponseInterface;
 use Exception;
@@ -17,6 +18,7 @@ class Login extends Base
 {
     public function index(): ResponseInterface
     {
+
         try {
             $data = [
                 'code' => Code::OK,
