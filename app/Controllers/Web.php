@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Enums\Code;
 use App\Enums\Setting;
 use App\Traits\TemplateTrait;
 use CodeIgniter\HTTP\RequestInterface;
@@ -130,7 +131,7 @@ class Web extends Base
      * 渲染模版
      * @param array $data
      */
-    protected function render(array $data = []): void
+    protected function renderTemplate(array $data = []): void
     {
         try {
             if (is_null($this->getTemplate())) {
@@ -157,6 +158,22 @@ class Web extends Base
             );
             $this->error(500, $e->getMessage());
         }
+    }
+
+    /**
+     * 渲染
+     * @param array|string $data
+     * @return never
+     */
+    protected function render(array|string $data = []): never
+    {
+        if (is_string($data)) {
+            $data = [
+                'data' => $data
+            ];
+        }
+        $this->renderTemplate($data);
+        exit(Code::OK->value);
     }
 
     /**

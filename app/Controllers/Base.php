@@ -8,15 +8,21 @@
 
 namespace App\Controllers;
 
+use App\Enums\Code;
 use App\Services\SettingService;
+use CodeIgniter\API\ResponseTrait;
 use CodeIgniter\Files\FileCollection;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
+use Config\Services;
 use Exception;
+use OutOfRangeException;
 use Psr\Log\LoggerInterface;
 
 class Base extends BaseController
 {
+    use ResponseTrait;
+
     protected readonly string $version;
     protected array $settings;
 
@@ -94,11 +100,6 @@ class Base extends BaseController
         }
     }
 
-    private function register()
-    {
-        // todo 注册到云平台
-    }
-
     /**
      * 拷贝目录
      * @param $source
@@ -131,6 +132,281 @@ class Base extends BaseController
     }
 
     /**
+     * 渲染数据
+     * @param array|string $data
+     * @return never
+     */
+    protected function render(array|string $data = [])
+    {
+        $resp = [
+            'OK' => 'OK',
+            'code' => Code::OK,
+            'message' => '',
+            'data' => []
+        ];
+        if (is_string($data)) {
+            $resp['message'] = $data;
+        }
+        if (is_array($data)) {
+            $code = $data['code'] ?? Code::FAIL;
+            try {
+                if (!is_object($code)) {
+                    throw new OutOfRangeException();
+                }
+                $resp['code'] = $code->value;
+            } catch (OutOfRangeException $exc) {
+                log_message('error', $exc->getMessage());
+                $resp['code'] = Code::FAIL->value;
+            }
+            if ($resp['code']) {
+                unset($resp['OK']);
+            }
+            $resp['message'] = $data['message'] ?? ($data['code'] ?? Code::FAIL)->name;
+            unset($data['code']);
+            unset($data['message']);
+            if (!empty($data)) {
+                $resp['data'] = $data;
+            } else {
+                unset($resp['data']);
+            }
+        }
+        $this->respond($resp, 200)
+            ->send();
+        exit(Code::OK->value);
+    }
+
+    /**
+     * POST过滤器
+     */
+    protected function postFilter(): void
+    {
+        $method = $this->request->getMethod();
+        try {
+            if ('POST' !== strtoupper($method)) {
+                throw new Exception('请求方法受限，请使用POST方法提交请求', Code::METHOD_NOT_SUPPORTED->value);
+            }
+        } catch (Exception $exception) {
+            $data = [
+                'code' => Code::METHOD_NOT_SUPPORTED,
+                'message' => $exception->getMessage(),
+            ];
+            $this->render($data);
+        }
+    }
+
+    /**
+     * 有效输入验证
+     * @param array $rules
+     */
+    protected function validInput(array $rules): void
+    {
+        if ($this->isJsonRequest()) {
+            $this->verifyJsonInputByRules($rules);
+        } else {
+            $this->verifyInputByRules($rules);
+        }
+    }
+
+    /**
+     * 是否为JSON请求
+     * @return bool
+     */
+    protected function isJsonRequest(): bool
+    {
+        $contentType = $this->request->getHeaderLine('Content-Type');
+        $validContentTypes = [
+            'application/json',
+            'application/json;charset=utf-8',
+            'application/json;charset=UTF-8'
+        ];
+        if (in_array($contentType, $validContentTypes, true)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 判断是否是JSON
+     * @param $str
+     * @return bool
+     */
+    protected function isJsonStr($str): bool
+    {
+        if (is_string($str)) {
+            @json_decode($str);
+            return (json_last_error() === JSON_ERROR_NONE);
+        }
+        return false;
+    }
+
+    /**
+     * 校验JSON输入
+     * @param array $data
+     */
+    protected function verifyJsonInputByRules(array $data): void
+    {
+        try {
+            if (!$this->isJsonRequest()) {
+                throw new Exception('无效的Content-Type', Code::INVALID_HTTP_CONTENT_TYPE->value);
+            }
+            $rawInput = file_get_contents('php://input');
+            if (strlen($rawInput) === 0) {
+                throw new Exception('无效的JSON格式', Code::INVALID_JSON_FORMAT->value);
+            }
+            if (!$this->isJsonStr($rawInput)) {
+                throw new Exception('无效的JSON格式', Code::INVALID_JSON_FORMAT->value);
+            }
+            $params = $this->request->getJSON(true);
+            $validation = Services::validation();
+            $errors = [];
+
+            foreach ($data as $k => $v) {
+                $param = $params[$k] ?? '';
+                $rules = explode('|', $v['rules']);
+                if (in_array('if_exist', $rules, true)) {
+                    if (!key_exists($k, $params)) {
+                        continue;
+                    }
+                }
+                foreach ($rules as $rule) {
+                    if (!str_contains($rule, '[')) {
+                        $error = [
+                            $rule => $rule !== 'if_exist' ? $v['errors'][$rule] : ''
+                        ];
+                    } else {
+                        $error = [
+                            strchr($rule, '[', true) => $v['errors'][strchr($rule, '[', true)]
+                        ];
+                    }
+                    $validation->check($param, $rule, $error);
+                    if ($validation->hasError('check')) {
+                        $errors = array_merge(
+                            $errors,
+                            [
+                                $k => $validation->getError('check'),
+                            ]
+                        );
+                    }
+                }
+            }
+            if (count($errors) !== 0) {
+                $data = [
+                    'code' => Code::FAIL,
+                    'message' => '输入参数无效',
+                    'errors' => $errors,
+                ];
+                $this->render($data);
+            }
+        } catch (Exception $e) {
+            $msg = '校验JSON输入，校验规则无效。error: ' . $e->getMessage();
+            $data = [
+                'code' => Code::SYSTEM_ERROR,
+                'message' => '服务器异常，请稍后再试',
+            ];
+            if ($e->getCode() !== 0) {
+                $msg = $e->getMessage();
+                $data = [
+                    'code' => Code::tryFrom($e->getCode()),
+                    'message' => $e->getMessage(),
+                ];
+            }
+            log_message('error', $msg);
+            $this->render($data);
+        }
+    }
+
+    /**
+     * 根据规则验证输入
+     * @param array $rules
+     */
+    protected function verifyInputByRules(array $rules): void
+    {
+        $data = [
+            'type' => 'rules',
+            'rules' => $rules
+        ];
+        $this->validation($data);
+    }
+
+    /**
+     * 输入验证
+     * @param array $data
+     */
+    protected function validation(array $data): void
+    {
+        $type = $data['type'] ?? 'rules';
+        if ('ruleGroup' === $type) {
+            $rules = $data['rules'] ?? '';
+        } else {
+            $rules = $data['rules'] ?? [];
+        }
+        $validation = Services::validation();
+        switch ($type) {
+            case 'rules':
+                $validation->setRules($rules);
+                break;
+            case 'ruleGroup':
+                $validation->setRuleGroup($rules);
+                break;
+        }
+        $verifyRes = $validation->withRequest($this->request)->run();
+        if (!$verifyRes) {
+            $errors = $validation->getErrors();
+            $data = [
+                'code' => Code::FAIL,
+                'message' => '输入参数无效',
+                'errors' => $errors,
+            ];
+            $this->render($data);
+        }
+    }
+
+    /**
+     * 获取参数
+     * @param string $key
+     * @return string|null
+     */
+    protected function getParam(string $key): ?string
+    {
+        if ($this->isJsonRequest()) {
+            return $this->getJsonInputParam($key);
+        }
+        $param = $this->request->getGetPost($key);
+        if (!is_null($param)) {
+            return $param;
+        }
+        // 尝试从原始输入用获取Token
+        $rawInput = $this->request->getRawInput();
+        if (!is_null($rawInput) && key_exists($key, $rawInput)) {
+            return $rawInput[$key];
+        }
+        return $this->request->getVar($key);
+    }
+
+    /**
+     * 获取输入的JSON数据的全部参数
+     * @return array
+     */
+    protected function getJsonInputParams(): array
+    {
+        return $this->request->getJSON(true);
+    }
+
+    /**
+     * 获取输入的JSON数据的参数的值
+     * @param string $key
+     * @return string|null
+     */
+    protected function getJsonInputParam(string $key): ?string
+    {
+        $params = $this->getJsonInputParams();
+        if (key_exists($key, $params)) {
+            return (string)$params[$key];
+        }
+        return null;
+    }
+
+    /**
      * 初始化配置
      * @return void
      */
@@ -143,5 +419,11 @@ class Base extends BaseController
             $settings[$item['key']] = $item['value'];
         }
         $this->setSettings($settings);
+    }
+
+
+    private function register()
+    {
+        // todo 注册到云平台
     }
 }
