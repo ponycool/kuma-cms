@@ -22,24 +22,24 @@ class Login extends Base
     {
         $this->postFilter();
         $rules = [
-            'account_name' => [
+            'accountName' => [
                 'rules' => 'required|min_length[4]',
                 'errors' => [
-                    'required' => '缺少参数账户名称account_name',
+                    'required' => '缺少参数账户名称accountName',
                     'min_length' => '账户名称无效，至少需要4个字符'
                 ]
             ],
-            'pwd' => [
+            'password' => [
                 'rules' => 'required|min_length[6]',
                 'errors' => [
-                    'required' => '缺少参数密码pwd',
+                    'required' => '缺少参数密码password',
                     'min_length' => '密码无效，至少需要6个字符'
                 ]
             ]
         ];
         $this->validInput($rules);
-        $accountName = $this->getParam('account_name');
-        $pwd = $this->getParam('pwd');
+        $accountName = $this->getParam('accountName');
+        $pwd = $this->getParam('password');
         try {
             if (!is_string($accountName) || !is_string($pwd)) {
                 throw new Exception('用户名称或者密码无效');
