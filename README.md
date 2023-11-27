@@ -1,7 +1,5 @@
 ## 酷码CMS
 
-## 描述
-
 基于Codeigniter4和React的快速建站系统
 
 ## Badges
