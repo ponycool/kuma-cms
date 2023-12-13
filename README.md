@@ -12,13 +12,11 @@ project. You can use Shields to add some to your README. Many services also have
 Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see
 GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
 
-## Installation
+## 安装
 
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew.
-However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing
-specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a
-specific context like a particular programming language version or operating system or has dependencies that have to be
-installed manually, also add a Requirements subsection.
+### 系统要求
+我们推荐服务器运行PHP 8.2或更高版本；数据库软件可采用MySQL 5.7或更高版本，也可采用MariaDB 10.3或更高版本。
+我们也推荐Apache或Nginx作为运行KumaCMS的可靠选项，但您也可以选择其他HTTP服务器软件。
 
 ## Usage
 
