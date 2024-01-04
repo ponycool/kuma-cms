@@ -3,21 +3,21 @@
  * Created by PhpStorm.
  * User: Pony
  * Date: 2024/01/04
- * Time: 01:46 上午
+ * Time: 01:47 上午
  */
 declare(strict_types=1);
 
 namespace App\Entities;
 
-class Account extends Base
+class Link extends Base
 {
     protected int $id = 0;
-    protected string $account_name;
-    protected string $password;
-    protected string $salt;
-    protected string $email;
-    protected int $locked;
-    protected string $locked_at;
+    protected string $link_name;
+    protected string $link_url;
+    protected string $link_desc;
+    protected string $link_image;
+    protected string $target;
+    protected int $is_visible;
     protected string $created_at;
     protected string $updated_at;
     protected string $deleted_at;
@@ -45,7 +45,7 @@ class Account extends Base
      * @param int $id
      * @return $this
      */
-    public function setId(int $id): Account
+    public function setId(int $id): Link
     {
         $this->id = $id;
         $this->attributes['id'] = $this->id;
@@ -55,114 +55,114 @@ class Account extends Base
     /**
      * @return string
      */
-    public function getAccountName(): string
+    public function getLinkName(): string
     {
-        return $this->account_name;
+        return $this->link_name;
     }
 
     /**
-     * @param string $account_name
+     * @param string $link_name
      * @return $this
      */
-    public function setAccountName(string $account_name): Account
+    public function setLinkName(string $link_name): Link
     {
-        $this->account_name = $account_name;
-        $this->attributes['account_name'] = $this->account_name;
+        $this->link_name = $link_name;
+        $this->attributes['link_name'] = $this->link_name;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getPassword(): string
+    public function getLinkUrl(): string
     {
-        return $this->password;
+        return $this->link_url;
     }
 
     /**
-     * @param string $password
+     * @param string $link_url
      * @return $this
      */
-    public function setPassword(string $password): Account
+    public function setLinkUrl(string $link_url): Link
     {
-        $this->password = $password;
-        $this->attributes['password'] = $this->password;
+        $this->link_url = $link_url;
+        $this->attributes['link_url'] = $this->link_url;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getSalt(): string
+    public function getLinkDesc(): string
     {
-        return $this->salt;
+        return $this->link_desc;
     }
 
     /**
-     * @param string $salt
+     * @param string $link_desc
      * @return $this
      */
-    public function setSalt(string $salt): Account
+    public function setLinkDesc(string $link_desc): Link
     {
-        $this->salt = $salt;
-        $this->attributes['salt'] = $this->salt;
+        $this->link_desc = $link_desc;
+        $this->attributes['link_desc'] = $this->link_desc;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getEmail(): string
+    public function getLinkImage(): string
     {
-        return $this->email;
+        return $this->link_image;
     }
 
     /**
-     * @param string $email
+     * @param string $link_image
      * @return $this
      */
-    public function setEmail(string $email): Account
+    public function setLinkImage(string $link_image): Link
     {
-        $this->email = $email;
-        $this->attributes['email'] = $this->email;
+        $this->link_image = $link_image;
+        $this->attributes['link_image'] = $this->link_image;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTarget(): string
+    {
+        return $this->target;
+    }
+
+    /**
+     * @param string $target
+     * @return $this
+     */
+    public function setTarget(string $target): Link
+    {
+        $this->target = $target;
+        $this->attributes['target'] = $this->target;
         return $this;
     }
 
     /**
      * @return int
      */
-    public function getLocked(): int
+    public function getIsVisible(): int
     {
-        return $this->locked;
+        return $this->is_visible;
     }
 
     /**
-     * @param int $locked
+     * @param int $is_visible
      * @return $this
      */
-    public function setLocked(int $locked): Account
+    public function setIsVisible(int $is_visible): Link
     {
-        $this->locked = $locked;
-        $this->attributes['locked'] = $this->locked;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLockedAt(): string
-    {
-        return $this->locked_at;
-    }
-
-    /**
-     * @param string $locked_at
-     * @return $this
-     */
-    public function setLockedAt(string $locked_at): Account
-    {
-        $this->locked_at = $locked_at;
-        $this->attributes['locked_at'] = $this->locked_at;
+        $this->is_visible = $is_visible;
+        $this->attributes['is_visible'] = $this->is_visible;
         return $this;
     }
 

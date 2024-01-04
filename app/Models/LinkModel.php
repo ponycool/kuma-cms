@@ -9,19 +9,19 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-class AccountModel extends BaseModel
+class LinkModel extends BaseModel
 {
-    protected $table = 'account';
+    protected $table = 'link';
     protected $primaryKey = 'id';
-    protected $returnType = 'App\Entities\Account';
+    protected $returnType = 'App\Entities\Link';
     protected $useSoftDeletes = true;
     protected $allowedFields = [
-        'account_name',
-        'password',
-        'salt',
-        'email',
-        'locked',
-        'locked_at',
+        'link_name',
+        'link_url',
+        'link_desc',
+        'link_image',
+        'target',
+        'is_visible',
     ];
     protected $useTimestamps = true;
     protected $createdField = 'created_at';

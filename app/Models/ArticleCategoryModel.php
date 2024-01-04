@@ -9,19 +9,19 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-class AccountModel extends BaseModel
+class ArticleCategoryModel extends BaseModel
 {
-    protected $table = 'account';
+    protected $table = 'article_category';
     protected $primaryKey = 'id';
-    protected $returnType = 'App\Entities\Account';
+    protected $returnType = 'App\Entities\ArticleCategory';
     protected $useSoftDeletes = true;
     protected $allowedFields = [
-        'account_name',
-        'password',
-        'salt',
-        'email',
-        'locked',
-        'locked_at',
+        'pid',
+        'name',
+        'icon',
+        'code',
+        'level',
+        'sort_index',
     ];
     protected $useTimestamps = true;
     protected $createdField = 'created_at';

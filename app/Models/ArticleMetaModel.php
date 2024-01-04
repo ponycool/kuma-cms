@@ -9,19 +9,16 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-class AccountModel extends BaseModel
+class ArticleMetaModel extends BaseModel
 {
-    protected $table = 'account';
+    protected $table = 'article_meta';
     protected $primaryKey = 'id';
-    protected $returnType = 'App\Entities\Account';
+    protected $returnType = 'App\Entities\ArticleMeta';
     protected $useSoftDeletes = true;
     protected $allowedFields = [
-        'account_name',
-        'password',
-        'salt',
-        'email',
-        'locked',
-        'locked_at',
+        'article_id',
+        'meta_key',
+        'meta_value',
     ];
     protected $useTimestamps = true;
     protected $createdField = 'created_at';

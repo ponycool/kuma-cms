@@ -9,10 +9,12 @@ declare(strict_types=1);
 
 namespace App\Entities;
 
-class Setting extends Base
+class UserMeta extends Base
 {
-    protected string $key;
-    protected string $value;
+    protected int $id = 0;
+    protected int $user_id;
+    protected string $meta_key;
+    protected string $meta_value;
     protected string $created_at;
     protected string $updated_at;
     protected string $deleted_at;
@@ -40,7 +42,7 @@ class Setting extends Base
      * @param int $id
      * @return $this
      */
-    public function setId(int $id): Setting
+    public function setId(int $id): UserMeta
     {
         $this->id = $id;
         $this->attributes['id'] = $this->id;
@@ -48,40 +50,59 @@ class Setting extends Base
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getKey(): string
+    public function getUserId(): int
     {
-        return $this->key;
+        return $this->user_id;
     }
 
     /**
-     * @param string $key
+     * @param int $user_id
      * @return $this
      */
-    public function setKey(string $key): Setting
+    public function setUserId(int $user_id): UserMeta
     {
-        $this->key = $key;
-        $this->attributes['key'] = $this->key;
+        $this->user_id = $user_id;
+        $this->attributes['user_id'] = $this->user_id;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getValue(): string
+    public function getMetaKey(): string
     {
-        return $this->value;
+        return $this->meta_key;
     }
 
     /**
-     * @param string $value
+     * @param string $meta_key
      * @return $this
      */
-    public function setValue(string $value): Setting
+    public function setMetaKey(string $meta_key): UserMeta
     {
-        $this->value = $value;
-        $this->attributes['value'] = $this->value;
+        $this->meta_key = $meta_key;
+        $this->attributes['meta_key'] = $this->meta_key;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMetaValue(): string
+    {
+        return $this->meta_value;
+    }
+
+    /**
+     * @param string $meta_value
+     * @return $this
+     */
+    public function setMetaValue(string $meta_value): UserMeta
+    {
+        $this->meta_value = $meta_value;
+        $this->attributes['meta_value'] = $this->meta_value;
         return $this;
     }
 

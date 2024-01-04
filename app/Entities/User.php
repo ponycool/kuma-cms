@@ -3,16 +3,17 @@
  * Created by PhpStorm.
  * User: Pony
  * Date: 2024/01/04
- * Time: 01:47 上午
+ * Time: 01:46 上午
  */
 declare(strict_types=1);
 
 namespace App\Entities;
 
-class Setting extends Base
+class User extends Base
 {
-    protected string $key;
-    protected string $value;
+    protected int $id = 0;
+    protected int $account_id;
+    protected string $nickname;
     protected string $created_at;
     protected string $updated_at;
     protected string $deleted_at;
@@ -40,7 +41,7 @@ class Setting extends Base
      * @param int $id
      * @return $this
      */
-    public function setId(int $id): Setting
+    public function setId(int $id): User
     {
         $this->id = $id;
         $this->attributes['id'] = $this->id;
@@ -48,40 +49,40 @@ class Setting extends Base
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getKey(): string
+    public function getAccountId(): int
     {
-        return $this->key;
+        return $this->account_id;
     }
 
     /**
-     * @param string $key
+     * @param int $account_id
      * @return $this
      */
-    public function setKey(string $key): Setting
+    public function setAccountId(int $account_id): User
     {
-        $this->key = $key;
-        $this->attributes['key'] = $this->key;
+        $this->account_id = $account_id;
+        $this->attributes['account_id'] = $this->account_id;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getValue(): string
+    public function getNickname(): string
     {
-        return $this->value;
+        return $this->nickname;
     }
 
     /**
-     * @param string $value
+     * @param string $nickname
      * @return $this
      */
-    public function setValue(string $value): Setting
+    public function setNickname(string $nickname): User
     {
-        $this->value = $value;
-        $this->attributes['value'] = $this->value;
+        $this->nickname = $nickname;
+        $this->attributes['nickname'] = $this->nickname;
         return $this;
     }
 

@@ -3,21 +3,21 @@
  * Created by PhpStorm.
  * User: Pony
  * Date: 2024/01/04
- * Time: 01:46 上午
+ * Time: 01:47 上午
  */
 declare(strict_types=1);
 
 namespace App\Entities;
 
-class Account extends Base
+class ArticleCategory extends Base
 {
     protected int $id = 0;
-    protected string $account_name;
-    protected string $password;
-    protected string $salt;
-    protected string $email;
-    protected int $locked;
-    protected string $locked_at;
+    protected int $pid;
+    protected string $name;
+    protected int $icon;
+    protected string $code;
+    protected int $level;
+    protected int $sort_index;
     protected string $created_at;
     protected string $updated_at;
     protected string $deleted_at;
@@ -45,7 +45,7 @@ class Account extends Base
      * @param int $id
      * @return $this
      */
-    public function setId(int $id): Account
+    public function setId(int $id): ArticleCategory
     {
         $this->id = $id;
         $this->attributes['id'] = $this->id;
@@ -53,116 +53,116 @@ class Account extends Base
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getAccountName(): string
+    public function getPid(): int
     {
-        return $this->account_name;
+        return $this->pid;
     }
 
     /**
-     * @param string $account_name
+     * @param int $pid
      * @return $this
      */
-    public function setAccountName(string $account_name): Account
+    public function setPid(int $pid): ArticleCategory
     {
-        $this->account_name = $account_name;
-        $this->attributes['account_name'] = $this->account_name;
+        $this->pid = $pid;
+        $this->attributes['pid'] = $this->pid;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getPassword(): string
+    public function getName(): string
     {
-        return $this->password;
+        return $this->name;
     }
 
     /**
-     * @param string $password
+     * @param string $name
      * @return $this
      */
-    public function setPassword(string $password): Account
+    public function setName(string $name): ArticleCategory
     {
-        $this->password = $password;
-        $this->attributes['password'] = $this->password;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSalt(): string
-    {
-        return $this->salt;
-    }
-
-    /**
-     * @param string $salt
-     * @return $this
-     */
-    public function setSalt(string $salt): Account
-    {
-        $this->salt = $salt;
-        $this->attributes['salt'] = $this->salt;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getEmail(): string
-    {
-        return $this->email;
-    }
-
-    /**
-     * @param string $email
-     * @return $this
-     */
-    public function setEmail(string $email): Account
-    {
-        $this->email = $email;
-        $this->attributes['email'] = $this->email;
+        $this->name = $name;
+        $this->attributes['name'] = $this->name;
         return $this;
     }
 
     /**
      * @return int
      */
-    public function getLocked(): int
+    public function getIcon(): int
     {
-        return $this->locked;
+        return $this->icon;
     }
 
     /**
-     * @param int $locked
+     * @param int $icon
      * @return $this
      */
-    public function setLocked(int $locked): Account
+    public function setIcon(int $icon): ArticleCategory
     {
-        $this->locked = $locked;
-        $this->attributes['locked'] = $this->locked;
+        $this->icon = $icon;
+        $this->attributes['icon'] = $this->icon;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getLockedAt(): string
+    public function getCode(): string
     {
-        return $this->locked_at;
+        return $this->code;
     }
 
     /**
-     * @param string $locked_at
+     * @param string $code
      * @return $this
      */
-    public function setLockedAt(string $locked_at): Account
+    public function setCode(string $code): ArticleCategory
     {
-        $this->locked_at = $locked_at;
-        $this->attributes['locked_at'] = $this->locked_at;
+        $this->code = $code;
+        $this->attributes['code'] = $this->code;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLevel(): int
+    {
+        return $this->level;
+    }
+
+    /**
+     * @param int $level
+     * @return $this
+     */
+    public function setLevel(int $level): ArticleCategory
+    {
+        $this->level = $level;
+        $this->attributes['level'] = $this->level;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSortIndex(): int
+    {
+        return $this->sort_index;
+    }
+
+    /**
+     * @param int $sort_index
+     * @return $this
+     */
+    public function setSortIndex(int $sort_index): ArticleCategory
+    {
+        $this->sort_index = $sort_index;
+        $this->attributes['sort_index'] = $this->sort_index;
         return $this;
     }
 
