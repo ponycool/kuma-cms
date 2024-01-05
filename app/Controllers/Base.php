@@ -407,6 +407,34 @@ class Base extends BaseController
     }
 
     /**
+     * 是否是API请求
+     * @return bool
+     */
+    protected function isApiRequest(): bool
+    {
+        $uri = service('uri');
+        $segments = $uri->getSegments();
+        $firstSegment = $segments[0] ?? null;
+        return $firstSegment === 'api';
+    }
+
+    /**
+     * 是否是开放API请求
+     * @return bool
+     */
+    protected function isOpenApiRequest(): bool
+    {
+        if (!$this->isApiRequest()) {
+            return false;
+        }
+
+        $uri = service('uri');
+        $segments = $uri->getSegments();
+        $secondSegment = $segments[1] ?? null;
+        return $secondSegment === 'open';
+    }
+
+    /**
      * 初始化配置
      * @return void
      */
