@@ -136,7 +136,7 @@ class Base extends BaseController
      * @param array|string $data
      * @return never
      */
-    protected function render(array|string $data = [])
+    protected function render(array|string $data = []): never
     {
         $resp = [
             'OK' => 'OK',
