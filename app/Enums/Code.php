@@ -23,4 +23,8 @@ enum Code: int
     case INVALID_HTTP_CONTENT_TYPE = 4;
     // 无效的JSON格式
     case INVALID_JSON_FORMAT = 5;
+    // 未授权
+    case UNAUTHORIZED = 6;
+    // 无效的令牌
+    case INVALID_TOKEN = 7;
 }
