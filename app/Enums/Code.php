@@ -27,4 +27,8 @@ enum Code: int
     case UNAUTHORIZED = 6;
     // 无效的令牌
     case INVALID_TOKEN = 7;
+    // 未配置JWR密钥
+    case JWT_SECRET_NOT_EXISTS = 8;
+    // 无效的JWT密钥
+    case INVALID_JWT_SECRET = 9;
 }
