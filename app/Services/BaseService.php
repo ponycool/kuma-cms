@@ -142,4 +142,68 @@ class BaseService
             ->findAll();
         return (array)$res;
     }
+
+    /**
+     * 根据查询条件获取所有符合条件的数据
+     * @param array $cond
+     * @param string|null $orderField
+     * @param string $order
+     * @return array
+     */
+    public function getByCond(array $cond, ?string $orderField = null, string $order = 'DESC'): array
+    {
+        $model = $this->getModel();
+        $builder = $model->asArray();
+        foreach ($cond as $k => $v) {
+            if (is_object($v)) {
+                break;
+            }
+            if (is_array($v)) {
+                $builder->whereIn($k, $v);
+                continue;
+            }
+            $builder->where($k, $v);
+        }
+        if (is_null($orderField)) {
+            $orderField = 'created_at';
+        }
+        $res = $builder->orderBy($orderField, $order)
+            ->findAll();
+        return (array)$res;
+    }
+
+    /**
+     * 根据查询条件获取一条符合条件的数据
+     * @param array $cond
+     * @param string|null $orderField 排序字段
+     * @param string $order
+     * @return array
+     */
+    public function getFirstByCond(array $cond, ?string $orderField = null, string $order = 'DESC'): array
+    {
+        $model = $this->getModel();
+        $builder = $model->asArray()
+            ->select($this->getSelectFields());
+        foreach ($cond as $k => $v) {
+            if (is_null($v)) {
+                continue;
+            }
+            if (is_object($v)) {
+                break;
+            }
+            if (is_array($v)) {
+                $builder->whereIn($k, $v);
+                continue;
+            }
+            $builder->where($k, $v);
+        }
+
+        if (!is_null($orderField)) {
+            $builder->orderBy($orderField, $order);
+        }
+
+        $res = $builder->limit(1)
+            ->first();
+        return (array)$res;
+    }
 }
