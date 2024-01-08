@@ -11,8 +11,4 @@ namespace App\Services;
 
 class AccountService extends BaseService
 {
-    public function login(string $accountName, string $password, int $expiresIn = WEEK): bool|string
-    {
-        return false;
-    }
 }
