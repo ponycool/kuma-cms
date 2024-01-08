@@ -13,6 +13,8 @@ namespace App\Services;
 use CodeIgniter\Database\BaseConnection;
 use CodeIgniter\Database\ConnectionInterface;
 use Config\Database;
+use Config\Services;
+use Exception;
 
 class BaseService
 {
@@ -107,6 +109,24 @@ class BaseService
     public function setModel(object $model): void
     {
         $this->model = $model;
+    }
+
+    /**
+     * 校验数据
+     * @param object $model
+     * @param object $entity
+     * @return array|null
+     */
+    public function verificationData(object $model, object $entity): ?array
+    {
+        $validation = Services::validation();
+        $validation->setRules($model->getValidationRules(), $model->getValidationMessages());
+        $validation->run($entity->toRawArray());
+        $errors = $validation->getErrors();
+        if (count($errors) !== 0) {
+            return $errors;
+        }
+        return null;
     }
 
     /**
@@ -205,5 +225,38 @@ class BaseService
         $res = $builder->limit(1)
             ->first();
         return (array)$res;
+    }
+
+    /**
+     * 插入一条数据
+     * @param object $entity 实体
+     * @return bool
+     */
+    public function insert(object $entity): bool
+    {
+        $table = $this->getTable();
+        $model = $this->getModel();
+        try {
+            $verificationRes = $this->verificationData($model, $entity);
+            if (!is_null($verificationRes)) {
+                throw new Exception('属性无效，未通过验证策略校验。');
+            }
+
+            $res = $model->insert($entity);
+            if ($res === false) {
+                throw new Exception('执行SQL失败');
+            }
+            return (bool)$res;
+        } catch (Exception $e) {
+            log_message(
+                'error',
+                '{table} reset record insert failed, err: {msg}',
+                [
+                    'table' => $table,
+                    'msg' => $e->getMessage()
+                ]
+            );
+            return false;
+        }
     }
 }
