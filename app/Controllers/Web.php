@@ -42,7 +42,7 @@ class Web extends Base
         parent::initController($request, $response, $logger);
 
         // 设置默认模版
-        $this->setTemplate('Home');
+        $this->setTemplate('home');
 
         // 设置默认主题
         $this->setTheme(self::getSettings()[Setting::theme->value] ?? 'default');
