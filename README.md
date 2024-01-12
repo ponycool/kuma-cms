@@ -11,12 +11,14 @@
 ## 安装
 
 ### 系统要求
+
 我们推荐服务器运行PHP 8.2或更高版本；数据库软件可采用MySQL 5.7或更高版本，也可采用MariaDB 10.3或更高版本。
 我们也推荐Apache或Nginx作为运行KumaCMS的可靠选项，但您也可以选择其他HTTP服务器软件。
 
 ## Usage
 
 ### 配置
+
 JWT密钥，必须为32位随机字符串，示例如下：
 
 jwt.secret = 0W************IZAa
@@ -24,6 +26,61 @@ jwt.secret = 0W************IZAa
 Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of
 usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably
 include in the README.
+
+### 编译镜像
+
+```shell
+# 编译镜像
+make build
+# 编译指定版本镜像
+# make -e version=1.0.0 build
+# 手动本地编译镜像
+# docker build -t ponycool/kumacms:latest .
+# 查看已经安装PHP模块，容器内执行
+# php -m
+# 镜像测试端口8080
+# docker run -it --rm -p 9000:8080 --name kumacms ponycool/kumacms:latest
+```
+### 镜像已安装模块
+```
+[PHP Modules]
+Core
+ctype
+curl
+date
+dom
+fileinfo
+filter
+ftp
+gd
+hash
+iconv
+intl
+json
+libxml
+mbstring
+mysqlnd
+openssl
+pcre
+PDO
+pdo_sqlite
+Phar
+posix
+random
+readline
+Reflection
+session
+SimpleXML
+sodium
+SPL
+sqlite3
+standard
+tokenizer
+xml
+xmlreader
+xmlwriter
+zlib
+```
 
 ## 二次开发
 
@@ -40,9 +97,11 @@ php spark model:generate
 ```
 
 #### 生成服务
+
 ```shell
 php spark service:generate
 ```
+
 ## Support
 
 Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address,
