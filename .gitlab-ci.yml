@@ -10,7 +10,8 @@ build:
   services:
     - docker:dind
   before_script:
-    - apk update
+    - sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
+    - apk update && apk upgrade
     - apk add make
     - apk add php82
     - apk add composer
