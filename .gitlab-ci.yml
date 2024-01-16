@@ -14,6 +14,16 @@ build:
     - apk update && apk upgrade
     - apk add make
     - apk add php82
+    - apk add php-intl
+    - apk add php-redis
+    - apk add php-tokenizer
+    - apk add php-dom
+    - apk add php-curl
+    - apk add php-iconv
+    - apk add php-mbstring
+    - apk add php-openssl
+    - apk add php-zip
+    - apk add php-phar
     - apk add composer
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
   script:
