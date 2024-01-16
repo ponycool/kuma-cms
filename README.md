@@ -15,7 +15,28 @@
 我们推荐服务器运行PHP 8.2或更高版本；数据库软件可采用MySQL 5.7或更高版本，也可采用MariaDB 10.3或更高版本。
 我们也推荐Apache或Nginx作为运行KumaCMS的可靠选项，但您也可以选择其他HTTP服务器软件。
 
-## Usage
+
+### 使用docker运行
+
+```shell
+# 数据持久化，请使用具名挂载的方式进行挂载
+docker run -d -p 80:80 -v kumacms-data:/opt/kumacms/writable/data --name kumacms ponycool/kumacms:latest
+```
+
+## 使用
+
+### 访问
+
+安装成功后，通过浏览器访问KumaCMS
+
+```
+# 前台
+地址: http://<KumaCMS服务器IP地址>:<服务运行端口>
+# 后台
+地址: http://<KumaCMS服务器IP地址>:<服务运行端口>/admin/#/login
+用户名: admin
+密码: kumacms
+```
 
 ### 配置
 
@@ -41,7 +62,9 @@ make build
 # 镜像测试端口8080
 # docker run -it --rm -p 9000:8080 --name kumacms ponycool/kumacms:latest
 ```
+
 ### 镜像已安装模块
+
 ```
 [PHP Modules]
 Core
