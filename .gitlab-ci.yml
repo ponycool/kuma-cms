@@ -35,6 +35,8 @@ deploy:
   stage: deploy
   image: alpine
   before_script:
+    - sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
+    - apk update && apk upgrade
     - 'which ssh-agent || ( apk update && apk add openssh-client git )'
     - eval $(ssh-agent -s)
     - echo "$DEMO_SERVER_KEY" | tr -d '\r' | ssh-add -
