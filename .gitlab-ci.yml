@@ -26,7 +26,7 @@ build:
         echo "This is a release"
       fi
   rules:
-    - if: $CI_COMMIT_BRANCH
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       exists:
         - Dockerfile
 
@@ -47,6 +47,6 @@ deploy:
   script:
     - ssh $DEMO_SERVER_USER@$DEMO_SERVER_HOST
       "cd /opt/proxy/docker-compose && sudo docker-compose pull kumacms && sudo  docker-compose restart kumacms"
-#  rules:
-#    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
