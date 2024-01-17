@@ -11,9 +11,9 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/re
     && apk update && apk upgrade
 
 # 设置时区
-#RUN apk add tzdata \
-#    && ln -snf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
-#    && echo ${TIMEZONE} > /etc/timezone
+RUN apk add tzdata \
+    && ln -snf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
+    && echo ${TIMEZONE} > /etc/timezone
 
 
 # 安装Nginx
@@ -90,5 +90,5 @@ EXPOSE 80
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
-# Configure a healthcheck to validate that everything is up&running
+# 配置健康检查以验证一切是否已启动并正在运行
 HEALTHCHECK --timeout=10s CMD curl --silent --fail http://127.0.0.1/fpm-ping
