@@ -43,9 +43,9 @@ deploy:
     - ssh-keyscan $DEMO_SERVER_HOST >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
   script:
-    - ssh root@$DEMO_SERVER_HOST
-      "docker ps \
-      && docker images"
+    - ssh $DEMO_SERVER_USER@$DEMO_SERVER_HOST
+      "sudo docker ps \
+      && sudo docker images"
 #  rules:
 #    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
