@@ -44,8 +44,7 @@ deploy:
     - chmod 644 ~/.ssh/known_hosts
   script:
     - ssh $DEMO_SERVER_USER@$DEMO_SERVER_HOST
-      "sudo docker ps \
-      && sudo docker images"
+      "sudo docker ps"
 #  rules:
 #    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
