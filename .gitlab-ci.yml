@@ -13,7 +13,7 @@ build:
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
     - composer install
-    - update-binfmts --enable
+    - docker run --rm --privileged linuxkit/binfmt:v0.8
   script:
     - make build
 #    - docker build -t "$DOCKER_IMAGE_NAME" .
