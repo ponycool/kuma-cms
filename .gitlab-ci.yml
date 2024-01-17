@@ -14,14 +14,12 @@ build:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
     - composer install
   script:
-    - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes; docker buildx create --use
-    - make build
-#    - docker build -t "$DOCKER_IMAGE_NAME" .
-#    - |
-#      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
-#        docker tag "$DOCKER_IMAGE_NAME" "$CI_REGISTRY_IMAGE:latest"
-#        docker push "$CI_REGISTRY_IMAGE:latest"
-#      fi
+    - docker build -t "$DOCKER_IMAGE_NAME" .
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        docker tag "$DOCKER_IMAGE_NAME" "$CI_REGISTRY_IMAGE:latest"
+        docker push "$CI_REGISTRY_IMAGE:latest"
+      fi
   rules:
     - if: $CI_COMMIT_BRANCH
       exists:
