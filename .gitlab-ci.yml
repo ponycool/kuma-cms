@@ -15,8 +15,8 @@ build:
     - composer install
     - apk add git
   script:
-    - echo $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-    - echo $DOCKER_IMAGE_NAME
+    - echo "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+    - echo "$DOCKER_IMAGE_NAME"
     - docker build -t "$DOCKER_IMAGE_NAME" .
     - |
       if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
