@@ -11,9 +11,9 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/re
     && apk update && apk upgrade
 
 # 设置时区
-RUN apk add tzdata \
-    && ln -snf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
-    && echo ${TIMEZONE} > /etc/timezone
+#RUN apk add tzdata \
+#    && ln -snf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
+#    && echo ${TIMEZONE} > /etc/timezone
 
 
 # 安装Nginx
