@@ -4,9 +4,9 @@
 
 [官网](https://ponycool.com/cms/index)
 
-[Demo]()
+[Demo](http://kumacms.com)
 
-[管理后台Demo]()
+[管理后台Demo](http://kumacms.com/admin/#/login)
 
 ## 安装
 
