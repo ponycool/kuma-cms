@@ -65,7 +65,9 @@ class Base extends BaseController
             }
             $staticDirList = [
                 'css',
-                'js'
+                'js',
+                'img',
+                'font'
             ];
             $files = new FileCollection();
             foreach ($staticDirList as $item) {
