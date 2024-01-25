@@ -42,7 +42,7 @@ class Web extends Base
         parent::initController($request, $response, $logger);
 
         // 设置默认模版
-        $this->setTemplate('Home');
+        $this->setTemplate('home');
 
         // 设置默认主题
         $this->setTheme(self::getSettings()[Setting::theme->value] ?? 'default');
@@ -199,7 +199,7 @@ class Web extends Base
             404 => '404',
             500 => '500'
         };
-        $template = 'errors/' . $template;
+        $template = 'error/' . $template;
         $data = array_merge($this->data, [
             'content' => $content
         ]);

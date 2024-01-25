@@ -34,7 +34,7 @@ class Base extends BaseController
         parent::initController($request, $response, $logger);
         $this->version = 'v1.0.0';
         // 主题路径
-        $this->themePath = APPPATH . 'Views/themes/';
+        $this->themePath = APPPATH . 'Views/theme/';
 
         // 初始化配置
         self::initSettings();
@@ -65,7 +65,9 @@ class Base extends BaseController
             }
             $staticDirList = [
                 'css',
-                'js'
+                'js',
+                'img',
+                'font'
             ];
             $files = new FileCollection();
             foreach ($staticDirList as $item) {
