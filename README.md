@@ -156,6 +156,8 @@ Show your appreciation to those who have contributed to the project.
 
 [Twig](https://twig.symfony.com/)
 
+！[JetBrains标志（主）标志]（https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png）
+
 ## License
 
 For open source projects, say how it is licensed.
