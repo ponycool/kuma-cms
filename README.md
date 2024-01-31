@@ -156,6 +156,8 @@ Show your appreciation to those who have contributed to the project.
 
 [Twig](https://twig.symfony.com/)
 
+<img alt="JetBrains" height="80" src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" width="80"/>
+
 ## License
 
 For open source projects, say how it is licensed.
