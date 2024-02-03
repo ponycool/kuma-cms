@@ -10,6 +10,7 @@ namespace App\Controllers;
 
 use App\Enums\Code;
 use App\Services\SettingService;
+use App\Traits\CoreTrait;
 use CodeIgniter\API\ResponseTrait;
 use CodeIgniter\Files\FileCollection;
 use CodeIgniter\HTTP\RequestInterface;
@@ -21,7 +22,7 @@ use Psr\Log\LoggerInterface;
 
 class Base extends BaseController
 {
-    use ResponseTrait;
+    use CoreTrait, ResponseTrait;
 
     protected readonly string $version;
     protected array $settings;

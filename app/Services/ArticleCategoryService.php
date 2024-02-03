@@ -126,6 +126,35 @@ class ArticleCategoryService extends BaseService
     }
 
     /**
+     * 更新分类
+     * @param array $params
+     * @return bool|string
+     */
+    public function updateCategory(array $params): bool|string
+    {
+        $data = $this->convertParamsToSnakeCase($params);
+        // 准备数据
+        $data = $this->prepareData($data);
+        if (is_string($data)) {
+            return $data;
+        }
+
+        $category = $this->getFirstByUuid($data['uuid']);
+        if (empty($category)) {
+            return '文章分类UUID不存在';
+        }
+
+        $articleCategory = new ArticleCategory();
+        $articleCategory->fillData($data)
+            ->filterInvalidProperties();
+        $res = $this->updateByUuid($articleCategory);
+        if ($res !== true) {
+            return '更新文章分类失败';
+        }
+        return true;
+    }
+
+    /**
      * 准备数据以供保存和更新，返回处理后的数据或错误消息
      * @param array $data
      * @return string|array 处理后的数据或错误消息

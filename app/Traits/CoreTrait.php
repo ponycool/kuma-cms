@@ -8,6 +8,8 @@
 
 namespace App\Traits;
 
+use Ramsey\Uuid\Uuid;
+
 trait CoreTrait
 {
     /**
@@ -37,5 +39,18 @@ trait CoreTrait
             }
         }
         return $data;
+    }
+
+    /**
+     * 校验UUID是否合法
+     * @param string|null $uuid
+     * @return bool|string
+     */
+    protected function validateUUID(?string $uuid): bool|string
+    {
+        if (is_null($uuid) || !Uuid::isValid($uuid)) {
+            return '无效的UUID';
+        }
+        return true;
     }
 }
