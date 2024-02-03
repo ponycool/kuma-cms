@@ -8,6 +8,9 @@
 
 [管理后台Demo](http://kumacms.com/admin/#/login)
 
+用户名: admin
+密码: kumacms
+
 ## 安装
 
 ### 系统要求
