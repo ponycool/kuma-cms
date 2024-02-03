@@ -155,6 +155,35 @@ class ArticleCategoryService extends BaseService
     }
 
     /**
+     * 删除文章分类
+     * @param string $uuid
+     * @return bool|string
+     */
+    public function deleteCategory(string $uuid): bool|string
+    {
+        $category = $this->getFirstByUuid($uuid);
+        if (empty($category)) {
+            return '文章分类UUID不存在';
+        }
+
+        $cond = [
+            'id' => $category['id'],
+            'pid' => $category['id']
+        ];
+        $list = $this->getOrWhere($cond);
+        $ids = [];
+        foreach ($list as $item) {
+            $ids[] = $item['id'];
+        }
+
+        $res = $this->batchDelByIds($ids);
+        if ($res !== true) {
+            return '删除文章分类失败';
+        }
+        return true;
+    }
+
+    /**
      * 准备数据以供保存和更新，返回处理后的数据或错误消息
      * @param array $data
      * @return string|array 处理后的数据或错误消息

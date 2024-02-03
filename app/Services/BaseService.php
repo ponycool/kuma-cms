@@ -273,6 +273,19 @@ class BaseService
     }
 
     /**
+     * @param $where
+     * @return array
+     */
+    public function getOrWhere($where): array
+    {
+        $model = $this->getModel();
+        $builder = $model->asArray();
+        $res = $builder->orWhere($where)
+            ->findAll();
+        return (array)$res;
+    }
+
+    /**
      * 获取分页数据
      * @param int $page 当前页
      * @param int $pageSize 每页条数
@@ -452,6 +465,79 @@ class BaseService
                     'error' => $e->getMessage()
                 ]
             );
+            return false;
+        }
+    }
+
+    /**
+     * 根据条件删除数据
+     * @param array $cond
+     * @return bool
+     */
+    public function deleteByCond(array $cond): bool
+    {
+        $db = $this->getDb();
+        $table = $this->getTable();
+        $builder = $db->table($table);
+        try {
+            foreach ($cond as $k => $v) {
+                if (is_object($v)) {
+                    break;
+                }
+                if (is_array($v)) {
+                    $builder->whereIn($k, $v);
+                    continue;
+                }
+                $builder->where($k, $v);
+            }
+            $currentTime = Time::now()->toDateTimeString();
+            $data = [
+                'deleted_at' => $currentTime,
+                'deleted' => DeletedStatus::DELETED->value
+            ];
+            $builder->update($data);
+            $rows = $db->affectedRows();
+            if ($rows === 0) {
+                throw new Exception('0行数据受影响');
+            }
+            log_message(
+                'info',
+                '{table} 删除 {rows} 行数据',
+                [
+                    'table' => $table,
+                    'rows' => $rows
+                ]
+            );
+            return true;
+        } catch (Exception $e) {
+            log_message(
+                'error',
+                '{table} delete failed, error: {msg}',
+                [
+                    'table' => $table,
+                    'msg' => $e->getMessage()
+                ]
+            );
+            return false;
+        }
+    }
+
+    /**
+     * 根据ID批量删除数据
+     * @param array $ids
+     * @return bool
+     */
+    public function batchDelByIds(array $ids): bool
+    {
+        try {
+            $cond = [
+                'id' => $ids
+            ];
+            return $this->deleteByCond($cond);
+        } catch (Exception $e) {
+            log_message('error', 'batch delete failed, error: {msg}', [
+                'msg' => $e->getMessage()
+            ]);
             return false;
         }
     }
