@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Traits\CoreTrait;
 use CodeIgniter\Database\BaseConnection;
 use CodeIgniter\Database\ConnectionInterface;
 use Config\Database;
@@ -25,6 +26,8 @@ class BaseService
     protected string $tablePrefix;
     // 数据模型
     protected object $model;
+
+    use CoreTrait;
 
     public function __construct()
     {
