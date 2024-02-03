@@ -3,15 +3,18 @@
  * Created by PhpStorm.
  * User: Pony
  * Date: 2024/02/03
- * Time: 07:26 上午
+ * Time: 07:51 上午
  */
 declare(strict_types=1);
 
 namespace App\Entities;
 
+use Exception;
+
 class Media extends Base
 {
     protected int $id = 0;
+    protected string $uuid;
     protected int $creator;
     protected string $type;
     protected string $thumbnail;
@@ -37,6 +40,15 @@ class Media extends Base
     public function __construct(array $data = null)
     {
         parent::__construct($data);
+        try {
+            $this->setUuid();
+        } catch (Exception $e) {
+            log_message(
+                'error',
+                '初始化 Media Entity 失败，error：{msg}',
+                ['msg' => $e->getMessage()]
+            );
+        }
     }
 
     /**
@@ -55,6 +67,26 @@ class Media extends Base
     {
         $this->id = $id;
         $this->attributes['id'] = $this->id;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUuid(): string
+    {
+        return $this->uuid;
+    }
+
+    /**
+     * @param string $uuid
+     * @return $this
+     * @throws Exception
+     */
+    public function setUuid(string $uuid = ''): Media
+    {
+        $this->uuid = $uuid ?: $this->generateUuid();
+        $this->attributes['uuid'] = $this->uuid;
         return $this;
     }
 

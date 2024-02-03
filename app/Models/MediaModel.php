@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: Pony
  * Date: 2024/02/03
- * Time: 07:26 上午
+ * Time: 07:56 上午
  */
 declare(strict_types=1);
 
@@ -16,6 +16,7 @@ class MediaModel extends BaseModel
     protected $returnType = 'App\Entities\Media';
     protected $useSoftDeletes = true;
     protected $allowedFields = [
+        'uuid',
         'creator',
         'type',
         'thumbnail',
@@ -34,9 +35,14 @@ class MediaModel extends BaseModel
     protected $updatedField = 'updated_at';
     protected $deletedField = 'deleted_at';
     protected $validationRules = [
+        'uuid' => 'required|min_length[36]|max_length[36]',
     ];
     protected $validationMessages = [
-
+        'uuid' => [
+            'required' => 'uuid 列为必填项',
+            'min_length' => 'uuid 长度为36个字符',
+            'max_length' => 'uuid 长度为36个字符',
+        ],
     ];
     protected $skipValidation = false;
 

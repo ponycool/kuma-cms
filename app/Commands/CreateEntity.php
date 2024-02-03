@@ -13,7 +13,8 @@ use App\Services\BaseService;
 use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
 
-class CreateEntity extends BaseCommand
+class
+CreateEntity extends BaseCommand
 {
     use CommandTrait;
 
@@ -42,6 +43,8 @@ class CreateEntity extends BaseCommand
         $data .= <<<EOF
 namespace App\Entities;
 
+use Exception;
+
 EOF;
         $data .= PHP_EOL;
         $data .= sprintf("class %s extends Base", $entityName) . PHP_EOL;
@@ -49,6 +52,29 @@ EOF;
         // 生成ID的GET和SET方法
         $functions = $this->createGet('id', 'int');
         $functions .= $this->createSet('id', 'int', $entityName);
+        if ($this->fieldExists($fields, 'uuid')) {
+            $functions .= <<<EOF
+    /**
+     * @return string
+     */
+    public function getUuid(): string
+    {
+EOF;
+            $functions .= PHP_EOL;
+            $functions .= "        return $" . "this->uuid;" . PHP_EOL;
+            $functions .= "    }" . PHP_EOL . PHP_EOL;
+            $functions .= "    /**" . PHP_EOL;
+            $functions .= "     * @param string $" . "uuid" . PHP_EOL;
+            $functions .= "     * @return $" . "this" . PHP_EOL;
+            $functions .= "     * @throws Exception" . PHP_EOL;
+            $functions .= "     */" . PHP_EOL;
+            $functions .= "    public function setUuid(string $" . "uuid = ''): " . $entityName . PHP_EOL;
+            $functions .= "    {" . PHP_EOL;
+            $functions .= "        $" . "this->uuid = $" . "uuid ?: $" . "this->generateUuid();" . PHP_EOL;
+            $functions .= "        $" . "this->attributes['uuid'] = $" . "this->uuid;" . PHP_EOL;
+            $functions .= "        return $" . "this;" . PHP_EOL;
+            $functions .= "    }" . PHP_EOL . PHP_EOL;
+        }
         $totalSteps = count($fields);
         $currStep = 1;
         $dates = [];
@@ -70,6 +96,7 @@ EOF;
             // 构造函数
             switch ($field->name) {
                 case 'id':
+                case 'uuid';
                     break;
                 case 'created_at':
                 case 'updated_at':
@@ -103,6 +130,28 @@ EOF;
         $data .= "    public function __construct(array $" . "data = null)" . PHP_EOL;
         $data .= "    {" . PHP_EOL;
         $data .= "        parent::__construct($" . "data);";
+        if ($this->fieldExists($fields, 'gid') || $this->fieldExists($fields, 'uuid')) {
+            $data .= PHP_EOL;
+            $data .= "        try {" . PHP_EOL;
+            if ($this->fieldExists($fields, 'gid')) {
+                $data .= "            $" . "this->setGid();" . PHP_EOL;
+            }
+            if ($this->fieldExists($fields, 'uuid')) {
+                $data .= "            $" . "this->setUuid();" . PHP_EOL;
+            }
+            $data .= "        } catch (Exception $" . "e) {" . PHP_EOL;
+            $data .= <<<EOF
+            log_message(
+                'error',
+EOF;
+            $data .= PHP_EOL;
+            $data .= "                '初始化 " . $entityName . " Entity 失败，error：{msg}'," . PHP_EOL;
+            $data .= "                ['msg' => $" . "e->getMessage()]" . PHP_EOL;
+            $data .= <<<EOF
+            );
+        }
+EOF;
+        }
         $data .= PHP_EOL . '    }';
         $data .= PHP_EOL . PHP_EOL;
         $data .= $functions;
