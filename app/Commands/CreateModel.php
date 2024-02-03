@@ -73,6 +73,9 @@ class CreateModel extends BaseCommand
             $data .= "    protected $" . "dateFormat = 'datetime';" . PHP_EOL;
         }
         $data .= "    protected $" . "validationRules = [" . PHP_EOL;
+        if ($this->fieldExists($fields, 'uuid')) {
+            $data .= "        'uuid' => 'required|min_length[36]|max_length[36]'," . PHP_EOL;
+        }
         if ($table === 'setting') {
             $data .= <<<EOF
         'key' => 'required',
@@ -82,6 +85,15 @@ EOF;
         $data .= "    ];";
         $data .= PHP_EOL;
         $data .= "    protected $" . "validationMessages = [" . PHP_EOL;
+        if ($this->fieldExists($fields, 'uuid')) {
+            $data .= <<<EOF
+        'uuid' => [
+            'required' => 'uuid 列为必填项',
+            'min_length' => 'uuid 长度为36个字符',
+            'max_length' => 'uuid 长度为36个字符',
+        ],
+EOF;
+        }
         if ($table === 'setting') {
             $data .= <<<EOF
         'key' => [

@@ -14,7 +14,9 @@
     "codeigniter4/framework": "^4.0",
     "nesbot/carbon": "^2.71",
     "ponycool/ponycool-library": "^1.0",
-    "twig/twig": "^3.8"
+    "ramsey/uuid": "^4.7",
+    "twig/twig": "^3.8",
+    "ext-bcmath": "*"
   },
   "require-dev": {
     "fakerphp/faker": "^1.9",

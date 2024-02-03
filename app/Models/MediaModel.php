@@ -3,26 +3,32 @@
  * Created by PhpStorm.
  * User: Pony
  * Date: 2024/02/03
- * Time: 08:21 上午
+ * Time: 07:56 上午
  */
 declare(strict_types=1);
 
 namespace App\Models;
 
-class ArticleCategoryModel extends BaseModel
+class MediaModel extends BaseModel
 {
-    protected $table = 'article_category';
+    protected $table = 'media';
     protected $primaryKey = 'id';
-    protected $returnType = 'App\Entities\ArticleCategory';
+    protected $returnType = 'App\Entities\Media';
     protected $useSoftDeletes = true;
     protected $allowedFields = [
         'uuid',
-        'pid',
-        'name',
-        'icon',
-        'code',
-        'level',
-        'sort_index',
+        'creator',
+        'type',
+        'thumbnail',
+        'file_name',
+        'file_url',
+        'size',
+        'size_by_unit',
+        'exts',
+        'mime_type',
+        'status',
+        'hash',
+        'hash_alg',
     ];
     protected $useTimestamps = true;
     protected $createdField = 'created_at';

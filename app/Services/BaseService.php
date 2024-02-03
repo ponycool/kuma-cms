@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\DeletedStatus;
+use App\Traits\CoreTrait;
 use CodeIgniter\Database\BaseConnection;
 use CodeIgniter\Database\ConnectionInterface;
 use Config\Database;
@@ -25,6 +27,8 @@ class BaseService
     protected string $tablePrefix;
     // 数据模型
     protected object $model;
+
+    use CoreTrait;
 
     public function __construct()
     {
@@ -130,6 +134,30 @@ class BaseService
     }
 
     /**
+     * 计算总页数
+     * @param int $total 总数据条数
+     * @param int $pageSize 每页分页条数
+     * @return int
+     */
+    public function totalPages(int $total, int $pageSize = 10): int
+    {
+        $totalPages = bcdiv(bcadd((string)$total, (string)($pageSize - 1)), (string)$pageSize);
+        return (int)$totalPages;
+    }
+
+    /**
+     * 计算分页偏移量
+     * @param int $page
+     * @param int $pageSize
+     * @return int
+     */
+    public function pageOffset(int $page = 1, int $pageSize = 10): int
+    {
+        $offset = bcmul(bcsub((string)$page, '1'), (string)$pageSize);
+        return (int)$offset;
+    }
+
+    /**
      * 获取查询字段
      * @return array
      */
@@ -225,6 +253,100 @@ class BaseService
         $res = $builder->limit(1)
             ->first();
         return (array)$res;
+    }
+
+    /**
+     * 获取分页数据
+     * @param int $page 当前页
+     * @param int $pageSize 每页条数
+     * @param array|null $cond 查询条件
+     * @param string|null $orderField 排序字段
+     * @param string $order 排序
+     * @return array
+     */
+    public function getPage(int $page = 1, int $pageSize = 10, ?array $cond = null, ?string $orderField = null, string $order = 'DESC'): array
+    {
+        $db = $this->getDb();
+        $table = $this->getTable();
+        $builder = $db->table($table);
+        $pageData = [
+            'page' => $page,
+            'pageSize' => $pageSize,
+            'total' => 0,
+            'totalPage' => 0,
+            'pageData' => []
+        ];
+        $builder->select($this->getSelectFields());
+        if (!is_null($cond)) {
+            foreach ($cond as $k => $v) {
+                if (is_null($v)) {
+                    continue;
+                }
+                if (is_object($v)) {
+                    break;
+                }
+                if (is_array($v)) {
+                    // 如果条件是而多维数组，则直接跳过
+                    if (count($v) !== count($v, 1)) {
+                        continue;
+                    }
+                    $opts = [
+                        'orWhere',
+                        'like',
+                        'orLike',
+                        'notLike',
+                        'orNotLike'
+                    ];
+                    if (in_array($k, $opts, true)) {
+                        foreach ($v as $field => $value) {
+                            switch ($k) {
+                                case 'orWhere':
+                                    $builder->orWhere($field, $value);
+                                    break;
+                                case 'like':
+                                    $builder->like($field, $value);
+                                    break;
+                                case 'orLike':
+                                    $builder->orLike($field, $value);
+                                    break;
+                                case 'notLike':
+                                    $builder->notLike($field, $value);
+                                    break;
+                                case 'orNotLike':
+                                    $builder->orNotLike($field, $value);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    } else {
+                        $builder->whereIn($k, $v);
+                    }
+                    continue;
+                }
+                $builder->where($k, $v);
+            }
+        }
+        $builder->where('deleted_at')
+            ->where('deleted', DeletedStatus::UNDELETED->value);
+        if (is_null($orderField)) {
+            $builder->orderBy('created_at', $order);
+        } else {
+            $builder->orderBy($orderField, $order);
+        }
+        $totalRows = $builder->countAllResults(false);
+        if ($totalRows === 0) {
+            return $pageData;
+        }
+        $pageData['total'] = $totalRows;
+        // 总页数
+        $pageData['totalPage'] = $this->totalPages($totalRows, $pageSize);
+        $offset = $this->pageOffset($page, $pageSize);
+        $builder->limit($pageSize, $offset);
+        $query = $builder->get();
+        $result = $query->getResultArray();
+        $pageData['pageData'] = $result;
+        return $pageData;
     }
 
     /**
