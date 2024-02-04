@@ -128,10 +128,13 @@ php spark model:generate
 php spark service:generate
 ```
 
-## Support
+## 支持
 
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address,
-etc.
+[Website](https://ponycool.com/cms/index)
+
+[issue](https://github.com/ponycool/kuma-cms/issues)
+
+Mail:pony@ponycool.com
 
 ## Roadmap
 
@@ -149,9 +152,6 @@ You can also document commands to lint the code or run tests. These steps help t
 the likelihood that the changes inadvertently break something. Having instructions for running tests is especially
 helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
 
-## Authors and acknowledgment
-
-Show your appreciation to those who have contributed to the project.
 
 ## 鸣谢
 
