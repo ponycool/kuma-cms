@@ -523,6 +523,43 @@ class BaseService
     }
 
     /**
+     * 删除数据
+     * @param int $id
+     * @return bool
+     */
+    public function delete(int $id): bool
+    {
+        $db = $this->getDb();
+        $table = $this->getTable();
+        $builder = $db->table($table);
+        try {
+            $currentTime = Time::now()->toDateTimeString();
+            $data = [
+                'deleted_at' => $currentTime,
+                'deleted' => DeletedStatus::DELETED->value
+            ];
+            $builder->where('id', $id)
+                ->update($data);
+            $rows = $db->affectedRows();
+            if ($rows === 0) {
+                throw new Exception('受影响行数为0');
+            }
+            return true;
+        } catch (Exception $e) {
+            log_message(
+                'error',
+                '根据ID删除{table}中ID为{id}的数据失败，error：{error}',
+                [
+                    'table' => $table,
+                    'id' => $id,
+                    'error' => $e->getMessage()
+                ]
+            );
+            return false;
+        }
+    }
+
+    /**
      * 根据ID批量删除数据
      * @param array $ids
      * @return bool

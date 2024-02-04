@@ -11,13 +11,12 @@ namespace App\Controllers\Api\Article;
 
 use App\Controllers\Api\Base;
 use App\Enums\Code;
-use CodeIgniter\HTTP\ResponseInterface;
 use App\Services\ArticleCategoryService as ArticleCategorySvc;
 use Exception;
 
 class Category extends Base
 {
-    public function index(): ResponseInterface
+    public function index(): void
     {
         $this->postFilter();
         try {
@@ -43,9 +42,9 @@ class Category extends Base
 
     /**
      * 创建文章分类
-     * @return ResponseInterface
+     * @return void
      */
-    public function create(): ResponseInterface
+    public function create(): void
     {
         $this->postFilter();
         $svc = new ArticleCategorySvc();
@@ -73,9 +72,9 @@ class Category extends Base
 
     /**
      * 更新文章分类
-     * @return ResponseInterface
+     * @return void
      */
-    public function update(): ResponseInterface
+    public function update(): void
     {
         $this->postFilter();
         $svc = new ArticleCategorySvc();
@@ -108,9 +107,9 @@ class Category extends Base
 
     /**
      * 删除文章分类
-     * @return ResponseInterface
+     * @return void
      */
-    public function delete(): ResponseInterface
+    public function delete(): void
     {
         $this->postFilter();
         try {

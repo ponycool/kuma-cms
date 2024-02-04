@@ -2,8 +2,8 @@
 /**
  * Created By PhpStorm
  * User: Pony
- * Data: 2024/1/5
- * Time: 14:24
+ * Data: 2024/2/4
+ * Time: 14:55
  */
 declare(strict_types=1);
 
@@ -14,30 +14,29 @@ use App\Enums\Code;
 use App\Services\ArticleService;
 use Exception;
 
-class Create extends Base
+class Page extends Base
 {
+    /**
+     * 获取文章列表信息
+     * @return void
+     */
     public function index(): void
     {
         $this->postFilter();
-        $articleSvc = new ArticleService();
-        $rules = $articleSvc->getValidationRules();
-        $this->verifyJsonInputByRules($rules);
+        $this->validatePageParamsFromJsonInput();
+        $svc = new ArticleService();
         try {
             $params = $this->getJsonInputParams();
-            // 创建业务逻辑
-            $res = $articleSvc->createArticle($params);
-            if ($res !== true) {
-                throw new Exception($res);
-            }
-
+            $list = $svc->getList($params);
             $data = [
                 'code' => Code::OK,
-                'message' => '创建文章成功',
+                'message' => '获取文章列表成功',
             ];
+            $data = array_merge($data, $list);
         } catch (Exception $e) {
             $data = [
                 'code' => Code::FAIL,
-                'message' => $e->getMessage() ?: '创建文章失败'
+                'message' => $e->getMessage() ?: '获取文章列表失败',
             ];
         }
         $this->render($data);

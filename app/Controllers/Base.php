@@ -438,6 +438,38 @@ class Base extends BaseController
     }
 
     /**
+     * 获取查询校验规则
+     * @return array[]
+     */
+    protected function getPageValidationRules(): array
+    {
+        return [
+            'page' => [
+                'rules' => 'if_exist|is_natural_no_zero',
+                'errors' => [
+                    'is_natural_no_zero' => '参数当前页数[page]无效，必须是非零自然数',
+                ]
+            ],
+            'pageSize' => [
+                'rules' => 'if_exist|is_natural_no_zero',
+                'errors' => [
+                    'is_natural_no_zero' => '参数分页条数[pageSize]无效，必须是非零自然数',
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * 验证JSON输入的分页参数
+     * @return void
+     */
+    protected function validatePageParamsFromJsonInput(): void
+    {
+        $rules = $this->getPageValidationRules();
+        $this->verifyJsonInputByRules($rules);
+    }
+
+    /**
      * 初始化配置
      * @return void
      */
