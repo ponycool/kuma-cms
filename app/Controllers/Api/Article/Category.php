@@ -11,13 +11,12 @@ namespace App\Controllers\Api\Article;
 
 use App\Controllers\Api\Base;
 use App\Enums\Code;
-use CodeIgniter\HTTP\ResponseInterface;
 use App\Services\ArticleCategoryService as ArticleCategorySvc;
 use Exception;
 
 class Category extends Base
 {
-    public function index(): ResponseInterface
+    public function index(): void
     {
         $this->postFilter();
         try {
@@ -43,9 +42,9 @@ class Category extends Base
 
     /**
      * 创建文章分类
-     * @return ResponseInterface
+     * @return void
      */
-    public function create(): ResponseInterface
+    public function create(): void
     {
         $this->postFilter();
         $svc = new ArticleCategorySvc();
@@ -73,67 +72,67 @@ class Category extends Base
 
     /**
      * 更新文章分类
-     * @return ResponseInterface
+     * @return void
      */
-    public function update(): ResponseInterface
+    public function update(): void
     {
-//        $this->postFilter();
-//        $svc = new ArticleCategoryService();
-//        $rules = $svc->getUpdateValidationRules();
-//        $this->verifyJsonInputByRules($rules);
-//        try {
-//            $params = $this->getJsonInputParams();
-//            $uuid = $params['uuid'] ?? null;
-//            if ($this->validateUUID($uuid) !== true) {
-//                throw new Exception('无效的文章分类UUID');
-//            }
-//
-//            $svc = new ArticleCategorySvc();
-//            $res = $svc->updateCategory($params);
-//            if ($res !== true) {
-//                throw new Exception($res);
-//            }
-//            $data = [
-//                'code' => Code::OK,
-//                'message' => '更新文章分类成功',
-//            ];
-//        } catch (Exception $e) {
-//            $data = [
-//                'code' => Code::FAIL,
-//                'message' => $e->getMessage() ?: '更新文章分类失败'
-//            ];
-//        }
-//        return $this->render($data);
+        $this->postFilter();
+        $svc = new ArticleCategorySvc();
+        $rules = $svc->getUpdateRules();
+        $this->verifyJsonInputByRules($rules);
+        try {
+            $params = $this->getJsonInputParams();
+            $uuid = $params['uuid'] ?? null;
+            if ($this->validateUUID($uuid) !== true) {
+                throw new Exception('无效的文章分类UUID');
+            }
+
+            $svc = new ArticleCategorySvc();
+            $res = $svc->updateCategory($params);
+            if ($res !== true) {
+                throw new Exception($res);
+            }
+            $data = [
+                'code' => Code::OK,
+                'message' => '更新文章分类成功',
+            ];
+        } catch (Exception $e) {
+            $data = [
+                'code' => Code::FAIL,
+                'message' => $e->getMessage() ?: '更新文章分类失败'
+            ];
+        }
+        $this->render($data);
     }
 
     /**
      * 删除文章分类
-     * @return ResponseInterface
+     * @return void
      */
-    public function delete(): ResponseInterface
+    public function delete(): void
     {
-//        $this->postFilter();
-//        try {
-//            $params = $this->getJsonInputParams();
-//            $uuid = $params['uuid'] ?? null;
-//            if (is_null($uuid) || !Uuid::isValid($uuid)) {
-//                throw new Exception('无效的文章分类UUID');
-//            }
-//            $svc = new ArticleCategorySvc();
-//            $res = $svc->deleteCategory($uuid);
-//            if ($res !== true) {
-//                throw new Exception($res);
-//            }
-//            $data = [
-//                'code' => Code::OK,
-//                'message' => '删除文章分类成功',
-//            ];
-//        } catch (Exception $e) {
-//            $data = [
-//                'code' => Code::FAIL,
-//                'message' => $e->getMessage() ?: '删除文章分类失败'
-//            ];
-//        }
-//        return $this->render($data);
+        $this->postFilter();
+        try {
+            $params = $this->getJsonInputParams();
+            $uuid = $params['uuid'] ?? null;
+            if ($this->validateUUID($uuid) !== true) {
+                throw new Exception('无效的文章分类UUID');
+            }
+            $svc = new ArticleCategorySvc();
+            $res = $svc->deleteCategory($uuid);
+            if ($res !== true) {
+                throw new Exception($res);
+            }
+            $data = [
+                'code' => Code::OK,
+                'message' => '删除文章分类成功',
+            ];
+        } catch (Exception $e) {
+            $data = [
+                'code' => Code::FAIL,
+                'message' => $e->getMessage() ?: '删除文章分类失败'
+            ];
+        }
+        $this->render($data);
     }
 }

@@ -10,6 +10,7 @@ namespace App\Controllers;
 
 use App\Enums\Code;
 use App\Services\SettingService;
+use App\Traits\CoreTrait;
 use CodeIgniter\API\ResponseTrait;
 use CodeIgniter\Files\FileCollection;
 use CodeIgniter\HTTP\RequestInterface;
@@ -21,7 +22,7 @@ use Psr\Log\LoggerInterface;
 
 class Base extends BaseController
 {
-    use ResponseTrait;
+    use CoreTrait, ResponseTrait;
 
     protected readonly string $version;
     protected array $settings;
@@ -434,6 +435,38 @@ class Base extends BaseController
         $segments = $uri->getSegments();
         $secondSegment = $segments[1] ?? null;
         return $secondSegment === 'open';
+    }
+
+    /**
+     * 获取查询校验规则
+     * @return array[]
+     */
+    protected function getPageValidationRules(): array
+    {
+        return [
+            'page' => [
+                'rules' => 'if_exist|is_natural_no_zero',
+                'errors' => [
+                    'is_natural_no_zero' => '参数当前页数[page]无效，必须是非零自然数',
+                ]
+            ],
+            'pageSize' => [
+                'rules' => 'if_exist|is_natural_no_zero',
+                'errors' => [
+                    'is_natural_no_zero' => '参数分页条数[pageSize]无效，必须是非零自然数',
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * 验证JSON输入的分页参数
+     * @return void
+     */
+    protected function validatePageParamsFromJsonInput(): void
+    {
+        $rules = $this->getPageValidationRules();
+        $this->verifyJsonInputByRules($rules);
     }
 
     /**

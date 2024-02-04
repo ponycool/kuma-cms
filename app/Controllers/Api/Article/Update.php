@@ -2,8 +2,8 @@
 /**
  * Created By PhpStorm
  * User: Pony
- * Data: 2024/1/5
- * Time: 14:24
+ * Data: 2024/2/4
+ * Time: 14:01
  */
 declare(strict_types=1);
 
@@ -14,30 +14,36 @@ use App\Enums\Code;
 use App\Services\ArticleService;
 use Exception;
 
-class Create extends Base
+class Update extends Base
 {
+    /**
+     * 更新文章
+     * @return void
+     */
     public function index(): void
     {
         $this->postFilter();
         $articleSvc = new ArticleService();
-        $rules = $articleSvc->getValidationRules();
+        $rules = $articleSvc->getUpdateRules();
         $this->verifyJsonInputByRules($rules);
         try {
             $params = $this->getJsonInputParams();
-            // 创建业务逻辑
-            $res = $articleSvc->createArticle($params);
+            $uuid = $params['uuid'] ?? null;
+            if ($this->validateUUID($uuid) !== true) {
+                throw new Exception('无效的文章UUID');
+            }
+            $res = $articleSvc->updateArticle($params);
             if ($res !== true) {
                 throw new Exception($res);
             }
-
             $data = [
                 'code' => Code::OK,
-                'message' => '创建文章成功',
+                'message' => '更新文章成功',
             ];
         } catch (Exception $e) {
             $data = [
                 'code' => Code::FAIL,
-                'message' => $e->getMessage() ?: '创建文章失败'
+                'message' => $e->getMessage() ?: '更新文章失败'
             ];
         }
         $this->render($data);

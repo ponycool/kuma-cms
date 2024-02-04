@@ -14,9 +14,11 @@ use App\Enums\DeletedStatus;
 use App\Traits\CoreTrait;
 use CodeIgniter\Database\BaseConnection;
 use CodeIgniter\Database\ConnectionInterface;
+use CodeIgniter\I18n\Time;
 use Config\Database;
 use Config\Services;
 use Exception;
+use Ramsey\Uuid\Uuid;
 
 class BaseService
 {
@@ -256,6 +258,34 @@ class BaseService
     }
 
     /**
+     * 根据UUID获取一条数据
+     * @param string $uuid
+     * @return array
+     */
+    public function getFirstByUuid(string $uuid): array
+    {
+        $model = $this->getModel();
+        $res = $model->asArray()
+            ->select($this->getSelectFields())
+            ->where('uuid', $uuid)
+            ->first();
+        return (array)$res;
+    }
+
+    /**
+     * @param $where
+     * @return array
+     */
+    public function getOrWhere($where): array
+    {
+        $model = $this->getModel();
+        $builder = $model->asArray();
+        $res = $builder->orWhere($where)
+            ->findAll();
+        return (array)$res;
+    }
+
+    /**
      * 获取分页数据
      * @param int $page 当前页
      * @param int $pageSize 每页条数
@@ -378,6 +408,173 @@ class BaseService
                     'msg' => $e->getMessage()
                 ]
             );
+            return false;
+        }
+    }
+
+    /**
+     * 根据UUID更新数据
+     * @param object $entity
+     * @param string|null $uuid
+     * @return bool
+     */
+    public function updateByUuid(object $entity, ?string $uuid = null): bool
+    {
+        $db = $this->getDb();
+        $table = $this->getTable();
+        $model = $this->getModel();
+        $builder = $db->table($table);
+        try {
+            if (!is_object($entity)) {
+                throw new Exception('数据类型必须为Object');
+            }
+            $verificationRes = $this->verificationData($model, $entity);
+            if (!is_null($verificationRes)) {
+                throw new Exception($table . '属性无效，未通过验证策略校验。');
+            }
+            // 如果未设置UUID参数，从实体中获取
+            if (is_null($uuid)) {
+                $uuid = $entity->getUuid();
+            }
+
+            // 判断是否是有效的UUID
+            if (!Uuid::isValid($uuid)) {
+                throw new Exception('参数UUID不是一个有效的UUID');
+            }
+
+            $currentTime = Time::now()->toDateTimeString();
+            $data = $entity->toArray();
+            // 移除id、gid、uuid等不需要更新参数
+            $data = array_diff_key($data, [
+                'id' => '',
+                'gid' => '',
+                'uuid' => ''
+            ]);
+            $data['updated_at'] = $currentTime;
+            $builder->where('uuid', $uuid)
+                ->update($data);
+            $rows = $db->affectedRows();
+            if ($rows === 0) {
+                throw new Exception('受影响行数为0');
+            }
+            return true;
+        } catch (Exception $e) {
+            log_message('error', '根据UUID更新{table}失败，error：{error}',
+                [
+                    'table' => $table,
+                    'error' => $e->getMessage()
+                ]
+            );
+            return false;
+        }
+    }
+
+    /**
+     * 根据条件删除数据
+     * @param array $cond
+     * @return bool
+     */
+    public function deleteByCond(array $cond): bool
+    {
+        $db = $this->getDb();
+        $table = $this->getTable();
+        $builder = $db->table($table);
+        try {
+            foreach ($cond as $k => $v) {
+                if (is_object($v)) {
+                    break;
+                }
+                if (is_array($v)) {
+                    $builder->whereIn($k, $v);
+                    continue;
+                }
+                $builder->where($k, $v);
+            }
+            $currentTime = Time::now()->toDateTimeString();
+            $data = [
+                'deleted_at' => $currentTime,
+                'deleted' => DeletedStatus::DELETED->value
+            ];
+            $builder->update($data);
+            $rows = $db->affectedRows();
+            if ($rows === 0) {
+                throw new Exception('0行数据受影响');
+            }
+            log_message(
+                'info',
+                '{table} 删除 {rows} 行数据',
+                [
+                    'table' => $table,
+                    'rows' => $rows
+                ]
+            );
+            return true;
+        } catch (Exception $e) {
+            log_message(
+                'error',
+                '{table} delete failed, error: {msg}',
+                [
+                    'table' => $table,
+                    'msg' => $e->getMessage()
+                ]
+            );
+            return false;
+        }
+    }
+
+    /**
+     * 删除数据
+     * @param int $id
+     * @return bool
+     */
+    public function delete(int $id): bool
+    {
+        $db = $this->getDb();
+        $table = $this->getTable();
+        $builder = $db->table($table);
+        try {
+            $currentTime = Time::now()->toDateTimeString();
+            $data = [
+                'deleted_at' => $currentTime,
+                'deleted' => DeletedStatus::DELETED->value
+            ];
+            $builder->where('id', $id)
+                ->update($data);
+            $rows = $db->affectedRows();
+            if ($rows === 0) {
+                throw new Exception('受影响行数为0');
+            }
+            return true;
+        } catch (Exception $e) {
+            log_message(
+                'error',
+                '根据ID删除{table}中ID为{id}的数据失败，error：{error}',
+                [
+                    'table' => $table,
+                    'id' => $id,
+                    'error' => $e->getMessage()
+                ]
+            );
+            return false;
+        }
+    }
+
+    /**
+     * 根据ID批量删除数据
+     * @param array $ids
+     * @return bool
+     */
+    public function batchDelByIds(array $ids): bool
+    {
+        try {
+            $cond = [
+                'id' => $ids
+            ];
+            return $this->deleteByCond($cond);
+        } catch (Exception $e) {
+            log_message('error', 'batch delete failed, error: {msg}', [
+                'msg' => $e->getMessage()
+            ]);
             return false;
         }
     }

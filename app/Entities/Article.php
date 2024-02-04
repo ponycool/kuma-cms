@@ -2,16 +2,20 @@
 /**
  * Created by PhpStorm.
  * User: Pony
- * Date: 2024/01/04
- * Time: 01:47 上午
+ * Date: 2024/02/04
+ * Time: 08:05 上午
  */
 declare(strict_types=1);
 
 namespace App\Entities;
 
+use Exception;
+
 class Article extends Base
 {
     protected int $id = 0;
+    protected string $uuid;
+    protected int $cid;
     protected string $title;
     protected int $cover_image;
     protected string $seo_title;
@@ -22,8 +26,9 @@ class Article extends Base
     protected string $author;
     protected string $custom_date;
     protected int $is_published;
-    protected int $view_count;
+    protected string $published_at;
     protected int $sort_index;
+    protected int $view_count;
     protected string $created_at;
     protected string $updated_at;
     protected string $deleted_at;
@@ -37,6 +42,15 @@ class Article extends Base
     public function __construct(array $data = null)
     {
         parent::__construct($data);
+        try {
+            $this->setUuid();
+        } catch (Exception $e) {
+            log_message(
+                'error',
+                '初始化 Article Entity 失败，error：{msg}',
+                ['msg' => $e->getMessage()]
+            );
+        }
     }
 
     /**
@@ -55,6 +69,45 @@ class Article extends Base
     {
         $this->id = $id;
         $this->attributes['id'] = $this->id;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUuid(): string
+    {
+        return $this->uuid;
+    }
+
+    /**
+     * @param string $uuid
+     * @return $this
+     * @throws Exception
+     */
+    public function setUuid(string $uuid = ''): Article
+    {
+        $this->uuid = $uuid ?: $this->generateUuid();
+        $this->attributes['uuid'] = $this->uuid;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCid(): int
+    {
+        return $this->cid;
+    }
+
+    /**
+     * @param int $cid
+     * @return $this
+     */
+    public function setCid(int $cid): Article
+    {
+        $this->cid = $cid;
+        $this->attributes['cid'] = $this->cid;
         return $this;
     }
 
@@ -249,21 +302,21 @@ class Article extends Base
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getViewCount(): int
+    public function getPublishedAt(): string
     {
-        return $this->view_count;
+        return $this->published_at;
     }
 
     /**
-     * @param int $view_count
+     * @param string $published_at
      * @return $this
      */
-    public function setViewCount(int $view_count): Article
+    public function setPublishedAt(string $published_at): Article
     {
-        $this->view_count = $view_count;
-        $this->attributes['view_count'] = $this->view_count;
+        $this->published_at = $published_at;
+        $this->attributes['published_at'] = $this->published_at;
         return $this;
     }
 
@@ -283,6 +336,25 @@ class Article extends Base
     {
         $this->sort_index = $sort_index;
         $this->attributes['sort_index'] = $this->sort_index;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getViewCount(): int
+    {
+        return $this->view_count;
+    }
+
+    /**
+     * @param int $view_count
+     * @return $this
+     */
+    public function setViewCount(int $view_count): Article
+    {
+        $this->view_count = $view_count;
+        $this->attributes['view_count'] = $this->view_count;
         return $this;
     }
 
