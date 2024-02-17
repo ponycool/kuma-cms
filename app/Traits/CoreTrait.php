@@ -73,4 +73,40 @@ trait CoreTrait
             return false;
         }
     }
+
+    /**
+     * 根据MimeType获取文件类型
+     * @param string $mimeType
+     * @return string
+     */
+    protected function getFileTypeByMimeType(string $mimeType): string
+    {
+        return match ($mimeType) {
+            'image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/wbmp' => 'image',
+            'audio/mpeg', 'audio/mpg', 'audio/mpeg3', 'audio/mp3' => 'audio',
+            'video/mp4', 'video/x-f4v', 'video/x-flv', 'video/3gp', 'video/3gpp', 'video/webm', 'video/x-ms-wmv', 'video/x-ms-asf' => 'video',
+            default => 'file',
+        };
+    }
+
+    /**
+     * 删除文件
+     * @param string $file 文件路径
+     * @return bool
+     */
+    protected function delFile(string $file): bool
+    {
+        if (!is_file($file) || !file_exists($file)) {
+            return false;
+        }
+        $winPath = iconv('utf-8', 'gbk', $file);
+        if (PATH_SEPARATOR == ':') {
+            //linux
+            unlink($file);
+        } else {
+            //Windows
+            unlink($winPath);
+        }
+        return true;
+    }
 }
