@@ -3,20 +3,21 @@
   "description": "基于Codeigniter4和React的快速建站系统",
   "license": "MIT",
   "type": "project",
-  "homepage": "https://codeigniter.com",
+  "homepage": "https://ponycool.com/cms/index",
   "support": {
     "forum": "https://forum.codeigniter.com/",
     "source": "https://github.com/ponycool/kuma-cms",
     "slack": "https://codeigniterchat.slack.com"
   },
   "require": {
-    "php": "^8.1",
+    "php": "^8.2",
     "codeigniter4/framework": "^4.0",
     "nesbot/carbon": "^2.71",
     "ponycool/ponycool-library": "^1.0",
     "ramsey/uuid": "^4.7",
     "twig/twig": "^3.8",
-    "ext-bcmath": "*"
+    "ext-bcmath": "*",
+    "ext-iconv": "*"
   },
   "require-dev": {
     "fakerphp/faker": "^1.9",

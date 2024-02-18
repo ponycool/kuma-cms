@@ -7,7 +7,7 @@
  */
 declare(strict_types=1);
 
-namespace App\Controllers\File;
+namespace App\Controllers\Media;
 
 use App\Controllers\Base;
 use CodeIgniter\Files\File;

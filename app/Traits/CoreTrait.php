@@ -8,8 +8,11 @@
 
 namespace App\Traits;
 
+use App\Enums\Code;
 use Carbon\Carbon;
+use Config\Services;
 use Exception;
+use PonyCool\Core\Jwt\Jwt;
 use Ramsey\Uuid\Uuid;
 
 trait CoreTrait
@@ -72,5 +75,97 @@ trait CoreTrait
         } catch (Exception) {
             return false;
         }
+    }
+
+    /**
+     * 根据MimeType获取文件类型
+     * @param string $mimeType
+     * @return string
+     */
+    protected function getFileTypeByMimeType(string $mimeType): string
+    {
+        return match ($mimeType) {
+            'image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/wbmp' => 'image',
+            'audio/mpeg', 'audio/mpg', 'audio/mpeg3', 'audio/mp3' => 'audio',
+            'video/mp4', 'video/x-f4v', 'video/x-flv', 'video/3gp', 'video/3gpp', 'video/webm', 'video/x-ms-wmv', 'video/x-ms-asf' => 'video',
+            default => 'file',
+        };
+    }
+
+    /**
+     * 删除文件
+     * @param string $file 文件路径
+     * @return bool
+     */
+    protected function delFile(string $file): bool
+    {
+        if (!is_file($file) || !file_exists($file)) {
+            return false;
+        }
+        $winPath = iconv('utf-8', 'gbk', $file);
+        if (PATH_SEPARATOR == ':') {
+            //linux
+            unlink($file);
+        } else {
+            //Windows
+            unlink($winPath);
+        }
+        return true;
+    }
+
+    /**
+     * 获取Token
+     * @return string|bool
+     */
+    protected function getToken(): string|bool
+    {
+        helper('cookie');
+        $request = service('request');
+        $token = get_cookie('token', true);
+        if (!is_null($token)) {
+            return $token;
+        }
+        if ($request->hasHeader('token')) {
+            $token = $request->getHeader('token');
+            return $token->getValue();
+        }
+        $token = $request->getVar('token');
+        if (is_null($token)) {
+            return false;
+        }
+        return $token;
+    }
+
+    /**
+     * 获取登录账户ID
+     * @return int|null
+     */
+    protected function getLoginAccountID(): ?int
+    {
+        $token = $this->getToken();
+        if ($token === false) {
+            return null;
+        }
+        $jwt = new Jwt();
+        try {
+            $secret = getenv('jwt.secret');
+            if ($secret === false) {
+                throw new Exception('未配置JWT密钥', Code::JWT_SECRET_NOT_EXISTS->value);
+            }
+            if (strlen($secret) !== 32) {
+                throw new Exception('无效的JWT密钥', Code::INVALID_JWT_SECRET->value);
+            }
+            if (!$jwt->verify($secret, $token)) {
+                throw new Exception('令牌无效', Code::INVALID_TOKEN->value);
+            }
+        } catch (Exception $e) {
+            log_message('info', '获取登录账户ID时，校验令牌失败；错误代码:{code}，错误消息：{message}', [
+                'code' => $e->getCode(),
+                'message' => $e->getMessage()
+            ]);
+            return null;
+        }
+        $payload = $jwt->getPayload($token);
+        return (int)$payload['account_id'] ?? null;
     }
 }
