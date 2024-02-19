@@ -70,6 +70,7 @@ make build
 
 ```
 [PHP Modules]
+bcmath
 Core
 ctype
 curl
@@ -77,7 +78,6 @@ date
 dom
 fileinfo
 filter
-ftp
 gd
 hash
 iconv
