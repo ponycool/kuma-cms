@@ -35,6 +35,7 @@ ENV apk add --no-cache $PHPIZE_DEPS && \
     apk del $PHPIZE_DEPS
 
 RUN apk add --no-cache freetype libpng libjpeg-turbo freetype-dev libpng-dev libjpeg-turbo-dev icu-dev && \
+    docker-php-ext-install bcmath && \
     docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-configure intl && \
     docker-php-ext-install -j$(nproc) gd && \
