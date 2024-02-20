@@ -68,7 +68,9 @@ class Base extends BaseController
                 'css',
                 'js',
                 'img',
-                'font'
+                'font',
+                'video',
+                'audio'
             ];
             $files = new FileCollection();
             foreach ($staticDirList as $item) {
