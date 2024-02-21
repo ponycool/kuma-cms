@@ -1,0 +1,22 @@
+<svg width="46.000000" height="46.000000" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<desc>
+			Created with Pixso.
+	</desc>
+	<defs>
+		<radialGradient id="paint_radial_132_79_0" cx="0.000000" cy="0.000000" r="1.000000" gradientUnits="userSpaceOnUse" gradientTransform="translate(18.6986 29.7435) rotate(-123.785) scale(13.412 10.4328)">
+			<stop stop-color="#1D82FF"/>
+			<stop offset="0.499486" stop-color="#67ABFF"/>
+			<stop offset="0.992270" stop-color="#6BFFFA"/>
+		</radialGradient>
+		<linearGradient id="paint_linear_132_78_0" x1="45.694870" y1="35.362846" x2="0.221305" y2="28.633057" gradientUnits="userSpaceOnUse">
+			<stop offset="0.006260" stop-color="#79A1FF"/>
+			<stop offset="0.552486" stop-color="#0071FC"/>
+			<stop offset="1.000000" stop-color="#6BFFFA"/>
+		</linearGradient>
+	</defs>
+	<rect id="画板 7" width="46.000000" height="46.000000" fill="#FFFFFF" fill-opacity="0"/>
+	<rect id="画板 4" width="46.000000" height="32.000000" transform="translate(0.000000 7.000000)" fill="#FFFFFF" fill-opacity="0"/>
+	<path id="多边形 7" d="M12.5698 22.0443C14.7681 28.0748 15.8456 28.1312 13.5744 34.832C24.3564 29.0634 29.5601 19.3133 29.8669 7.13632C24.4507 15.4518 15.4759 21.5898 12.5698 22.0443Z" fill="#59A4FF" fill-opacity="1.000000" fill-rule="evenodd"/>
+	<path id="多边形 8" d="M39.4036 25.6528C31.8061 26.0002 29.0475 26.0023 24.3477 25.6615C22.5272 25.5295 20.0363 25.3499 16.9359 24.1058C14.9698 23.3169 10.18 20.1975 10.18 20.1975C8.67395 26.9131 9.68152 24.0016 6.3555 28.7965C26.2465 38.1406 32.7818 30.6931 39.4036 25.6528Z" fill="url(#paint_radial_132_79_0)" fill-opacity="1.000000" fill-rule="evenodd"/>
+	<path id="多边形 9" d="M45.8232 35.0924C32.9287 34.094 24.0887 30.6607 10.1947 16.9481C8.10724 23.0234 5.85135 25.6875 0 29.0995C18.7568 40.8232 28.6773 40.4396 45.8232 35.0924Z" fill="url(#paint_linear_132_78_0)" fill-opacity="1.000000" fill-rule="evenodd"/>
+</svg>
