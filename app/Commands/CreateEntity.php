@@ -49,9 +49,12 @@ EOF;
         $data .= PHP_EOL;
         $data .= sprintf("class %s extends Base", $entityName) . PHP_EOL;
         $data .= "{" . PHP_EOL;
+        $functions = '';
         // 生成ID的GET和SET方法
-        $functions = $this->createGet('id', 'int');
-        $functions .= $this->createSet('id', 'int', $entityName);
+        if ($this->fieldExists($fields, 'id')) {
+            $functions .= $this->createGet('id', 'int');
+            $functions .= $this->createSet('id', 'int', $entityName);
+        }
         if ($this->fieldExists($fields, 'uuid')) {
             $functions .= <<<EOF
     /**

@@ -413,6 +413,49 @@ class BaseService
     }
 
     /**
+     * 批量插入数据
+     * @param array $data
+     * @return bool
+     */
+    public function insertBatch(array $data): bool
+    {
+        $db = $this->getDb();
+        $model = $this->getModel();
+        $table = $this->getTable();
+        $builder = $db->table($table);
+        try {
+            $time = Time::now()->toDateTimeString();
+            foreach ($data as &$item) {
+                if (!is_object($item)) {
+                    throw new Exception('数据类型必须为Object');
+                }
+                $verificationRes = $this->verificationData($model, $item);
+                if (!is_null($verificationRes)) {
+                    throw new Exception($table . '属性无效，未通过验证策略校验。');
+                }
+                $item = $item->toArray();
+                $item['created_at'] = $time;
+                $item['updated_at'] = $time;
+            }
+            $res = $builder->insertBatch($data);
+            if ($res === false) {
+                throw new Exception('执行SQL失败');
+            }
+            return (bool)$res;
+        } catch (Exception $e) {
+            log_message(
+                'error',
+                '{table} batch insert failed, error: {msg}',
+                [
+                    'table' => $table,
+                    'msg' => $e->getMessage()
+                ]
+            );
+            return false;
+        }
+    }
+
+    /**
      * 根据UUID更新数据
      * @param object $entity
      * @param string|null $uuid
@@ -463,6 +506,76 @@ class BaseService
                 [
                     'table' => $table,
                     'error' => $e->getMessage()
+                ]
+            );
+            return false;
+        }
+    }
+
+    /**
+     * 批量更新数据
+     * @param array $data 数据
+     * @param string $indexField 索引字段
+     * @return bool
+     */
+    public function updateBatch(array $data, string $indexField): bool
+    {
+        $db = $this->getDb();
+        $model = $this->getModel();
+        $table = $this->getTable();
+        $builder = $db->table($this->getTable());
+        try {
+            $time = Time::now()->toDateTimeString();
+            foreach ($data as &$item) {
+                if (is_object($item)) {
+                    $verificationRes = $this->verificationData($model, $item);
+                    if (!is_null($verificationRes)) {
+                        throw new Exception($table . '属性无效，未通过验证策略校验。');
+                    }
+                    $item = $item->toArray();
+                    $item['updated_at'] = $time;
+                }
+                if (is_array($item)) {
+                    $item['updated_at'] = $time;
+                }
+            }
+
+            foreach ($data as &$item) {
+                // 更新时如果存在创建时间，则移除创建时间
+                if (array_key_exists('created_at', $item)) {
+                    unset($item['created_at']);
+                }
+                // 更新时如果存在删除属性，则移除删除属性
+                if (array_key_exists('deleted', $item)) {
+                    unset($item['deleted']);
+                }
+                if (array_key_exists('deleted_at', $item)) {
+                    unset($item['deleted_at']);
+                }
+                // 尝试移除不需要的索引
+                if (array_key_exists('id', $item) && $indexField !== 'id') {
+                    unset($item['id']);
+                }
+                if (array_key_exists('gid', $item) && $indexField !== 'gid') {
+                    unset($item['gid']);
+                }
+                if (array_key_exists('uuid', $item) && $indexField !== 'uuid') {
+                    unset($item['uuid']);
+                }
+            }
+
+            $res = $builder->updateBatch($data, $indexField);
+            if ($res === false) {
+                throw new Exception('执行SQL失败');
+            }
+            return (bool)$res;
+        } catch (Exception $e) {
+            log_message(
+                'error',
+                '{table} batch update failed, error: {msg}',
+                [
+                    'table' => $this->getTable(),
+                    'msg' => $e->getMessage()
                 ]
             );
             return false;

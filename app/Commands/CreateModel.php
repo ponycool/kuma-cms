@@ -45,7 +45,9 @@ class CreateModel extends BaseCommand
         $data .= sprintf("class %s extends BaseModel", $modelName) . PHP_EOL;
         $data .= "{" . PHP_EOL;
         $data .= "    protected $" . "table = '" . $table . "';" . PHP_EOL;
-        $data .= "    protected $" . "primaryKey = 'id';" . PHP_EOL;
+        if ($this->fieldExists($fields, 'id')) {
+            $data .= "    protected $" . "primaryKey = 'id';" . PHP_EOL;
+        }
         $data .= "    protected $" . "returnType = 'App\Entities\\" . $entityName . "';" . PHP_EOL;
         $data .= "    protected $" . "useSoftDeletes = true;" . PHP_EOL;
         $data .= "    protected $" . "allowedFields = [" . PHP_EOL;

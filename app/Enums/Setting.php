@@ -10,5 +10,11 @@ declare(strict_types=1);
 namespace App\Enums;
 enum Setting: string
 {
-    case theme = 'theme';
+    // 默认主题
+    case THEME = 'theme';
+    case SITE_URL = 'site_url';
+    // 系统版本
+    case VERSION = 'version';
+    // ICP 备案
+    case ICP = 'icp';
 }
