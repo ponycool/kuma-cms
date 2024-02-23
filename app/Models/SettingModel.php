@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: Pony
- * Date: 2024/01/04
- * Time: 01:48 上午
+ * Date: 2024/02/23
+ * Time: 06:38 上午
  */
 declare(strict_types=1);
 
@@ -12,7 +12,6 @@ namespace App\Models;
 class SettingModel extends BaseModel
 {
     protected $table = 'setting';
-    protected $primaryKey = 'id';
     protected $returnType = 'App\Entities\Setting';
     protected $useSoftDeletes = true;
     protected $allowedFields = [

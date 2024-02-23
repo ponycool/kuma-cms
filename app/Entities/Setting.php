@@ -2,12 +2,14 @@
 /**
  * Created by PhpStorm.
  * User: Pony
- * Date: 2024/01/04
- * Time: 01:47 上午
+ * Date: 2024/02/23
+ * Time: 06:37 上午
  */
 declare(strict_types=1);
 
 namespace App\Entities;
+
+use Exception;
 
 class Setting extends Base
 {
@@ -26,25 +28,6 @@ class Setting extends Base
     public function __construct(array $data = null)
     {
         parent::__construct($data);
-    }
-
-    /**
-     * @return int
-     */
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param int $id
-     * @return $this
-     */
-    public function setId(int $id): Setting
-    {
-        $this->id = $id;
-        $this->attributes['id'] = $this->id;
-        return $this;
     }
 
     /**
