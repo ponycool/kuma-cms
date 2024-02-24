@@ -14,6 +14,7 @@ use App\Enums\DeletedStatus;
 use App\Traits\CoreTrait;
 use CodeIgniter\Database\BaseConnection;
 use CodeIgniter\Database\ConnectionInterface;
+use CodeIgniter\Database\Query;
 use CodeIgniter\I18n\Time;
 use Config\Database;
 use Config\Services;
@@ -29,6 +30,8 @@ class BaseService
     protected string $tablePrefix;
     // 数据模型
     protected object $model;
+    //返回结果数据类型，object、array
+    protected string $resultType = 'object';
 
     use CoreTrait;
 
@@ -117,6 +120,16 @@ class BaseService
         $this->model = $model;
     }
 
+    public function getResultType(): string
+    {
+        return $this->resultType;
+    }
+
+    public function setResultType(string $resultType): void
+    {
+        $this->resultType = $resultType;
+    }
+
     /**
      * 校验数据
      * @param object $model
@@ -134,6 +147,76 @@ class BaseService
         }
         return null;
     }
+
+    /**
+     * 自定义SQL查询
+     * @param string $sql
+     * @param array|null $params
+     * @return array
+     */
+    public function query(string $sql, ?array $params = null): array
+    {
+        $db = $this->getDb();
+        if (is_null($params)) {
+            $query = $db->query($sql);
+        } else {
+            $query = $db->query($sql, $params);
+        }
+        if ($this->getResultType() === 'object') {
+            return $query->getResult();
+        }
+        return $query->getResultArray();
+    }
+
+    /**
+     * 拼装SQL
+     * @param array $sql
+     * @return string
+     */
+    public function assembleSql(array $sql): string
+    {
+        $newSql = implode('', $sql);
+        $newSql = trim($newSql);
+        $tablePrefix = $this->getTablePrefix();
+        // 替换表前缀
+        return str_replace('swap_', $tablePrefix, $newSql);
+    }
+
+    /**
+     * 预编译SQL
+     * @param string $sql
+     * @param array|null $params
+     * @return string
+     */
+    public function prepareSql(string $sql, ?array $params = null): string
+    {
+        $db = $this->getDb();
+        if (is_null($params)) {
+            $pQuery = $db->prepare(function () use ($db, $sql) {
+                return (new Query($db))->setQuery($sql);
+            });
+        } else {
+            $pQuery = $db->prepare(
+                function () use ($db, $sql) {
+                    return (new Query($db))->setQuery($sql);
+                },
+                $params
+            );
+        }
+        if ($pQuery->hasError()) {
+            log_message(
+                'error',
+                'SQL预编译失败，err：{err}',
+                [
+                    'err' => $pQuery->getErrorMessage()
+                ]
+            );
+        }
+        $pQuery->close();
+
+        return $pQuery->getQueryString();
+    }
+
 
     /**
      * 计算总页数
@@ -192,6 +275,69 @@ class BaseService
             ->findAll();
         return (array)$res;
     }
+
+    /**
+     * 根据自定义SQL获取数据总条数
+     * @param string $sql 自定义SQL
+     * @param array|null $params 参数
+     * @return int
+     */
+    public function getTotalRowsByQuery(string $sql, ?array $params = null): int
+    {
+        $selectKeyword = 'SELECT';
+        $fromKeyword = 'FROM';
+        $start = stripos($sql, $selectKeyword);
+        $end = stripos($sql, $fromKeyword);
+        if ($start !== false && $end !== false) {
+            $newSql = substr($sql, 0, strlen($selectKeyword) + 1);
+            $newSql .= "count(*) as total_rows ";
+            $newSql .= substr($sql, $end);
+            $result = $this->query($newSql, $params);
+            if (count($result) === 0) {
+                return 0;
+            }
+            if (is_array($result[0])) {
+                return (int)$result[0]['total_rows'];
+            } else {
+                return (int)$result[0]->total_rows;
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * 根据自定义SQL获取分页
+     * @param string $sql
+     * @param array|null $params
+     * @param int $page
+     * @param int $pageSize
+     * @return array
+     */
+    public function getPageByQuery(string $sql, ?array $params = null, int $page = 1, int $pageSize = 10): array
+    {
+        $pageData = [
+            'page' => $page,
+            'pageSize' => $pageSize,
+            'total' => 0,
+            'totalPage' => 0,
+            'pageData' => []
+        ];
+        $sql = $this->prepareSql($sql, $params);
+        $totalRows = $this->getTotalRowsByQuery($sql, $params);
+        if ($totalRows === 0) {
+            return $pageData;
+        }
+        $pageData['total'] = $totalRows;
+        // 总页数
+        $pageData['totalPage'] = $this->totalPages($totalRows, $pageSize);
+        $offset = $this->pageOffset($page, $pageSize);
+        $sql .= sprintf(" LIMIT %s,%s", $offset, $pageSize);
+        $this->setResultType('array');
+        $result = $this->query($sql, $params);
+        $pageData['pageData'] = $result;
+        return $pageData;
+    }
+
 
     /**
      * 根据查询条件获取所有符合条件的数据
