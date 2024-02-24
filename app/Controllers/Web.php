@@ -45,7 +45,7 @@ class Web extends Base
         $this->setTemplate('home');
 
         // 设置默认主题
-        $this->setTheme(self::getSettings()[Setting::theme->value] ?? 'default');
+        $this->setTheme(self::getSettings()[Setting::THEME->value] ?? 'default');
 
         // 设置全局数据
         $this->setData([]);
