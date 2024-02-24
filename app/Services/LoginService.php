@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entities\Login;
+use App\Enums\DeletedStatus;
 use App\Enums\Status;
 use CodeIgniter\I18n\Time;
 use Config\Services;
@@ -86,5 +87,34 @@ class LoginService extends BaseService
         $login->setIp($ip);
         $this->insert($login);
         return $token;
+    }
+
+    /**
+     * 获取日志分页数据
+     * @param string|null $keyword
+     * @param int $page
+     * @param int $pageSize
+     * @return array
+     */
+    public function getList(?string $keyword = null, int $page = 1, int $pageSize = 10): array
+    {
+        $sql = [
+            'SELECT id,account_id,account_name,ip,login_status,created_at,updated_at ',
+            'FROM swap_login ',
+            'WHERE deleted_at IS NULL ',
+            'AND deleted=? '
+        ];
+        if (!is_null($keyword)) {
+            $sql[] = 'AND account_name like ? ';
+        }
+        $sql[] = 'ORDER BY created_at DESC';
+        $sql = $this->assembleSql($sql);
+        $sqlParams = [
+            DeletedStatus::UNDELETED->value
+        ];
+        if (!is_null($keyword)) {
+            $sqlParams[] = '%' . $keyword . '%';
+        }
+        return $this->getPageByQuery($sql, $sqlParams, page: $page, pageSize: $pageSize);
     }
 }
