@@ -14,7 +14,7 @@ use App\Enums\Code;
 use App\Services\ArticleService;
 use Exception;
 
-class Page extends Base
+class Query extends Base
 {
     /**
      * 获取文章列表信息
