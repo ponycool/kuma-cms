@@ -168,6 +168,23 @@ class ArticleService extends BaseService
     }
 
     /**
+     * 根据UUID获取文章详情
+     * @param string $uuid
+     * @return array|null
+     */
+    public function getArticleByUUID(string $uuid): ?array
+    {
+        if ($this->validateUUID($uuid) !== true) {
+            return null;
+        }
+        $res = $this->getFirstByUuid($uuid);
+        if (count($res) > 0) {
+            $res = $this->mergeMedia([$res])[0];
+        }
+        return $res;
+    }
+
+    /**
      * 创建文章
      * @param array $params
      * @return bool|string

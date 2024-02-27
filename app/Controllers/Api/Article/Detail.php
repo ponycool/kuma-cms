@@ -41,7 +41,10 @@ class Detail extends Base
                 throw new Exception('无效的文章UUID');
             }
             $svc = new ArticleService();
-            $res = $svc->getFirstByUuid($uuid);
+            $res = $svc->getArticleByUUID($uuid);
+            if (is_null($res)) {
+                throw new Exception('获取文章失败');
+            }
             $data = [
                 'code' => Code::OK,
                 'message' => '获取文章成功',
