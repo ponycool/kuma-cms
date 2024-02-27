@@ -60,4 +60,51 @@ class UserService extends BaseService
         }
         return $this->getPageByQuery($sql, $sqlParams, page: $page, pageSize: $pageSize);
     }
+
+    /**
+     * 获取用户档案
+     * @param string $uuid
+     * @return array|null
+     */
+    public function getUserProfile(string $uuid): ?array
+    {
+        if (!$this->validateUUID($uuid)) {
+            return null;
+        }
+        $sql = [
+            'SELECT user.id,user.uuid,user.account_id,user.nickname,user.created_at,user.updated_at,',
+            'account.uuid AS account_uuid,account.account_name,account.email,account.locked,account.locked_at ',
+            'FROM swap_user AS user ',
+            'LEFT JOIN swap_account AS account on account.id=user.account_id ',
+            'WHERE user.deleted_at IS NULL ',
+            'AND user.deleted=? ',
+            'AND account.deleted_at IS NULL ',
+            'AND account.deleted=? ',
+            'AND user.uuid = ?'
+        ];
+        $sql = $this->assembleSql($sql);
+        $sqlParams = [
+            DeletedStatus::UNDELETED->value,
+            DeletedStatus::UNDELETED->value,
+            $uuid
+        ];
+        $res = $this->query($sql, $sqlParams);
+        if (count($res) === 0) {
+            return null;
+        }
+        $uid = $res['id'] ?? null;
+        if (!is_null($uid)) {
+            $userMetaSvc = new UserMetaService();
+            $cond = [
+                'user_id' => $uid
+            ];
+            $meta = $userMetaSvc->getByCond($cond);
+            if (count($meta) > 0) {
+                foreach ($meta as $item) {
+                    $res[$item['meta_key']] = $item['meta_value'];
+                }
+            }
+        }
+        return $res;
+    }
 }
