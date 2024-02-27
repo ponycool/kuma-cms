@@ -2,41 +2,40 @@
 /**
  * Created By PhpStorm
  * User: Pony
- * Data: 2024/2/4
- * Time: 14:55
+ * Data: 2024/2/26
+ * Time: 16:09
  */
 declare(strict_types=1);
 
-namespace App\Controllers\Api\Article;
+namespace App\Controllers\Api\User;
 
 use App\Controllers\Api\Base;
 use App\Enums\Code;
-use App\Services\ArticleService;
+use App\Services\UserService;
 use Exception;
 
-class Page extends Base
+class Query extends Base
 {
-    /**
-     * 获取文章列表信息
-     * @return void
-     */
     public function index(): void
     {
         $this->postFilter();
         $this->validatePageParamsFromJsonInput();
-        $svc = new ArticleService();
+        $params = $this->getJsonInputParams();
+        $page = $params['page'] ?? 1;
+        $pageSize = $params['pageSize'] ?? 10;
+        $keyword = $params['keyword'] ?? null;
+        $svc = new UserService();
         try {
-            $params = $this->getJsonInputParams();
-            $list = $svc->getList($params);
+            $list = $svc->getList($keyword, page: $page, pageSize: $pageSize);
             $data = [
                 'code' => Code::OK,
-                'message' => '获取文章列表成功',
+                'message' => '获取用户列表成功',
             ];
             $data = array_merge($data, $list);
         } catch (Exception $e) {
             $data = [
                 'code' => Code::FAIL,
-                'message' => $e->getMessage() ?: '获取文章列表失败',
+                'message' => $e->getMessage() ?: '获取用户列表失败',
             ];
         }
         $this->render($data);
