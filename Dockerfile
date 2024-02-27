@@ -28,7 +28,8 @@ RUN addgroup -g 1000 -S www && adduser -s /sbin/nologin -S -D -u 1000 -G www www
 RUN set-eux; \
     [ ! -d "$APP_PATH" ]; \
     mkdir -p "$APP_PATH"; \
-    chown -R www:www "$APP_PATH"
+    chown -R www:www "$APP_PATH"; \
+    chown -R www:www "/var/lib/nginx"
 
 # PHPIZE_DEPS 包含 gcc g++ 等编译辅助类库，完成编译后删除
 ENV apk add --no-cache $PHPIZE_DEPS && \
