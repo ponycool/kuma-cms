@@ -41,10 +41,10 @@ class MediaService extends BaseService
                 $mergeId = function ($id) use (&$layers, &$count, &$medias, &$mergeId) {
                     $layers++;
                     foreach ($id as $item) {
-                        if (!is_string($item) && !is_array($item)) {
+                        if (!is_string($item) && !is_array($item) && !is_int($item)) {
                             throw new Exception('存在无效的媒体ID');
                         }
-                        if (is_string($item)) {
+                        if (is_string($item)||is_int($item)) {
                             $medias[] = $item;
                             $count++;
                         }
