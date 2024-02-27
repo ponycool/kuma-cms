@@ -126,15 +126,13 @@ class ArticleService extends BaseService
      * @param array $list
      * @return array
      */
-    public function mergeImages(array $list): array
+    public function mergeMedia(array $list): array
     {
         $coverImageList = [];
         foreach ($list as $item) {
             if (!is_null($item['cover_image'])) {
                 $coverImageList[] = $item['cover_image'];
             }
-
-
         }
         $mediaSvc = new MediaService();
         if (!empty($coverImageList)) {
@@ -163,7 +161,7 @@ class ArticleService extends BaseService
         $res = $this->getPage($page, $pageSize);
         if ($res['total'] > 0) {
             if (is_array($res['pageData'])) {
-                $res['pageData'] = $this->mergeImages($res['pageData']);
+                $res['pageData'] = $this->mergeMedia($res['pageData']);
             }
         }
         return $res;
