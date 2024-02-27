@@ -86,6 +86,8 @@ RUN chown -R www.www /var/www/html && \
     rm -rf $APP_PATH/writable/logs/*.log && \
     echo "jwt.secret=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)" >> "$APP_PATH/.env"
 
+VOLUME "$APP_PATH/writable"
+
 WORKDIR "$APP_PATH"
 
 EXPOSE 80
