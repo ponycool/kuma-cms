@@ -206,11 +206,13 @@ class MediaService extends BaseService
                     ->setStatus('normal');
                 // 获取当前用户
                 $accountID = $this->getLoginAccountID();
-                $userSvc = new UserService();
-                $user = $userSvc->getByAccountID($accountID);
-                $creator = $user['id'] ?? null;
-                if (!is_null($creator)) {
-                    $media->setCreator($creator);
+                if (!is_null($accountID)) {
+                    $userSvc = new UserService();
+                    $user = $userSvc->getByAccountID($accountID);
+                    $creator = $user['id'] ?? null;
+                    if (!is_null($creator)) {
+                        $media->setCreator($creator);
+                    }
                 }
                 $res = $service->insert($media);
                 if ($res) {
