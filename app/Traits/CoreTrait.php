@@ -10,7 +10,6 @@ namespace App\Traits;
 
 use App\Enums\Code;
 use Carbon\Carbon;
-use Config\Services;
 use Exception;
 use PonyCool\Core\Jwt\Jwt;
 use Ramsey\Uuid\Uuid;
@@ -73,6 +72,58 @@ trait CoreTrait
             // 检查Carbon对象是否存在，并且与原始字符串完全匹配
             return $d && $d->format($format) == $date;
         } catch (Exception) {
+            return false;
+        }
+    }
+
+    /**
+     * 校验密码，必须包含大小写字母、数字、特殊字符其中的任意三种组合，并且长度不能小于6位
+     * @param string $password
+     * @return bool
+     */
+    protected function validatePassword(string $password): bool
+    {
+        if (strlen($password) < 6) {
+            return false;
+        }
+        // 包含大写字母
+        $uppercase = preg_match('/[A-Z]/', $password);
+        // 包含小写字母
+        $lowercase = preg_match('/[a-z]/', $password);
+        // 包含数字
+        $number = preg_match('/[0-9]/', $password);
+        // 包含特殊字符
+        $specialChars = preg_match('/[^A-Za-z0-9]/', $password);
+
+        $conditionsMet = 0;
+        if ($uppercase) {
+            $conditionsMet++;
+        }
+        if ($lowercase) {
+            $conditionsMet++;
+        }
+        if ($number) {
+            $conditionsMet++;
+        }
+        if ($specialChars) {
+            $conditionsMet++;
+        }
+        return $conditionsMet >= 3; // 至少符合三种条件
+    }
+
+    /**
+     * 生成盐值
+     * @param int $length
+     * @return bool|string
+     */
+    protected function generateSalt(int $length = 32): bool|string
+    {
+        try {
+            return bin2hex(random_bytes($length / 2));
+        } catch (Exception $exc) {
+            log_message("error", "生成盐值异常，err：{err}",
+                ["err" => $exc->getMessage()]
+            );
             return false;
         }
     }

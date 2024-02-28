@@ -526,6 +526,16 @@ class BaseService
     }
 
     /**
+     * 获取插入行的ID
+     * @return int
+     */
+    public function getInsertId(): int
+    {
+        $db = $this->getDb();
+        return $db->insertID();
+    }
+
+    /**
      * 插入一条数据
      * @param object $entity 实体
      * @return bool
