@@ -82,6 +82,28 @@ class UserService extends BaseService
     }
 
     /**
+     * 获取更新规则
+     * @return array
+     */
+    public function getUpdateRules(): array
+    {
+        $rules = [
+            'uuid' => [
+                'rules' => 'required|min_length[35]|max_length[37]',
+                'errors' => [
+                    'required' => '参数用户UUID[uuid]为必填项',
+                    'min_length' => '参数用户UUID[uuid]无效',
+                    'max_length' => '参数用户UUID[uuid]无效',
+                ]
+            ],
+        ];
+        return array_merge(
+            $this->getBaseRules(),
+            $rules
+        );
+    }
+
+    /**
      * 根据账户ID获取用户
      * @param int $id
      * @return array
@@ -188,6 +210,11 @@ class UserService extends BaseService
         if (is_string($data)) {
             return $data;
         }
+        // 校验密码
+        $password = $data['password'] ?? '';
+        if ($this->validatePassword($password) !== true) {
+            return '无效的密码,密码长度不能小于6位，且必须包含大小写字母、数字、特殊字符其中的任意三种组合';
+        }
 
         $accountName = $data['account_name'];
         $password = $data['password'];
@@ -237,11 +264,6 @@ class UserService extends BaseService
     public function prepareData(array $data): string|array
     {
         $data = $this->convertParamsToSnakeCase($data);
-        // 校验密码
-        $password = $data['password'] ?? '';
-        if ($this->validatePassword($password) !== true) {
-            return '无效的密码,密码长度不能小于6位，且必须包含大小写字母、数字、特殊字符其中的任意三种组合';
-        }
 
         // 校验用户头像
         $mediaSvc = new MediaService();
@@ -254,20 +276,53 @@ class UserService extends BaseService
             $data['avatar'] = (int)$media['id'];
         }
 
-        // 移除系统生成参数，防止篡改
-        if (!is_null($data['id'] ?? null)) {
-            unset($data['id']);
-        }
-        if (!is_null($data['uuid'] ?? null)) {
-            unset($data['uuid']);
-        }
-        if (!is_null($data['salt'] ?? null)) {
-            unset($data['salt']);
-        }
-        if (!is_null($data['locked'] ?? null)) {
-            unset($data['locked']);
+        return $data;
+    }
+
+    /**
+     * 更新用户
+     * @param array $params
+     * @return bool|string
+     */
+    public function updateUser(array $params): bool|string
+    {
+        $data = $this->prepareData($params);
+
+        $rawUser = $this->getFirstByUuid($data['uuid']);
+        if (empty($rawUser)) {
+            return '用户UUID不存在';
         }
 
-        return $data;
+        $accountName = $data['account_name'] ?? null;
+        $email = $data['email'] ?? null;
+        $nickname = $data['nickname'] ?? null;
+        $account = new Account();
+        $accountSvc = new AccountService();
+        // 开始执行事务
+        $this->db->transStart();
+        if (!is_null($accountName)) {
+            $cond = [
+                'account_name' => $accountName
+            ];
+            $rawAccount = $accountSvc->getFirstByCond($cond);
+            if (empty($rawAccount)) {
+                $account->setAccountName($accountName);
+            }
+        }
+        if (!is_null($email)) {
+            $account->setEmail($email);
+        }
+
+        if (!is_null($accountName) || !is_null($email)) {
+            $accountSvc->updateById($account, $rawUser['account_id']);
+        }
+
+        if (!is_null($nickname)) {
+            $user = new User();
+            $user->setNickname($nickname);
+            $this->updateById($user, $rawUser['id']);
+        }
+        $this->db->transComplete();
+        return true;
     }
 }
