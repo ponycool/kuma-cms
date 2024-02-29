@@ -207,19 +207,13 @@ class UserService extends BaseService
         $accountSvc = new AccountService();
         // 开始执行事务
         $this->db->transStart();
-        $res = $accountSvc->insert($account);
-        if ($res !== true) {
-            return '创建账户信息失败';
-        }
+        $accountSvc->insert($account);
         $accountID = $this->getInsertId();
         $nickname = $data['nickname'] ?? $accountName;
         $user = new User();
         $user->setAccountId($accountID)
             ->setNickname($nickname);
-        $res = $this->insert($user);
-        if ($res !== true) {
-            return '创建用户信息失败';
-        }
+        $this->insert($user);
         $uid = $this->getInsertId();
 
         $userMetaSvc = new UserMetaService();
