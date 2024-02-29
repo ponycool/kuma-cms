@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: Pony
- * Date: 2024/01/04
- * Time: 01:48 上午
+ * Date: 2024/02/29
+ * Time: 02:30 上午
  */
 declare(strict_types=1);
 
@@ -16,6 +16,7 @@ class AccountModel extends BaseModel
     protected $returnType = 'App\Entities\Account';
     protected $useSoftDeletes = true;
     protected $allowedFields = [
+        'uuid',
         'account_name',
         'password',
         'salt',
@@ -28,9 +29,14 @@ class AccountModel extends BaseModel
     protected $updatedField = 'updated_at';
     protected $deletedField = 'deleted_at';
     protected $validationRules = [
+        'uuid' => 'required|min_length[36]|max_length[36]',
     ];
     protected $validationMessages = [
-
+        'uuid' => [
+            'required' => 'uuid 列为必填项',
+            'min_length' => 'uuid 长度为36个字符',
+            'max_length' => 'uuid 长度为36个字符',
+        ],
     ];
     protected $skipValidation = false;
 

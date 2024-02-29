@@ -20,7 +20,7 @@ class UserService extends BaseService
      * 获取基础验证规则
      * @return array[]
      */
-    public function getValidationRules(): array
+    public function getBaseRules(): array
     {
         return [
             'accountName' => [
@@ -76,7 +76,29 @@ class UserService extends BaseService
             ],
         ];
         return array_merge(
-            $this->getValidationRules(),
+            $this->getBaseRules(),
+            $rules
+        );
+    }
+
+    /**
+     * 获取更新规则
+     * @return array
+     */
+    public function getUpdateRules(): array
+    {
+        $rules = [
+            'uuid' => [
+                'rules' => 'required|min_length[35]|max_length[37]',
+                'errors' => [
+                    'required' => '参数用户UUID[uuid]为必填项',
+                    'min_length' => '参数用户UUID[uuid]无效',
+                    'max_length' => '参数用户UUID[uuid]无效',
+                ]
+            ],
+        ];
+        return array_merge(
+            $this->getBaseRules(),
             $rules
         );
     }
@@ -188,6 +210,11 @@ class UserService extends BaseService
         if (is_string($data)) {
             return $data;
         }
+        // 校验密码
+        $password = $data['password'] ?? '';
+        if ($this->validatePassword($password) !== true) {
+            return '无效的密码,密码长度不能小于6位，且必须包含大小写字母、数字、特殊字符其中的任意三种组合';
+        }
 
         $accountName = $data['account_name'];
         $password = $data['password'];
@@ -197,29 +224,40 @@ class UserService extends BaseService
         }
         $password = hash_hmac('sha256', $password, $salt);
         $email = $data['email'] ?? null;
+        // 判断账户是否已经存在
+        $accountSvc = new AccountService();
+        $cond = [
+            'account_name' => $accountName,
+        ];
+        $res = $accountSvc->getByCond($cond);
+        if (!empty($res)) {
+            return '账户名已存在';
+        }
+
         $account = new Account();
         $account->setAccountName($accountName)
             ->setPassword($password)
             ->setSalt($salt);
         if (!is_null($email)) {
+            $cond = [
+                'email' => $email,
+            ];
+            $res = $accountSvc->getByCond($cond);
+            if (!empty($res)) {
+                return '邮箱已被注册';
+            }
             $account->setEmail($email);
         }
-        $accountSvc = new AccountService();
+
         // 开始执行事务
         $this->db->transStart();
-        $res = $accountSvc->insert($account);
-        if ($res !== true) {
-            return '创建账户信息失败';
-        }
+        $accountSvc->insert($account);
         $accountID = $this->getInsertId();
         $nickname = $data['nickname'] ?? $accountName;
         $user = new User();
         $user->setAccountId($accountID)
             ->setNickname($nickname);
-        $res = $this->insert($user);
-        if ($res !== true) {
-            return '创建用户信息失败';
-        }
+        $this->insert($user);
         $uid = $this->getInsertId();
 
         $userMetaSvc = new UserMetaService();
@@ -243,11 +281,6 @@ class UserService extends BaseService
     public function prepareData(array $data): string|array
     {
         $data = $this->convertParamsToSnakeCase($data);
-        // 校验密码
-        $password = $data['password'] ?? '';
-        if ($this->validatePassword($password) !== true) {
-            return '无效的密码,密码长度不能小于6位，且必须包含大小写字母、数字、特殊字符其中的任意三种组合';
-        }
 
         // 校验用户头像
         $mediaSvc = new MediaService();
@@ -260,20 +293,79 @@ class UserService extends BaseService
             $data['avatar'] = (int)$media['id'];
         }
 
-        // 移除系统生成参数，防止篡改
-        if (!is_null($data['id'] ?? null)) {
-            unset($data['id']);
-        }
-        if (!is_null($data['uuid'] ?? null)) {
-            unset($data['uuid']);
-        }
-        if (!is_null($data['salt'] ?? null)) {
-            unset($data['salt']);
-        }
-        if (!is_null($data['locked'] ?? null)) {
-            unset($data['locked']);
+        return $data;
+    }
+
+    /**
+     * 更新用户
+     * @param array $params
+     * @return bool|string
+     */
+    public function updateUser(array $params): bool|string
+    {
+        $data = $this->prepareData($params);
+
+        $rawUser = $this->getFirstByUuid($data['uuid']);
+        if (empty($rawUser)) {
+            return '用户UUID不存在';
         }
 
-        return $data;
+        $accountName = $data['account_name'] ?? null;
+        $email = $data['email'] ?? null;
+        $nickname = $data['nickname'] ?? null;
+        $account = new Account();
+        $accountSvc = new AccountService();
+        // 开始执行事务
+        $this->db->transStart();
+        if (!is_null($accountName)) {
+            $cond = [
+                'account_name' => $accountName
+            ];
+            $rawAccount = $accountSvc->getFirstByCond($cond);
+            if (empty($rawAccount)) {
+                $account->setAccountName($accountName);
+            }
+        }
+        if (!is_null($email)) {
+            $account->setEmail($email);
+        }
+
+        if (!is_null($accountName) || !is_null($email)) {
+            $accountSvc->updateById($account, $rawUser['account_id']);
+        }
+
+        if (!is_null($nickname)) {
+            $user = new User();
+            $user->setNickname($nickname);
+            $this->updateById($user, $rawUser['id']);
+        }
+        $this->db->transComplete();
+        return true;
+    }
+
+    /**
+     * 删除用户
+     * @param string $uuid
+     * @return bool|string
+     */
+    public function deleteUser(string $uuid): bool|string
+    {
+        $user = $this->getFirstByUuid($uuid);
+        if (empty($user)) {
+            return '用户UUID不存在';
+        }
+        if ($user['account_id'] === 1) {
+            return '超级管理员不允许删除';
+        }
+
+        $id = (int)$user['id'];
+        $accountID = (int)$user['account_id'];
+        $accountSvc = new AccountService();
+        // 开始执行事务
+        $this->db->transStart();
+        $this->delete($id);
+        $accountSvc->delete($accountID);
+        $this->db->transComplete();
+        return true;
     }
 }

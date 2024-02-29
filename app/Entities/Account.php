@@ -2,16 +2,19 @@
 /**
  * Created by PhpStorm.
  * User: Pony
- * Date: 2024/01/04
- * Time: 01:46 上午
+ * Date: 2024/02/29
+ * Time: 02:30 上午
  */
 declare(strict_types=1);
 
 namespace App\Entities;
 
+use Exception;
+
 class Account extends Base
 {
     protected int $id = 0;
+    protected string $uuid;
     protected string $account_name;
     protected string $password;
     protected string $salt;
@@ -31,6 +34,15 @@ class Account extends Base
     public function __construct(array $data = null)
     {
         parent::__construct($data);
+        try {
+            $this->setUuid();
+        } catch (Exception $e) {
+            log_message(
+                'error',
+                '初始化 Account Entity 失败，error：{msg}',
+                ['msg' => $e->getMessage()]
+            );
+        }
     }
 
     /**
@@ -49,6 +61,26 @@ class Account extends Base
     {
         $this->id = $id;
         $this->attributes['id'] = $this->id;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUuid(): string
+    {
+        return $this->uuid;
+    }
+
+    /**
+     * @param string $uuid
+     * @return $this
+     * @throws Exception
+     */
+    public function setUuid(string $uuid = ''): Account
+    {
+        $this->uuid = $uuid ?: $this->generateUuid();
+        $this->attributes['uuid'] = $this->uuid;
         return $this;
     }
 

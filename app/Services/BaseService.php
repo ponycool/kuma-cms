@@ -422,6 +422,19 @@ class BaseService
      * @param $where
      * @return array
      */
+    public function getWhere($where): array
+    {
+        $model = $this->getModel();
+        $builder = $model->asArray();
+        $res = $builder->where($where)
+            ->findAll();
+        return (array)$res;
+    }
+
+    /**
+     * @param $where
+     * @return array
+     */
     public function getOrWhere($where): array
     {
         $model = $this->getModel();
@@ -612,6 +625,58 @@ class BaseService
     }
 
     /**
+     * 根据ID更新数据
+     * @param object $entity
+     * @param int|null $id
+     * @return bool
+     */
+    public function updateById(object $entity, ?int $id = null): bool
+    {
+        $db = $this->getDb();
+        $table = $this->getTable();
+        $model = $this->getModel();
+        $builder = $db->table($table);
+        try {
+            if (!is_object($entity)) {
+                throw new Exception('数据类型必须为Object');
+            }
+            $verificationRes = $this->verificationData($model, $entity);
+            if (!is_null($verificationRes)) {
+                throw new Exception($table . '属性无效，未通过验证策略校验。');
+            }
+            // 如果未设置ID参数，从实体中获取
+            if (is_null($id)) {
+                $id = $entity->getId();
+            }
+
+            $currentTime = Time::now()->toDateTimeString();
+            $data = $entity->toArray();
+            // 移除id、gid、uuid等不需要更新参数
+            $data = array_diff_key($data, [
+                'id' => '',
+                'gid' => '',
+                'uuid' => ''
+            ]);
+            $data['updated_at'] = $currentTime;
+            $builder->where('id', $id)
+                ->update($data);
+            $rows = $db->affectedRows();
+            if ($rows === 0) {
+                throw new Exception('受影响行数为0');
+            }
+            return true;
+        } catch (Exception $e) {
+            log_message('error', '根据ID更新{table}失败，error：{error}',
+                [
+                    'table' => $table,
+                    'error' => $e->getMessage()
+                ]
+            );
+            return false;
+        }
+    }
+
+    /**
      * 根据UUID更新数据
      * @param object $entity
      * @param string|null $uuid
@@ -662,6 +727,71 @@ class BaseService
                 [
                     'table' => $table,
                     'error' => $e->getMessage()
+                ]
+            );
+            return false;
+        }
+    }
+
+    /**
+     * 根据条件更新
+     * @param array $data 更新数据
+     * @param array $cond 更新条件
+     * @return bool
+     */
+    public function updateByCond(array $data, array $cond): bool
+    {
+        $db = $this->getDb();
+        $table = $this->getTable();
+        $builder = $db->table($table);
+        try {
+            $builder->where('deleted', DeletedStatus::UNDELETED->value);
+            foreach ($cond as $k => $v) {
+                if (is_object($v)) {
+                    break;
+                }
+                if (is_array($v)) {
+                    $builder->whereIn($k, $v);
+                    continue;
+                }
+                $builder->where($k, $v);
+            }
+            $data['updated_at'] = Time::now()->toDateTimeString();
+            // 更新时如果存在创建时间，则移除创建时间
+            if (array_key_exists('created_at', $data)) {
+                unset($data['created_at']);
+            }
+            // 尝试移除不需要更新的索引
+            if (array_key_exists('id', $data)) {
+                unset($data['id']);
+            }
+            if (array_key_exists('gid', $data)) {
+                unset($data['gid']);
+            }
+            if (array_key_exists('uuid', $data)) {
+                unset($data['uuid']);
+            }
+            $builder->update($data);
+            $rows = $db->affectedRows();
+            if ($rows === 0) {
+                throw new Exception('0行数据受影响');
+            }
+            log_message(
+                'info',
+                '{table} 更新 {rows} 行数据',
+                [
+                    'table' => $table,
+                    'rows' => $rows
+                ]
+            );
+            return true;
+        } catch (Exception $e) {
+            log_message(
+                'error',
+                '{table} update failed, error: {msg}',
+                [
+                    'table' => $table,
+                    'msg' => $e->getMessage()
                 ]
             );
             return false;

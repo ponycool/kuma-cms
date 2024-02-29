@@ -191,9 +191,8 @@ class ArticleService extends BaseService
      */
     public function createArticle(array $params): bool|string
     {
-        $data = $this->convertParamsToSnakeCase($params);
         // 准备数据
-        $data = $this->prepareData($data);
+        $data = $this->prepareData($params);
         if (is_string($data)) {
             return $data;
         }
@@ -272,6 +271,7 @@ class ArticleService extends BaseService
      */
     public function prepareData(array $data): string|array
     {
+        $data = $this->convertParamsToSnakeCase($data);
         // 校验自定义发布时间
         if (!is_null($data['custom_date'] ?? null)) {
             if (!$this->validateDate($data['custom_date'])) {
