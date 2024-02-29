@@ -224,14 +224,31 @@ class UserService extends BaseService
         }
         $password = hash_hmac('sha256', $password, $salt);
         $email = $data['email'] ?? null;
+        // 判断账户是否已经存在
+        $accountSvc = new AccountService();
+        $cond = [
+            'account_name' => $accountName,
+        ];
+        $res = $accountSvc->getByCond($cond);
+        if (!empty($res)) {
+            return '账户名已存在';
+        }
+
         $account = new Account();
         $account->setAccountName($accountName)
             ->setPassword($password)
             ->setSalt($salt);
         if (!is_null($email)) {
+            $cond = [
+                'email' => $email,
+            ];
+            $res = $accountSvc->getByCond($cond);
+            if (!empty($res)) {
+                return '邮箱已被注册';
+            }
             $account->setEmail($email);
         }
-        $accountSvc = new AccountService();
+
         // 开始执行事务
         $this->db->transStart();
         $accountSvc->insert($account);
@@ -322,6 +339,32 @@ class UserService extends BaseService
             $user->setNickname($nickname);
             $this->updateById($user, $rawUser['id']);
         }
+        $this->db->transComplete();
+        return true;
+    }
+
+    /**
+     * 删除用户
+     * @param string $uuid
+     * @return bool|string
+     */
+    public function deleteUser(string $uuid): bool|string
+    {
+        $user = $this->getFirstByUuid($uuid);
+        if (empty($user)) {
+            return '用户UUID不存在';
+        }
+        if ($user['account_id'] === 1) {
+            return '超级管理员不允许删除';
+        }
+
+        $id = (int)$user['id'];
+        $accountID = (int)$user['account_id'];
+        $accountSvc = new AccountService();
+        // 开始执行事务
+        $this->db->transStart();
+        $this->delete($id);
+        $accountSvc->delete($accountID);
         $this->db->transComplete();
         return true;
     }

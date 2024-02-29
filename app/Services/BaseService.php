@@ -422,6 +422,19 @@ class BaseService
      * @param $where
      * @return array
      */
+    public function getWhere($where): array
+    {
+        $model = $this->getModel();
+        $builder = $model->asArray();
+        $res = $builder->where($where)
+            ->findAll();
+        return (array)$res;
+    }
+
+    /**
+     * @param $where
+     * @return array
+     */
     public function getOrWhere($where): array
     {
         $model = $this->getModel();
