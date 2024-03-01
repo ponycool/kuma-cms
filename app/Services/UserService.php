@@ -13,6 +13,8 @@ use App\Entities\Account;
 use App\Entities\User;
 use App\Entities\UserMeta;
 use App\Enums\DeletedStatus;
+use App\Enums\LockStatus;
+use Carbon\Carbon;
 
 class UserService extends BaseService
 {
@@ -366,6 +368,54 @@ class UserService extends BaseService
         $this->delete($id);
         $accountSvc->delete($accountID);
         $this->db->transComplete();
+        return true;
+    }
+
+    /**
+     * 冻结用户
+     * @param string $uuid
+     * @return bool|string
+     */
+    public function lockUser(string $uuid): bool|string
+    {
+        $user = $this->getFirstByUuid($uuid);
+        if (empty($user)) {
+            return '用户UUID不存在';
+        }
+        if ($user['account_id'] === 1) {
+            return '超级管理员不允许冻结';
+        }
+
+        $account = new Account();
+        $account->setLocked(LockStatus::LOCKED->value)
+            ->setLockedAt(Carbon::now()->toDateTimeString());
+        $svc = new AccountService();
+        $res = $svc->updateById($account, $user['account_id']);
+        if ($res !== true) {
+            return '账户冻结失败';
+        }
+        return true;
+    }
+
+    /**
+     * 解冻用户
+     * @param string $uuid
+     * @return bool|string
+     */
+    public function unlockUser(string $uuid): bool|string
+    {
+        $user = $this->getFirstByUuid($uuid);
+        if (empty($user)) {
+            return '用户UUID不存在';
+        }
+
+        $account = new Account();
+        $account->setLocked(LockStatus::UNLOCKED->value);
+        $svc = new AccountService();
+        $res = $svc->updateById($account, $user['account_id']);
+        if ($res !== true) {
+            return '账户解冻失败';
+        }
         return true;
     }
 }
