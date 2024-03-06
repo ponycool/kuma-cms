@@ -46,12 +46,12 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarCollapse">
         <div class="navbar-nav ms-auto p-4 p-lg-0">
-            <a href="/" class="nav-item nav-link active">首页</a>
-            <a href="/about" class="nav-item nav-link">关于我们</a>
-            <a href="/service" class="nav-item nav-link">服务支持</a>
-            <a href="/cases" class="nav-item nav-link">项目案例</a>
+            <a href="/" class="nav-item nav-link {{ page=='index'?'active':'' }}">首页</a>
+            <a href="/about" class="nav-item nav-link {{ page=='about'?'active':'' }}">关于我们</a>
+            <a href="/service" class="nav-item nav-link {{ page=='service'?'active':'' }}">服务支持</a>
+            <a href="/cases" class="nav-item nav-link {{ page=='case'?'active':'' }}">项目案例</a>
             <div class="nav-item dropdown">
-                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">页面</a>
+                <a href="#" class="nav-link dropdown-toggle {{ isPage?'active':'' }}" data-bs-toggle="dropdown">页面</a>
                 <div class="dropdown-menu bg-light m-0">
                     <a href="/page?code=feature" class="dropdown-item">特色</a>
                     <a href="/page?code=quote" class="dropdown-item">免费报价</a>
@@ -60,7 +60,7 @@
                     <a href="/error?code=404" class="dropdown-item">404 页面</a>
                 </div>
             </div>
-            <a href="/contact" class="nav-item nav-link">联系我们</a>
+            <a href="/contact" class="nav-item nav-link {{ page=='contact'?'active':'' }}">联系我们</a>
         </div>
         <a href="" class="btn btn-primary rounded-0 py-4 px-lg-5 d-none d-lg-block">获取报价<i
                     class="fa fa-arrow-right ms-3"></i></a>

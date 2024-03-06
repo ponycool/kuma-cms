@@ -869,6 +869,39 @@ class BaseService
     }
 
     /**
+     * 根据ID将字段的值递增指定的量
+     * @param int $id
+     * @param string $field
+     * @param int $value
+     * @return bool
+     */
+    public function incrById(int $id, string $field, int $value = 1): bool
+    {
+        $db = $this->getDb();
+        $table = $this->getTable();
+        $builder = $db->table($this->getTable());
+        try {
+            $builder->where('id', $id)
+                ->increment($field, $value);
+            $rows = $db->affectedRows();
+            if ($rows !== 1) {
+                return false;
+            }
+            return true;
+        } catch (Exception $e) {
+            log_message(
+                'error',
+                '{table} increment failed, error: {msg}',
+                [
+                    'table' => $table,
+                    'msg' => $e->getMessage()
+                ]
+            );
+            return false;
+        }
+    }
+
+    /**
      * 根据条件删除数据
      * @param array $cond
      * @return bool

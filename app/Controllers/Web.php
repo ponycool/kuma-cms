@@ -11,6 +11,7 @@ namespace App\Controllers;
 
 use App\Enums\Code;
 use App\Enums\Setting;
+use App\Services\ArticleService;
 use App\Traits\TemplateTrait;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -29,6 +30,12 @@ class Web extends Base
 
     // 全局数据
     protected array $data;
+
+    // 当前页面
+    protected ?string $page;
+
+    // 网站模块
+    private array $modules;
 
     // 页面标题
     protected string $title;
@@ -49,6 +56,12 @@ class Web extends Base
 
         // 设置全局数据
         $this->setData([]);
+
+        // 初始化当前页面
+        $this->setPage('index');
+
+        // 初始化网站模块
+        self::initModules();
 
         // 初始化页面数据
         $this->setTitle('')
@@ -91,6 +104,28 @@ class Web extends Base
     public function setData(array $data): Web
     {
         $this->data = $data;
+        return $this;
+    }
+
+    public function getPage(): ?string
+    {
+        return $this->page;
+    }
+
+    public function setPage(?string $page): Web
+    {
+        $this->page = $page;
+        return $this;
+    }
+
+    public function getModules(): array
+    {
+        return $this->modules;
+    }
+
+    public function setModules(array $modules): Web
+    {
+        $this->modules = $modules;
         return $this;
     }
 
@@ -150,7 +185,12 @@ class Web extends Base
                 'description' => $this->getDescription(),
                 'keywords' => $this->getKeywords()
             ];
+
             $data = array_merge(self::getData(), $pageData, $data);
+            // 加载公共数据
+            $data = self::mergeCommonData($data);
+            // 加载模块数据
+            $data = self::mergeModuleData($viewPath, $data);
             $this->templateRender($viewPath, $this->getTemplate(), $data, true);
         } catch (Exception $e) {
             log_message('error', 'error: {exception}',
@@ -172,6 +212,7 @@ class Web extends Base
                 'data' => $data
             ];
         }
+
         $this->renderTemplate($data);
         exit(Code::OK->value);
     }
@@ -206,5 +247,72 @@ class Web extends Base
         $viewPath = APPPATH . 'Views';
         $this->templateRender($viewPath, $template, $data, true);
         exit();
+    }
+
+    private function initModules(): void
+    {
+        $modules = [
+            'menu',
+            // 文章列表
+            'articleList',
+        ];
+        $this->setModules($modules);
+
+    }
+
+    /**
+     * 合并公共数据
+     * @param array $data
+     * @return array
+     */
+    private function mergeCommonData(array $data): array
+    {
+        $uri = $this->request->getUri();
+        $path = $uri->getPath() === '/' ? '/' : '/' . $uri->getPath();
+        return array_merge($data,
+            [
+                'baseUrl' => base_url(),
+                'page' => $this->getPage(),
+                'icpLink' => 'https://beian.miit.gov.cn',
+                'path' => $path
+            ]
+        );
+    }
+
+    /**
+     * 加载模块数据
+     * @param string $viewPath
+     * @param array $data
+     * @return array
+     */
+    private function mergeModuleData(string $viewPath, array $data): array
+    {
+        $view = $this->getTemplate();
+        $templateVariables = $this->getTemplateVariables($viewPath, $view);
+        $modules = $this->getModules();
+        foreach ($templateVariables as $variable) {
+            if (in_array($variable, $modules, true) && !key_exists($variable, $data)) {
+                // 加载模块数据
+                $method = 'load' . ucfirst($variable);
+                if (method_exists($this, $method)) {
+                    $data[$variable] = self::$method();
+                }
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * 加载文章列表
+     * @return array
+     */
+    private function loadArticleList(): array
+    {
+        $page = $this->request->getGetPost('page') ?? 1;
+        $pageSize = $this->request->getGetPost('pageSize') ?? 10;
+        $params['page'] = (int)$page;
+        $params['pageSize'] = (int)$pageSize;
+        $svc = new ArticleService();
+        return $svc->getList($params);
     }
 }
