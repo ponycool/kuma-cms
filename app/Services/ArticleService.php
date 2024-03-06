@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entities\Article;
+use App\Enums\PublishStatus;
 use Carbon\Carbon;
 
 class ArticleService extends BaseService
@@ -178,6 +179,63 @@ class ArticleService extends BaseService
             return null;
         }
         $res = $this->getFirstByUuid($uuid);
+        if (count($res) > 0) {
+            $res = $this->mergeMedia([$res])[0];
+        }
+        return $res;
+    }
+
+    /**
+     * 根据UUID获取已发布文章
+     * @param string $uuid
+     * @return array|null
+     */
+    public function getPublishedArticleByUuid(string $uuid): ?array
+    {
+        if ($this->validateUUID($uuid) !== true) {
+            return null;
+        }
+        $cond = [
+            'uuid' => $uuid,
+            'is_published' => PublishStatus::PUBLISHED->value
+        ];
+        $res = $this->getFirstByCond($cond);
+        if (count($res) > 0) {
+            $res = $this->mergeMedia([$res])[0];
+        }
+        return $res;
+    }
+
+    /**
+     * 获取上一篇文章
+     * @param int $id
+     * @return array
+     */
+    public function getPreviousArticle(int $id): array
+    {
+        $cond = [
+            'id <' => $id,
+            'is_published' => PublishStatus::PUBLISHED->value
+        ];
+        $res = $this->getFirstByCond($cond);
+        if (count($res) > 0) {
+            $res = $this->mergeMedia([$res])[0];
+        }
+        return $res;
+    }
+
+    /**
+     * 获取下一篇文章
+     * @param int $id
+     * @return array
+     */
+    public function getNextArticle(int $id): array
+    {
+        $cond = [
+            'id >' => $id,
+            'is_published' => PublishStatus::PUBLISHED->value
+        ];
+        $res = $this->getFirstByCond($cond);
         if (count($res) > 0) {
             $res = $this->mergeMedia([$res])[0];
         }

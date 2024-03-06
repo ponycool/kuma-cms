@@ -14,6 +14,7 @@ class Cases extends Web
     public function index(): void
     {
         $this->setTemplate('case')
+            ->setPage('case')
             ->render();
     }
 }

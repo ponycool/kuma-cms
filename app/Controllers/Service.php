@@ -14,6 +14,7 @@ class Service extends Web
     public function index(): void
     {
         $this->setTemplate('service')
+            ->setPage('service')
             ->render();
     }
 }

@@ -7,7 +7,7 @@ class Home extends Web
 {
     public function index(): void
     {
-        $this->setTitle('酷码内容管理系统');
-        $this->render();
+        $this->setTitle('酷码内容管理系统')
+            ->render();
     }
 }

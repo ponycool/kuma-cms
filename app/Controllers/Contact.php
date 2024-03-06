@@ -14,6 +14,7 @@ class Contact extends Web
     public function index(): void
     {
         $this->setTemplate('contact')
+            ->setPage('contact')
             ->render();
     }
 }
