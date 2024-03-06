@@ -269,12 +269,19 @@ class Web extends Base
     {
         $uri = $this->request->getUri();
         $path = $uri->getPath() === '/' ? '/' : '/' . $uri->getPath();
+        $segments = $uri->getTotalSegments();
+        $assetRelativePath = '';
+        if ($segments > 1) {
+            $assetRelativePath = str_repeat('../', $segments);
+        }
         return array_merge($data,
             [
                 'baseUrl' => base_url(),
                 'page' => $this->getPage(),
+                'assetPath' => '/',
+                'assetRelativePath' => $assetRelativePath,
                 'icpLink' => 'https://beian.miit.gov.cn',
-                'path' => $path
+                'path' => $path,
             ]
         );
     }
