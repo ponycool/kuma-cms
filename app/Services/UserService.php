@@ -155,13 +155,16 @@ class UserService extends BaseService
 
     /**
      * 获取用户档案
-     * @param string $uuid
+     * @param string|null $uuid
      * @return array|null
      */
-    public function getUserProfile(string $uuid): ?array
+    public function getUserProfile(?string $uuid): ?array
     {
-        if (!$this->validateUUID($uuid)) {
+        if (!is_null($uuid) && !$this->validateUUID($uuid)) {
             return null;
+        }
+        if (is_null($uuid)) {
+            $accountId = $this->getLoginAccountID();
         }
         $sql = [
             'SELECT user.id,user.uuid,user.account_id,user.nickname,user.created_at,user.updated_at,',
@@ -172,14 +175,21 @@ class UserService extends BaseService
             'AND user.deleted=? ',
             'AND account.deleted_at IS NULL ',
             'AND account.deleted=? ',
-            'AND user.uuid = ?'
         ];
-        $sql = $this->assembleSql($sql);
         $sqlParams = [
             DeletedStatus::UNDELETED->value,
             DeletedStatus::UNDELETED->value,
-            $uuid
         ];
+
+        if (is_null($uuid)) {
+            $sql[] = 'AND account.id = ?';
+            $sqlParams[] = $accountId;
+        } else {
+            $sql[] = 'AND user.uuid = ?';
+            $sqlParams[] = $uuid;
+        }
+
+        $sql = $this->assembleSql($sql);
         $res = $this->query($sql, $sqlParams);
         if (count($res) === 0) {
             return null;
