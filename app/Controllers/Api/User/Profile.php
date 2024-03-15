@@ -16,14 +16,17 @@ use Exception;
 
 class Profile extends Base
 {
+    /**
+     * 获取用户档案，如果缺少用户UUID参数，则获取当前登录用户档案
+     * @return void
+     */
     public function index(): void
     {
         $this->postFilter();
         $rules = [
             'uuid' => [
-                'rules' => 'required|min_length[35]|max_length[37]',
+                'rules' => 'if_exist|min_length[35]|max_length[37]',
                 'errors' => [
-                    'required' => '参数用户UUID[uuid]为必填项',
                     'min_length' => '参数用户UUID[uuid]无效',
                     'max_length' => '参数用户UUID[uuid]无效',
                 ]
@@ -33,7 +36,7 @@ class Profile extends Base
         try {
             $params = $this->getJsonInputParams();
             $uuid = $params['uuid'] ?? null;
-            if ($this->validateUUID($uuid) !== true) {
+            if (!is_null($uuid) && $this->validateUUID($uuid) !== true) {
                 throw new Exception('无效的用户UUID');
             }
             $svc = new UserService();

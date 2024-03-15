@@ -404,6 +404,21 @@ class BaseService
     }
 
     /**
+     * 根据ID获取一条数据
+     * @param int $id
+     * @return array
+     */
+    public function getFirstById(int $id): array
+    {
+        $model = $this->getModel();
+        $res = $model->asArray()
+            ->select($this->getSelectFields())
+            ->where('id', $id)
+            ->first();
+        return (array)$res;
+    }
+
+    /**
      * 根据UUID获取一条数据
      * @param string $uuid
      * @return array

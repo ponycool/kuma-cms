@@ -106,6 +106,40 @@ class UserService extends BaseService
     }
 
     /**
+     * 修改密码验证规则
+     * @return array[]
+     */
+    public function changePasswordRules(): array
+    {
+        return [
+            'uuid' => [
+                'rules' => 'if_exist|min_length[35]|max_length[37]',
+                'errors' => [
+                    'if_exist' => '参数用户UUID[uuid]为必填项',
+                    'min_length' => '参数用户UUID[uuid]无效',
+                    'max_length' => '参数用户UUID[uuid]无效',
+                ]
+            ],
+            'oldPassword' => [
+                'rules' => 'required|min_length[6]|max_length[20]',
+                'errors' => [
+                    'required' => '参数原密码[oldPassword]为必填项',
+                    'min_length' => '参数原密码[oldPassword]无效，字符长度不能少于6个字符',
+                    'max_length' => '参数原密码[oldPassword]无效，字符长度不能超过20个字符',
+                ]
+            ],
+            'password' => [
+                'rules' => 'required|min_length[6]|max_length[20]',
+                'errors' => [
+                    'required' => '参数密码[password]为必填项',
+                    'min_length' => '参数密码[password]无效，字符长度不能少于6个字符',
+                    'max_length' => '参数密码[password]无效，字符长度不能超过20个字符',
+                ]
+            ],
+        ];
+    }
+
+    /**
      * 根据账户ID获取用户
      * @param int $id
      * @return array
@@ -155,13 +189,16 @@ class UserService extends BaseService
 
     /**
      * 获取用户档案
-     * @param string $uuid
+     * @param string|null $uuid
      * @return array|null
      */
-    public function getUserProfile(string $uuid): ?array
+    public function getUserProfile(?string $uuid): ?array
     {
-        if (!$this->validateUUID($uuid)) {
+        if (!is_null($uuid) && !$this->validateUUID($uuid)) {
             return null;
+        }
+        if (is_null($uuid)) {
+            $accountId = $this->getLoginAccountID();
         }
         $sql = [
             'SELECT user.id,user.uuid,user.account_id,user.nickname,user.created_at,user.updated_at,',
@@ -172,14 +209,21 @@ class UserService extends BaseService
             'AND user.deleted=? ',
             'AND account.deleted_at IS NULL ',
             'AND account.deleted=? ',
-            'AND user.uuid = ?'
         ];
-        $sql = $this->assembleSql($sql);
         $sqlParams = [
             DeletedStatus::UNDELETED->value,
             DeletedStatus::UNDELETED->value,
-            $uuid
         ];
+
+        if (is_null($uuid)) {
+            $sql[] = 'AND account.id = ?';
+            $sqlParams[] = $accountId;
+        } else {
+            $sql[] = 'AND user.uuid = ?';
+            $sqlParams[] = $uuid;
+        }
+
+        $sql = $this->assembleSql($sql);
         $res = $this->query($sql, $sqlParams);
         if (count($res) === 0) {
             return null;
@@ -208,7 +252,7 @@ class UserService extends BaseService
     public function createUser(array $params): bool|string
     {
         // 准备数据
-        $data = $this->prepareData($params);
+        $data = self::prepare($params);
         if (is_string($data)) {
             return $data;
         }
@@ -276,36 +320,13 @@ class UserService extends BaseService
     }
 
     /**
-     * 准备数据以供保存和更新，返回处理后的数据或错误消息
-     * @param array $data
-     * @return string|array 处理后的数据或错误消息
-     */
-    public function prepareData(array $data): string|array
-    {
-        $data = $this->convertParamsToSnakeCase($data);
-
-        // 校验用户头像
-        $mediaSvc = new MediaService();
-        $avatar = $data['avatar'] ?? null;
-        if (!is_null($avatar)) {
-            $media = $mediaSvc->getByMediaName($avatar);
-            if (empty($media)) {
-                return '无效的用户头像';
-            }
-            $data['avatar'] = (int)$media['id'];
-        }
-
-        return $data;
-    }
-
-    /**
      * 更新用户
      * @param array $params
      * @return bool|string
      */
     public function updateUser(array $params): bool|string
     {
-        $data = $this->prepareData($params);
+        $data = self::prepare($params);
 
         $rawUser = $this->getFirstByUuid($data['uuid']);
         if (empty($rawUser)) {
@@ -417,5 +438,82 @@ class UserService extends BaseService
             return '账户解冻失败';
         }
         return true;
+    }
+
+    /**
+     * 修改密码
+     * @param array $params
+     * @return bool|string
+     */
+    public function changePassword(array $params): bool|string
+    {
+        $data = self::prepare($params);
+        $uuid = $data['uuid'] ?? null;
+        $accountSvc = new AccountService();
+        if (is_null($uuid)) {
+            $accountId = $this->getLoginAccountID();
+        } else {
+            $user = $this->getFirstByUuid($uuid);
+            if (empty($user)) {
+                return '未查询到有效的用户';
+            }
+            $accountId = $user['account_id'];
+        }
+
+        $rawAccount = $accountSvc->getFirstById($accountId);
+        if (empty($rawAccount)) {
+            return '未查询到有效的账户';
+        }
+
+        $oldPassword = $data['old_password'] ?? null;
+        $password = $data['password'] ?? null;
+
+        if (is_null($oldPassword)) {
+            return '请输入原密码';
+        }
+        if (is_null($password)) {
+            return '请输入新密码';
+        }
+        if ($this->validatePassword($password) !== true) {
+            return '密码无效，必须包含大小写字母、数字、特殊字符其中的任意三种组合，并且长度不能小于6位';
+        }
+        if ($oldPassword === $password) {
+            return '新密码和原密码不能相同';
+        }
+        $encryptPwd = hash_hmac('sha256', $oldPassword, $rawAccount['salt']);
+        if ($rawAccount['password'] !== $encryptPwd) {
+            return '原密码错误';
+        }
+        $newPwd = hash_hmac('sha256', $password, $rawAccount['salt']);
+
+        $account = new Account();
+        $account->setId($rawAccount['id'])
+            ->setPassword($newPwd);
+        $res = $accountSvc->updateById($account);
+        // todo 报错系统日志
+        return $res;
+    }
+
+    /**
+     * 准备数据以供保存和更新，返回处理后的数据或错误消息
+     * @param array $data
+     * @return string|array 处理后的数据或错误消息
+     */
+    private function prepare(array $data): string|array
+    {
+        $data = $this->convertParamsToSnakeCase($data);
+
+        // 校验用户头像
+        $mediaSvc = new MediaService();
+        $avatar = $data['avatar'] ?? null;
+        if (!is_null($avatar)) {
+            $media = $mediaSvc->getByMediaName($avatar);
+            if (empty($media)) {
+                return '无效的用户头像';
+            }
+            $data['avatar'] = (int)$media['id'];
+        }
+
+        return $data;
     }
 }
