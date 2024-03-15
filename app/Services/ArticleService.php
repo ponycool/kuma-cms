@@ -250,7 +250,7 @@ class ArticleService extends BaseService
     public function createArticle(array $params): bool|string
     {
         // 准备数据
-        $data = $this->prepareData($params);
+        $data = self::prepare($params);
         if (is_string($data)) {
             return $data;
         }
@@ -276,17 +276,15 @@ class ArticleService extends BaseService
      */
     public function updateArticle(array $params): bool|string
     {
-        $data = $this->convertParamsToSnakeCase($params);
+        // 准备数据
+        $data = self::prepare($params);
+        if (is_string($data)) {
+            return $data;
+        }
 
         $articleData = $this->getFirstByUuid($data['uuid']);
         if (empty($articleData)) {
             return '文章UUID不存在';
-        }
-
-        // 准备数据
-        $data = $this->prepareData($data);
-        if (is_string($data)) {
-            return $data;
         }
 
         $article = new Article();
@@ -327,7 +325,7 @@ class ArticleService extends BaseService
      * @param array $data
      * @return string|array 处理后的数据或错误消息
      */
-    public function prepareData(array $data): string|array
+    private function prepare(array $data): string|array
     {
         $data = $this->convertParamsToSnakeCase($data);
         // 校验自定义发布时间
