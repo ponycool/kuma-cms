@@ -33,8 +33,8 @@ class Login extends Base
                 'code' => Code::OK,
                 'message' => '获取登录日志成功'
             ];
-            $list = $svc->getList($keyword, page: $page, pageSize: $pageSize);
-            $data = array_merge($data, $list);
+            $res = $svc->getList($keyword, page: $page, pageSize: $pageSize);
+            $data = array_merge($data, $res);
         } catch (Exception $e) {
             $data = [
                 'code' => Code::FAIL,
