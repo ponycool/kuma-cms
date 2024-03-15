@@ -24,7 +24,7 @@ enum Setting: string
     // ICP 备案
     case ICP = 'icp';
     // 公安备案
-    case POLICE_RECORD = 'POLICE_RECORD';
+    case POLICE_RECORD = 'police_record';
     // 统计脚本
     case STATISTICAL_SCRIPT = 'statistical_script';
     // 客服脚本

@@ -14,6 +14,7 @@ use App\Entities\User;
 use App\Entities\UserMeta;
 use App\Enums\DeletedStatus;
 use App\Enums\LockStatus;
+use App\Enums\LogCategory;
 use Carbon\Carbon;
 
 class UserService extends BaseService
@@ -490,7 +491,9 @@ class UserService extends BaseService
         $account->setId($rawAccount['id'])
             ->setPassword($newPwd);
         $res = $accountSvc->updateById($account);
-        // todo 报错系统日志
+        // 日志
+        $logSvc = new LogService();
+        $logSvc->info('修改密码', LogCategory::USER->value);
         return $res;
     }
 
