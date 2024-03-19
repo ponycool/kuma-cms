@@ -306,6 +306,30 @@ class BaseService
     }
 
     /**
+     * 构建条件
+     * @param object $builder
+     * @param array $cond
+     * @return object
+     */
+    public function buildConditions(object $builder, array $cond): object
+    {
+        foreach ($cond as $k => $v) {
+            if (is_null($v)) {
+                continue;
+            }
+            if (is_object($v)) {
+                break;
+            }
+            if (is_array($v)) {
+                $builder->whereIn($k, $v);
+                continue;
+            }
+            $builder->where($k, $v);
+        }
+        return $builder;
+    }
+
+    /**
      * 根据自定义SQL获取分页
      * @param string $sql
      * @param array|null $params
@@ -460,6 +484,25 @@ class BaseService
     }
 
     /**
+     * 获取统计数量
+     * @param array|null $cond
+     * @return int
+     */
+    public function getCount(?array $cond = null): int
+    {
+        $model = $this->getModel();
+        $builder = $model->select('count(*) as count');
+        if (!is_null($cond)) {
+            $builder = $this->buildConditions($builder, $cond);
+        }
+        $builder->where('deleted_at IS NULL')
+            ->where('deleted', DeletedStatus::UNDELETED->value);
+        $query = $builder->get();
+        $res = $query->getRowArray();
+        return (int)$res['count'] ?? 0;
+    }
+
+    /**
      * 获取分页数据
      * @param int $page 当前页
      * @param int $pageSize 每页条数
@@ -561,6 +604,138 @@ class BaseService
     {
         $db = $this->getDb();
         return $db->insertID();
+    }
+
+    /**
+     * 按月份汇总每个月份的数据条数并补全
+     * 这个方法可以对MySQL中的数据按照月份进行汇总，
+     * 并且将没有数据的月份进行补全并填充为0。
+     * 这个方法可以在需要生成包含所有月份数据的报表或图表时使用，确保结果完整且没有缺失。
+     * 汇总当年数据，必须指定当前年时间段
+     * @param string $dateField 汇总日期字段
+     * @param array|null $where 筛选条件
+     * @return array
+     */
+    public function monthlyCount(string $dateField = 'created_at', ?array $where = null): array
+    {
+        $table = $this->getTable();
+        $sql = [
+            'SELECT mt.month, ',
+            'COALESCE(count(t.`id`), 0) AS count ',
+            'FROM (',
+            'SELECT 1 AS month ',
+            'UNION SELECT 2 AS month ',
+            'UNION SELECT 3 AS month ',
+            'UNION SELECT 4 AS month ',
+            'UNION SELECT 5 AS month ',
+            'UNION SELECT 6 AS month ',
+            'UNION SELECT 7 AS month ',
+            'UNION SELECT 8 AS month ',
+            'UNION SELECT 9 AS month ',
+            'UNION SELECT 10 AS month ',
+            'UNION SELECT 11 AS month ',
+            'UNION SELECT 12 AS month ',
+            ') AS mt ',
+            'LEFT JOIN (',
+            'select * ',
+            'FROM `swap_' . $table . '` ',
+            'WHERE `deleted` = 0 ',
+            'AND deleted_at IS NULL ',
+        ];
+        if (!is_null($where)) {
+            foreach ($where as $k => $v) {
+                if (!strpos($k, '>') && !strpos($k, '<')) {
+                    $sql [] = sprintf("AND `%s` = '%s' ", $k, $v);
+                } else {
+                    $sql [] = sprintf("AND %s '%s' ", $k, $v);
+                }
+            }
+        }
+        array_push($sql,
+            ') as t ON MONTH(t.`' . $dateField . '`) = mt.month ',
+            'GROUP BY mt.month ',
+            'ORDER BY mt.month'
+        );
+        $sql = $this->assembleSql($sql);
+        return $this->query($sql);
+    }
+
+    /**
+     * 按月份汇总数据并补全
+     * 这个方法可以对MySQL中的数据按照月份进行汇总，
+     * 并且将没有数据的月份进行补全并填充为0。
+     * 这个方法可以在需要生成包含所有月份数据的报表或图表时使用，确保结果完整且没有缺失。
+     * 汇总当年数据，必须指定当前年时间段
+     * @param string|array $fields
+     * @param string $dateField 汇总日期字段
+     * @param array|null $where 筛选条件
+     * @return array
+     */
+    public function summarizeAndFillByMonth(string|array $fields, string $dateField = 'created_at',
+                                            ?array       $where = null): array
+    {
+        $table = $this->getTable();
+        $queryFields = '';
+        if (is_string($fields)) {
+            $queryFields = sprintf(', COALESCE(SUM(t.`%s`), 0) AS %s ', $fields, $fields);
+        }
+        if (is_array($fields)) {
+            $count = 0;
+            foreach ($fields as $item) {
+                if ($count < count($fields)) {
+                    $queryFields .= ', ';
+                }
+                $queryFields .= sprintf('COALESCE(SUM(t.`%s`), 0) AS %s ', $item, $item);
+                $count++;
+            }
+        }
+        $sql = [
+            'SELECT month_table.month ',
+            $queryFields,
+            'FROM (',
+            'SELECT 1 AS month ',
+            'UNION SELECT 2 AS month ',
+            'UNION SELECT 3 AS month ',
+            'UNION SELECT 4 AS month ',
+            'UNION SELECT 5 AS month ',
+            'UNION SELECT 6 AS month ',
+            'UNION SELECT 7 AS month ',
+            'UNION SELECT 8 AS month ',
+            'UNION SELECT 9 AS month ',
+            'UNION SELECT 10 AS month ',
+            'UNION SELECT 11 AS month ',
+            'UNION SELECT 12 AS month ',
+            ') AS month_table ',
+            'LEFT JOIN (',
+            'SELECT * ',
+            'FROM `swap_' . $table . '` ',
+            'WHERE `deleted` = 0 ',
+            'AND deleted_at IS NULL ',
+        ];
+        if (!is_null($where)) {
+            foreach ($where as $k => $v) {
+                if (!strpos($k, '>') && !strpos($k, '<')) {
+                    $sql [] = sprintf("AND `%s` = '%s' ", $k, $v);
+                } else {
+                    $sql [] = sprintf("AND %s '%s' ", $k, $v);
+                }
+            }
+        }
+        // 兼容性
+        $sql[] = match ($this->getDb()->DBDriver) {
+            'SQLite3' => ') as t ON CAST(strftime(\'%m\',' . $dateField . ') AS INTEGER) = month_table.month ',
+            default => ') as t ON MONTH(t.`' . $dateField . '`) = month_table.month ',
+        };
+        array_push($sql,
+            'GROUP BY month_table.month ',
+            'ORDER BY month_table.month'
+        );
+        $sql = $this->assembleSql($sql);
+        $res = $this->query($sql);
+        if (count($res) === 0) {
+            return [];
+        }
+        return $res;
     }
 
     /**
