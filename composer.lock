@@ -746,16 +746,16 @@
         },
         {
             "name": "ponycool/ponycool-library",
-            "version": "v1.0.14",
+            "version": "v1.0.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ponycool/ponycool-library.git",
-                "reference": "645620a4f09cb937ff50e5ba7106c95a199706bb"
+                "reference": "cbde9f33522b83fc07d0282c09468710eb660b52"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ponycool/ponycool-library/zipball/645620a4f09cb937ff50e5ba7106c95a199706bb",
-                "reference": "645620a4f09cb937ff50e5ba7106c95a199706bb",
+                "url": "https://api.github.com/repos/ponycool/ponycool-library/zipball/cbde9f33522b83fc07d0282c09468710eb660b52",
+                "reference": "cbde9f33522b83fc07d0282c09468710eb660b52",
                 "shasum": ""
             },
             "require": {
@@ -793,7 +793,7 @@
                 "issues": "https://github.com/ponycool/ponycool-library/issues",
                 "source": "https://github.com/ponycool/ponycool-library"
             },
-            "time": "2024-03-16T02:20:48+00:00"
+            "time": "2024-03-19T01:36:33+00:00"
         },
         {
             "name": "psr/clock",
