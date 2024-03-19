@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entities\Article;
+use App\Enums\DeletedStatus;
 use App\Enums\PublishStatus;
 use Carbon\Carbon;
 
@@ -240,6 +241,31 @@ class ArticleService extends BaseService
             $res = $this->mergeMedia([$res])[0];
         }
         return $res;
+    }
+
+
+    /**
+     * 根据API记录获取前10的适配器
+     * @param int $count
+     * @return array
+     */
+    public function getTopArticle(int $count = 10): array
+    {
+        $sql = [
+            'SELECT ',
+            implode(',', $this->getSelectFields()) . ' ',
+            'FROM swap_article ',
+            'WHERE deleted_at IS NULL ',
+            'AND deleted=? ',
+            'ORDER BY view_count DESC ',
+            'LIMIT ?'
+        ];
+        $params = [
+            DeletedStatus::UNDELETED->value,
+            $count
+        ];
+        $sql = $this->assembleSql($sql);
+        return $this->query($sql, $params);
     }
 
     /**
