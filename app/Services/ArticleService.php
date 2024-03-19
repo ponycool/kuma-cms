@@ -269,6 +269,51 @@ class ArticleService extends BaseService
     }
 
     /**
+     * 文章类别占比分析
+     * @return array
+     */
+    public function categoryAnalysis(): array
+    {
+        $sql = [
+            'SELECT article.id,article.cid,article.count, ',
+            'category.name AS category ',
+            'FROM (',
+            'SELECT id,cid,count(`id`) AS count ',
+            'FROM swap_article ',
+            'WHERE deleted_at IS NULL ',
+            'AND deleted=? ',
+            'GROUP BY cid',
+            ') AS article ',
+            'LEFT JOIN swap_article_category AS category ',
+            'ON article.cid=category.id ',
+            'WHERE category.deleted_at IS NULL ',
+            'AND category.deleted=? '
+        ];
+        $params = [
+            DeletedStatus::UNDELETED->value,
+            DeletedStatus::UNDELETED->value,
+        ];
+        $sql = $this->assembleSql($sql);
+        $this->setResultType('array');
+        $res = $this->query($sql, $params);
+        $total = 0;
+        $analyzeResult = [];
+        if (!empty($res)) {
+            foreach ($res as $item) {
+                $total += (int)$item['count'];
+                $analyzeResult[] = [
+                    'category' => $item['category'],
+                    'count' => $item['count']
+                ];
+            }
+            foreach ($analyzeResult as &$item) {
+                $item['rate'] = ((int)$item['count'] / $total) * 100;
+            }
+        }
+        return $analyzeResult;
+    }
+
+    /**
      * 创建文章
      * @param array $params
      * @return bool|string
