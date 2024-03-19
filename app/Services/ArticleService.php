@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entities\Article;
+use App\Enums\DeletedStatus;
 use App\Enums\PublishStatus;
 use Carbon\Carbon;
 
@@ -240,6 +241,76 @@ class ArticleService extends BaseService
             $res = $this->mergeMedia([$res])[0];
         }
         return $res;
+    }
+
+
+    /**
+     * 根据API记录获取前10的适配器
+     * @param int $count
+     * @return array
+     */
+    public function getTopArticle(int $count = 10): array
+    {
+        $sql = [
+            'SELECT ',
+            implode(',', $this->getSelectFields()) . ' ',
+            'FROM swap_article ',
+            'WHERE deleted_at IS NULL ',
+            'AND deleted=? ',
+            'ORDER BY view_count DESC ',
+            'LIMIT ?'
+        ];
+        $params = [
+            DeletedStatus::UNDELETED->value,
+            $count
+        ];
+        $sql = $this->assembleSql($sql);
+        return $this->query($sql, $params);
+    }
+
+    /**
+     * 文章类别占比分析
+     * @return array
+     */
+    public function categoryAnalysis(): array
+    {
+        $sql = [
+            'SELECT article.id,article.cid,article.count, ',
+            'category.name AS category ',
+            'FROM (',
+            'SELECT id,cid,count(`id`) AS count ',
+            'FROM swap_article ',
+            'WHERE deleted_at IS NULL ',
+            'AND deleted=? ',
+            'GROUP BY cid',
+            ') AS article ',
+            'LEFT JOIN swap_article_category AS category ',
+            'ON article.cid=category.id ',
+            'WHERE category.deleted_at IS NULL ',
+            'AND category.deleted=? '
+        ];
+        $params = [
+            DeletedStatus::UNDELETED->value,
+            DeletedStatus::UNDELETED->value,
+        ];
+        $sql = $this->assembleSql($sql);
+        $this->setResultType('array');
+        $res = $this->query($sql, $params);
+        $total = 0;
+        $analyzeResult = [];
+        if (!empty($res)) {
+            foreach ($res as $item) {
+                $total += (int)$item['count'];
+                $analyzeResult[] = [
+                    'category' => $item['category'],
+                    'count' => $item['count']
+                ];
+            }
+            foreach ($analyzeResult as &$item) {
+                $item['rate'] = ((int)$item['count'] / $total) * 100;
+            }
+        }
+        return $analyzeResult;
     }
 
     /**
