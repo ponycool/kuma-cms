@@ -16,6 +16,10 @@ use Exception;
 
 class Query extends Base
 {
+    /**
+     * 获取服务器上数据库备份列表
+     * @return void
+     */
     public function index(): void
     {
         $this->postFilter();
