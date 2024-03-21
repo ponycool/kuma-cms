@@ -19,15 +19,6 @@ use Exception;
 
 class Run extends Base
 {
-    private string $logFile;
-
-    public function __construct()
-    {
-        $date = Carbon::now()->toDateString();
-        $this->logFile = WRITEPATH . 'logs/log-' . $date . '.log';
-
-    }
-
     /**
      * 获取系统日志
      * @return void
@@ -39,11 +30,11 @@ class Run extends Base
                 'code' => Code::OK,
                 'message' => '获取系统运行日志成功'
             ];
-            if (!file_exists($this->logFile)) {
+            if (!file_exists(self::getLogFile())) {
                 throw new Exception('系统运行日志不存在');
             }
             $fileUtil = new FileUtil();
-            $content = $fileUtil::getFileLastLines($this->logFile, 50);
+            $content = $fileUtil::getFileLastLines(self::getLogFile(), 50);
             $data = array_merge($data, $content);
         } catch (Exception $e) {
             $data = [
@@ -60,13 +51,14 @@ class Run extends Base
      */
     public function download(): ResponseInterface
     {
+        $logFile = self::getLogFile();
         try {
-            if (!file_exists($this->logFile)) {
+            if (!file_exists($logFile)) {
                 throw new Exception('系统运行日志不存在');
             }
 
-            $file = new File($this->logFile);
-            $binary = readfile($this->logFile);
+            $file = new File($logFile);
+            $binary = readfile($logFile);
             return $this->response
                 ->setHeader('Content-Type', $file->getMimeType())
                 ->setHeader('Content-disposition', 'attachment; filename="' . $file->getBasename() . '"')
@@ -79,5 +71,15 @@ class Run extends Base
             ];
         }
         $this->render($data);
+    }
+
+    /**
+     * 获取日志文件
+     * @return string
+     */
+    private function getLogFile(): string
+    {
+        $date = Carbon::now()->toDateString();
+        return WRITEPATH . 'logs/log-' . $date . '.log';
     }
 }
