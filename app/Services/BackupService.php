@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\LogCategory;
 use Carbon\Carbon;
 use CodeIgniter\Files\File;
 use PonyCool\File\File as FileUtil;
@@ -22,10 +23,28 @@ class BackupService extends BaseService
     const BACKUP_PATH = WRITEPATH . 'backup/';
 
     /**
+     * 获取删除验证规则
+     * @return array[]
+     */
+    public function getBaseRules(): array
+    {
+        return [
+            'filename' => [
+                'rules' => 'required|regex_match[/^cms_[0-9]{1,18}\.db$/]|max_length[26]',
+                'errors' => [
+                    'required' => '参数备份文件名称[filename]无效,备份文件名称为必填项',
+                    'regex_match' => '参数备份文件名称[filename]无效,参数备份文件名称必须符合规则',
+                    'max_length' => '参数备份文件名称[filename]无效,字符长度不能超过26个字符',
+                ]
+            ],
+        ];
+    }
+
+    /**
      * 备份数据库到本地
      * @return bool
      */
-    public function backupToLocal(): bool
+    public function backupToServer(): bool
     {
         if (file_exists(self::BACKUP_PATH)) {
             if (!is_writable(self::BACKUP_PATH)) {
@@ -65,7 +84,7 @@ class BackupService extends BaseService
      * @param array $params
      * @return array
      */
-    public function getLocalBackup(array $params): array
+    public function getServerBackup(array $params): array
     {
         $page = $params['page'] ?? 1;
         $pageSize = $params['pageSize'] ?? 10;
@@ -87,6 +106,45 @@ class BackupService extends BaseService
             $res['currentPageFiles'] = $list;
         }
         return $res;
+    }
+
+    /**
+     * 删除服务器上的数据库备份文件
+     * @param string $filename
+     * @return bool
+     */
+    public function deleteServerBackup(string $filename): bool
+    {
+        $file = self::BACKUP_PATH . $filename;
+        if (!file_exists($file)) {
+            log_message(
+                'warning',
+                '删除数据库备份失败，备份文件{filename}不存在',
+                ['filename' => $filename]
+            );
+            return false;
+        }
+        if (!is_writable($file)) {
+            log_message('warning', '删除数据库备份时，备份目录没有删除权限');
+            return false;
+        }
+        $logSvc = new LogService();
+        if (unlink($file)) {
+            $logSvc->info('删除数据库备份成功，备份文件' . $filename, LogCategory::USER->value);
+            log_message(
+                'info',
+                '删除数据库备份成功，备份文件{filename}',
+                ['filename' => $filename]
+            );
+        } else {
+            $logSvc->warn('删除数据库备份失败，备份文件' . $filename, LogCategory::USER->value);
+            log_message(
+                'warning',
+                '删除数据库备份失败，备份文件{filename}',
+                ['filename' => $filename]
+            );
+        }
+        return true;
     }
 
     /**

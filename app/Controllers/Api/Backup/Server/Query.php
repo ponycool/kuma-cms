@@ -27,7 +27,7 @@ class Query extends Base
         $svc = new BackupService();
         try {
             $params = $this->getJsonInputParams();
-            $list = $svc->getLocalBackup($params);
+            $list = $svc->getServerBackup($params);
             $data = [
                 'code' => Code::OK,
                 'message' => '获取数据库备份列表成功',
