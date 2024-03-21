@@ -148,6 +148,17 @@ class BackupService extends BaseService
     }
 
     /**
+     * 备份文件是否存在
+     * @param string $filename
+     * @return bool
+     */
+    public function exists(string $filename): bool
+    {
+        $file = self::BACKUP_PATH . $filename;
+        return file_exists($file);
+    }
+
+    /**
      * 获取备份文件名称
      * @return string
      */
