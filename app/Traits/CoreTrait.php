@@ -38,6 +38,11 @@ trait CoreTrait
     {
         $data = [];
         foreach ($params as $key => $value) {
+            // 修复漏洞，当传递参数为小写加下划线时，会绕过参数验证规则
+            if (str_contains($key, "_")) {
+                continue;
+            }
+
             if (!is_null($value)) {
                 $data[$this->camelCaseToSnakeCase($key)] = $value;
             }
