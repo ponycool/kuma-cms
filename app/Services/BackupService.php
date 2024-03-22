@@ -148,6 +148,53 @@ class BackupService extends BaseService
     }
 
     /**
+     * 从服务器数据库备份恢复
+     * @param string $filename
+     * @return bool
+     */
+    public function restoreDatabaseFromServer(string $filename): bool
+    {
+        if (!$this->exists($filename)) {
+            log_message(
+                'warning',
+                '恢复数据库备份失败，备份文件{filename}不存在',
+                ['filename' => $filename]
+            );
+            return false;
+        }
+        if (!is_writable(WRITEPATH . 'data')) {
+            log_message('warning', '恢复数据库备份时失败，数据库目录没有写入权限');
+            return false;
+        }
+        $logSvc = new LogService();
+        if (copy(self::BACKUP_PATH . $filename, self::DATABASE)) {
+            // 恢复后重新给数据库文件更改可写权限
+            if (!is_writable(self::DATABASE)) {
+                if (@chmod(self::DATABASE, 0777)) {
+                    log_message('info', '恢复数据库备份成功，数据库权限已更改为可写');
+                } else {
+                    log_message('error', '恢复数据库备份成功，数据库无法赋予目录写权限，请检查服务器设置');
+                    return false;
+                }
+            }
+            log_message(
+                'info',
+                '恢复数据库备份成功，备份文件{filename}',
+                ['filename' => $filename]
+            );
+            $logSvc->info('恢复数据库备份成功，备份文件' . $filename, LogCategory::USER->value);
+        } else {
+            log_message(
+                'warning',
+                '恢复数据库备份失败，备份文件{filename}',
+                ['filename' => $filename]
+            );
+            $logSvc->warn('恢复数据库备份失败，备份文件' . $filename, LogCategory::USER->value);
+        }
+        return true;
+    }
+
+    /**
      * 备份文件是否存在
      * @param string $filename
      * @return bool
