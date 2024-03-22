@@ -12,6 +12,7 @@ namespace App\Services;
 use App\Enums\LogCategory;
 use Carbon\Carbon;
 use CodeIgniter\Files\File;
+use Config\Services;
 use PonyCool\File\File as FileUtil;
 
 class BackupService extends BaseService
@@ -35,6 +36,31 @@ class BackupService extends BaseService
                     'required' => '参数备份文件名称[filename]无效,备份文件名称为必填项',
                     'regex_match' => '参数备份文件名称[filename]无效,参数备份文件名称必须符合规则',
                     'max_length' => '参数备份文件名称[filename]无效,字符长度不能超过26个字符',
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * 获取数据库备份文件上传规则
+     * @return array[]
+     */
+    public function getUploadRules(): array
+    {
+        $uploadRules = [
+            'uploaded[file]',
+            'max_size[file,102400]',
+            'mime_in[file,application/x-sqlite3]',
+//            'ext_in[file,db]',
+        ];
+        return [
+            'file' => [
+                'rules' => implode('|', $uploadRules),
+                'errors' => [
+                    'uploaded' => '请上传正确的数据库备份文件',
+                    'max_size' => '数据库备份文件最大支持100MB',
+                    'mime_in' => '数据库备份文件类型不支持',
+                    'ext_in' => '数据库备份文件扩展名不支持',
                 ]
             ],
         ];
@@ -192,6 +218,46 @@ class BackupService extends BaseService
             $logSvc->warn('恢复数据库备份失败，备份文件' . $filename, LogCategory::USER->value);
         }
         return true;
+    }
+
+    /**
+     * 上传数据库备份文件
+     * @param string $filename
+     * @return bool
+     */
+    public function upload(string $filename): bool
+    {
+        $request = Services::request();
+        $file = $request->getFile($filename);
+        if (is_null($file)) {
+            return false;
+        }
+        echo $file->guessExtension();
+        $filename = $file->getName();
+        if (!preg_match('/^cms_[0-9]{1,18}\.db$/', $filename)) {
+            return false;
+        }
+        if (!$file->isValid()) {
+            return false;
+        }
+        if (!$file->hasMoved()) {
+            // 如果存在则删除旧文件
+            if ($this->exists($filename)) {
+                unlink(self::BACKUP_PATH . $filename);
+            }
+            $res = $file->move(self::BACKUP_PATH);
+            if ($res === true) {
+                $logSvc = new LogService();
+                log_message(
+                    'info',
+                    '上传数据库备份成功，备份文件{filename}',
+                    ['filename' => $filename]
+                );
+                $logSvc->info('上传数据库备份成功，备份文件' . $filename, LogCategory::USER->value);
+            }
+            return $res;
+        }
+        return false;
     }
 
     /**
