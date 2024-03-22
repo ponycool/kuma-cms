@@ -12,7 +12,14 @@ enum Setting: string
 {
     // 默认主题
     case THEME = 'theme';
+    // 站点名称
+    case SITE_NAME = 'site_name';
+    // 站点地址
     case SITE_URL = 'site_url';
+    // 站点描述
+    case SITE_DESCRIPTION = 'site_description';
+    // 站点关键词
+    case SITE_KEYWORDS = 'site_keywords';
     // 系统版本
     case VERSION = 'version';
     // 服务热线
