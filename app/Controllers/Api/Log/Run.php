@@ -11,6 +11,7 @@ namespace App\Controllers\Api\Log;
 
 use App\Controllers\Api\Base;
 use App\Enums\Code;
+use App\Services\RunLogService;
 use Carbon\Carbon;
 use CodeIgniter\Files\File;
 use PonyCool\File\File as FileUtil;
@@ -25,6 +26,9 @@ class Run extends Base
      */
     public function index(): void
     {
+        $svc = new RunLogService();
+        $rules = $svc->getBaseRules();
+        $this->verifyJsonInputByRules($rules);
         try {
             $data = [
                 'code' => Code::OK,
@@ -33,8 +37,9 @@ class Run extends Base
             if (!file_exists(self::getLogFile())) {
                 throw new Exception('系统运行日志不存在');
             }
+            $line = (int)($this->getJsonInputParam('line') ?? 50);
             $fileUtil = new FileUtil();
-            $content = $fileUtil::getFileLastLines(self::getLogFile(), 50);
+            $content = $fileUtil::getFileLastLines(self::getLogFile(), $line);
             $data = array_merge($data, $content);
         } catch (Exception $e) {
             $data = [
