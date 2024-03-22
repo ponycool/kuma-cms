@@ -12,7 +12,6 @@ namespace App\Controllers\Api\Log;
 use App\Controllers\Api\Base;
 use App\Enums\Code;
 use App\Services\RunLogService;
-use Carbon\Carbon;
 use CodeIgniter\Files\File;
 use PonyCool\File\File as FileUtil;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -34,12 +33,12 @@ class Run extends Base
                 'code' => Code::OK,
                 'message' => '获取系统运行日志成功'
             ];
-            if (!file_exists(self::getLogFile())) {
+            if (!file_exists($svc->getLogFile())) {
                 throw new Exception('系统运行日志不存在');
             }
             $line = (int)($this->getJsonInputParam('line') ?? 50);
             $fileUtil = new FileUtil();
-            $content = $fileUtil::getFileLastLines(self::getLogFile(), $line);
+            $content = $fileUtil::getFileLastLines($svc->getLogFile(), $line);
             $data = array_merge($data, $content);
         } catch (Exception $e) {
             $data = [
@@ -56,7 +55,8 @@ class Run extends Base
      */
     public function download(): ResponseInterface
     {
-        $logFile = self::getLogFile();
+        $svc = new RunLogService();
+        $logFile = $svc->getLogFile();
         try {
             if (!file_exists($logFile)) {
                 throw new Exception('系统运行日志不存在');
@@ -79,12 +79,30 @@ class Run extends Base
     }
 
     /**
-     * 获取日志文件
-     * @return string
+     * 清空运行日志
+     * @return bool
      */
-    private function getLogFile(): string
+    public function clear(): bool
     {
-        $date = Carbon::now()->toDateString();
-        return WRITEPATH . 'logs/log-' . $date . '.log';
+        try {
+            $data = [
+                'code' => Code::OK,
+                'message' => '清空系统运行日志成功'
+            ];
+            $svc = new RunLogService();
+            if (!file_exists($svc->getLogFile())) {
+                throw new Exception('系统运行日志不存在');
+            }
+            $res = $svc->clear();
+            if ($res !== true) {
+                throw new Exception('清空系统运行日志失败');
+            }
+        } catch (Exception $e) {
+            $data = [
+                'code' => Code::FAIL,
+                'message' => $e->getMessage() ?: '清空系统运行日志失败',
+            ];
+        }
+        $this->render($data);
     }
 }
