@@ -63,6 +63,8 @@ writable/session/*
 writable/debugbar/*
 !writable/debugbar/.gitkeep
 
+writable/backup/*
+
 php_errors.log
 
 #-------------------------
