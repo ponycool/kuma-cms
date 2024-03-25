@@ -493,7 +493,7 @@ class UserService extends BaseService
         $res = $accountSvc->updateById($account);
         // 日志
         $logSvc = new LogService();
-        $logSvc->info('修改密码', LogCategory::USER->value);
+        $logSvc->info('修改密码', LogCategory::USER);
         return $res;
     }
 
