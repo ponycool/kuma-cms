@@ -15,7 +15,7 @@ use Carbon\Carbon;
 class RunLogService extends BaseService
 {
     /**
-     * 获取更新规则
+     * 获取基础验证规则
      * @return array
      */
     public function getBaseRules(): array
