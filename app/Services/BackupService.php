@@ -51,7 +51,8 @@ class BackupService extends BaseService
             'uploaded[file]',
             'max_size[file,102400]',
             'mime_in[file,application/x-sqlite3]',
-//            'ext_in[file,db]',
+            // 该验证规则可能是存在BUG，无法通过测试，暂时屏蔽该验证规则
+            // 'ext_in[file,db]',
         ];
         return [
             'file' => [
@@ -156,14 +157,14 @@ class BackupService extends BaseService
         }
         $logSvc = new LogService();
         if (unlink($file)) {
-            $logSvc->info('删除数据库备份成功，备份文件' . $filename, LogCategory::USER->value);
+            $logSvc->info('删除数据库备份成功，备份文件' . $filename, LogCategory::USER);
             log_message(
                 'info',
                 '删除数据库备份成功，备份文件{filename}',
                 ['filename' => $filename]
             );
         } else {
-            $logSvc->warn('删除数据库备份失败，备份文件' . $filename, LogCategory::USER->value);
+            $logSvc->warn('删除数据库备份失败，备份文件' . $filename, LogCategory::USER);
             log_message(
                 'warning',
                 '删除数据库备份失败，备份文件{filename}',
@@ -208,14 +209,14 @@ class BackupService extends BaseService
                 '恢复数据库备份成功，备份文件{filename}',
                 ['filename' => $filename]
             );
-            $logSvc->info('恢复数据库备份成功，备份文件' . $filename, LogCategory::USER->value);
+            $logSvc->info('恢复数据库备份成功，备份文件' . $filename, LogCategory::USER);
         } else {
             log_message(
                 'warning',
                 '恢复数据库备份失败，备份文件{filename}',
                 ['filename' => $filename]
             );
-            $logSvc->warn('恢复数据库备份失败，备份文件' . $filename, LogCategory::USER->value);
+            $logSvc->warn('恢复数据库备份失败，备份文件' . $filename, LogCategory::USER);
         }
         return true;
     }
@@ -253,7 +254,7 @@ class BackupService extends BaseService
                     '上传数据库备份成功，备份文件{filename}',
                     ['filename' => $filename]
                 );
-                $logSvc->info('上传数据库备份成功，备份文件' . $filename, LogCategory::USER->value);
+                $logSvc->info('上传数据库备份成功，备份文件' . $filename, LogCategory::USER);
             }
             return $res;
         }

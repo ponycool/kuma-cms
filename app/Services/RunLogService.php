@@ -15,7 +15,7 @@ use Carbon\Carbon;
 class RunLogService extends BaseService
 {
     /**
-     * 获取更新规则
+     * 获取基础验证规则
      * @return array
      */
     public function getBaseRules(): array
@@ -51,13 +51,13 @@ class RunLogService extends BaseService
 
         $logSvc = new LogService();
         if (file_put_contents($logFile, "") !== false) {
-            $logSvc->info('清空运行日志', LogCategory::USER->value);
+            $logSvc->info('清空运行日志', LogCategory::USER);
         } else {
             log_message(
                 'warning',
                 '清空运行日志失败',
             );
-            $logSvc->warn('清空运行日志失败', LogCategory::USER->value);
+            $logSvc->warn('清空运行日志失败', LogCategory::USER);
             return false;
         }
         return true;

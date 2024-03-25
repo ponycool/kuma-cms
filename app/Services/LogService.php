@@ -20,23 +20,23 @@ class LogService extends BaseService
     /**
      * DEBUG级别日志
      * @param string $message
-     * @param string $category
+     * @param LogCategory $category
      * @param int|null $uid
      * @return void
      */
-    public function debug(string $message, string $category = LogCategory::SYSTEM->value, ?int $uid = null): void
+    public function debug(string $message, LogCategory $category = LogCategory::SYSTEM, ?int $uid = null): void
     {
-        $this->saveLog($message, level: LogLevel::DEBUG->value, category: $category, uid: $uid);
+        $this->saveLog($message, level: LogLevel::DEBUG, category: $category, uid: $uid);
     }
 
     /**
      * INFO级别日志
      * @param string $message
-     * @param string $category
+     * @param LogCategory $category
      * @param int|null $uid
      * @return void
      */
-    public function info(string $message, string $category = LogCategory::SYSTEM->value, ?int $uid = null): void
+    public function info(string $message, LogCategory $category = LogCategory::SYSTEM, ?int $uid = null): void
     {
         $this->saveLog($message, category: $category, uid: $uid);
     }
@@ -44,25 +44,25 @@ class LogService extends BaseService
     /**
      * WARN级别日志
      * @param string $message
-     * @param string $category
+     * @param LogCategory $category
      * @param int|null $uid
      * @return void
      */
-    public function warn(string $message, string $category = LogCategory::SYSTEM->value, ?int $uid = null): void
+    public function warn(string $message, LogCategory $category = LogCategory::SYSTEM, ?int $uid = null): void
     {
-        $this->saveLog($message, level: LogLevel::WARN->value, category: $category, uid: $uid);
+        $this->saveLog($message, level: LogLevel::WARN, category: $category, uid: $uid);
     }
 
     /**
      * ERROR级别日志
      * @param string $message
-     * @param string $category
+     * @param LogCategory $category
      * @param int|null $uid
      * @return void
      */
-    public function error(string $message, string $category = LogCategory::SYSTEM->value, ?int $uid = null): void
+    public function error(string $message, LogCategory $category = LogCategory::SYSTEM, ?int $uid = null): void
     {
-        $this->saveLog($message, LogLevel::ERROR->value, category: $category, uid: $uid);
+        $this->saveLog($message, LogLevel::ERROR, category: $category, uid: $uid);
     }
 
     /**
@@ -187,13 +187,13 @@ class LogService extends BaseService
     /**
      * 保存日志
      * @param string $message
-     * @param string $level
-     * @param string $category
+     * @param LogLevel $level
+     * @param LogCategory $category
      * @param int|null $uid
      * @return void
      */
-    private function saveLog(string $message, string $level = LogLevel::INFO->value,
-                             string $category = LogCategory::SYSTEM->value, ?int $uid = null): void
+    private function saveLog(string      $message, LogLevel $level = LogLevel::INFO,
+                             LogCategory $category = LogCategory::SYSTEM, ?int $uid = null): void
     {
         if (is_null($uid)) {
             $accountId = $this->getLoginAccountID();
@@ -209,8 +209,8 @@ class LogService extends BaseService
         $agent = $request->getUserAgent();
         $timestamp = Carbon::now()->getTimestamp();
         $log = new Log();
-        $log->setLevel($level)
-            ->setCategory($category)
+        $log->setLevel($level->value)
+            ->setCategory($category->value)
             ->setMessage($message)
             ->setIpAddress($ip)
             ->setUserAgent($agent->getAgentString())
