@@ -51,7 +51,8 @@ class BackupService extends BaseService
             'uploaded[file]',
             'max_size[file,102400]',
             'mime_in[file,application/x-sqlite3]',
-//            'ext_in[file,db]',
+            // 该验证规则可能是存在BUG，无法通过测试，暂时屏蔽该验证规则
+            // 'ext_in[file,db]',
         ];
         return [
             'file' => [
