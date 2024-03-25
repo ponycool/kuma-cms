@@ -80,9 +80,9 @@ class Run extends Base
 
     /**
      * 清空运行日志
-     * @return bool
+     * @return void
      */
-    public function clear(): bool
+    public function clear(): void
     {
         try {
             $data = [
