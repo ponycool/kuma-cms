@@ -115,6 +115,9 @@ class BackupService extends BaseService
     {
         $page = $params['page'] ?? 1;
         $pageSize = $params['pageSize'] ?? 10;
+        if (!file_exists(self::BACKUP_PATH) && !is_dir(self::BACKUP_PATH)) {
+            mkdir(self::BACKUP_PATH);
+        }
         $fileUtil = new FileUtil();
         $res = $fileUtil::paginateFiles(self::BACKUP_PATH, $page, $pageSize);
         $currentPageFiles = (array)$res['currentPageFiles'];
