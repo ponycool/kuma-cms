@@ -28,12 +28,6 @@ class Query extends Base
         try {
             $params = $this->getJsonInputParams();
             $list = $svc->getServerBackup($params);
-            $list['pageSize'] = $list['size'];
-            $list['totalPage'] = $list['totalPages'];
-            $list['pageData'] = $list['currentPageFiles'];
-            unset($list['size']);
-            unset($list['totalPages']);
-            unset($list['currentPageFiles']);
             $data = [
                 'code' => Code::OK,
                 'message' => '获取数据库备份列表成功',

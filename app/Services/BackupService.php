@@ -135,6 +135,12 @@ class BackupService extends BaseService
             }
             $res['currentPageFiles'] = $list;
         }
+        $res['pageSize'] = $res['size'];
+        $res['totalPage'] = $res['totalPages'];
+        $res['pageData'] = $res['currentPageFiles'];
+        unset($res['size']);
+        unset($res['totalPages']);
+        unset($res['currentPageFiles']);
         return $res;
     }
 
