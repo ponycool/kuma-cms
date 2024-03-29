@@ -119,7 +119,7 @@ class BackupService extends BaseService
             mkdir(self::BACKUP_PATH);
         }
         $fileUtil = new FileUtil();
-        $res = $fileUtil::paginateFiles(self::BACKUP_PATH, $page, $pageSize);
+        $res = $fileUtil::paginateFiles(self::BACKUP_PATH, $page, $pageSize, 'DESC');
         $currentPageFiles = (array)$res['currentPageFiles'];
         $list = [];
         if (!empty($currentPageFiles)) {
