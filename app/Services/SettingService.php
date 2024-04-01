@@ -105,6 +105,10 @@ class SettingService extends BaseService
     public function updateSetting(array $settings): bool|string
     {
         $settings = self::prepare($settings);
+        if (is_string($settings)) {
+            return $settings;
+        }
+
         $updateList = [];
         $insertList = [];
         $keyList = [];
@@ -153,6 +157,15 @@ class SettingService extends BaseService
         // 如果存在版本则移除，防止篡改
         if (!is_null($data['version'] ?? null)) {
             unset($data['version']);
+        }
+
+        $theme = $data['theme'] ?? null;
+        if (!is_null($theme)) {
+            $themeSvc = new ThemeService();
+            $themeList = $themeSvc->getList();
+            if (!in_array($theme, $themeList, true)) {
+                return '主题不存在';
+            }
         }
         return $data;
     }
