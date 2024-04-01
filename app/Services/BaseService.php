@@ -169,6 +169,24 @@ class BaseService
     }
 
     /**
+     * 执行自定义SQL，只能执行写入操作
+     * @param string $sql
+     * @return bool
+     */
+    public function exec(string $sql): bool
+    {
+        if (stripos($sql, 'select') !== false) {
+            log_message(
+                'error',
+                '执行自定义SQL失败，err：自定义SQL存在查询操作',
+            );
+            return false;
+        }
+        $db = $this->getDb();
+        return $db->query($sql);
+    }
+
+    /**
      * 拼装SQL
      * @param array $sql
      * @return string
