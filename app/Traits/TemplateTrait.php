@@ -30,6 +30,18 @@ trait TemplateTrait
 {
     // 模版前缀
     protected string $templateSuffix = '.twig';
+    // 模板扩展
+    public array $templateExtension = [];
+
+    public function getTemplateExtension(): array
+    {
+        return $this->templateExtension;
+    }
+
+    public function setTemplateExtension(array $templateExtension): void
+    {
+        $this->templateExtension = $templateExtension;
+    }
 
     /**
      * 渲染模板
@@ -45,6 +57,14 @@ trait TemplateTrait
         if ('production' !== \ENVIRONMENT) {
             $twig->addExtension(new DebugExtension());
         }
+
+        // 加载模版扩展
+        if (!empty($this->templateExtension)) {
+            foreach ($this->templateExtension as $extension) {
+                $twig->addExtension($extension);
+            }
+        }
+
         try {
             $template = $twig->load($view . $this->templateSuffix);
             if ($display) {
