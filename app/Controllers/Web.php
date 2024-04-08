@@ -259,6 +259,7 @@ class Web extends Base
                 'assetRelativePath' => $assetRelativePath,
                 'icpLink' => 'https://beian.miit.gov.cn',
                 'path' => $path,
+                'settings' => self::getSettings()
             ]
         );
     }
