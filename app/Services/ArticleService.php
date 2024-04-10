@@ -419,8 +419,8 @@ class ArticleService extends BaseService
 
         // 处理发布状态和发布时间
         if (!is_null($data['is_published'] ?? null)) {
-            $data['is_published'] = $data['is_published'] === 'true';
-            if ($data['is_published'] === true) {
+            $data['is_published'] = (int)($data['is_published'] === 'true');
+            if ($data['is_published']) {
                 $data['published_at'] = Carbon::now()->toDateTimeString();
             }
         }
