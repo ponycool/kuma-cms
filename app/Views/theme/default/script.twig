@@ -10,3 +10,11 @@
 <script src="js/lightbox.min.js" type="abde1e19203d8affdb577a67-text/javascript"></script>
 <script src="js/main.js" type="abde1e19203d8affdb577a67-text/javascript"></script>
 <script src="js/rocket-loader.min.js" data-cf-settings="abde1e19203d8affdb577a67-|49" defer=""></script>
+{# 统计脚本 #}
+{% if settings.statistical_script %}
+    {{ settings.statistical_script | raw }}
+{% endif %}
+{# 客服脚本 #}
+{% if settings.service_script %}
+    {{ settings.service_script | raw }}
+{% endif %}
