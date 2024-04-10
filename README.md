@@ -15,9 +15,8 @@
 
 ### 系统要求
 
-我们推荐服务器运行PHP 8.2或更高版本；数据库软件可采用MySQL 5.7或更高版本，也可采用MariaDB 10.3或更高版本。
+我们推荐服务器运行PHP 8.2或更高版本；数据库软件默认SQLite3，也可采用MySQL 5.7或更高版本、MariaDB 10.3或更高版本。
 我们也推荐Apache或Nginx作为运行KumaCMS的可靠选项，但您也可以选择其他HTTP服务器软件。
-
 
 ### 使用docker运行
 
@@ -136,23 +135,6 @@ php spark service:generate
 
 Mail:pony@ponycool.com
 
-## Roadmap
-
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started.
-Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps
-explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce
-the likelihood that the changes inadvertently break something. Having instructions for running tests is especially
-helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-
 ## 鸣谢
 
 [CodeIgniter4](https://github.com/codeigniter4/CodeIgniter4)
@@ -165,10 +147,4 @@ helpful if it requires external setup, such as starting a Selenium server for te
 
 ## License
 
-For open source projects, say how it is licensed.
-
-## Project status
-
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has
-slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or
-owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+MIT
