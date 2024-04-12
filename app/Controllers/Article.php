@@ -48,20 +48,21 @@ class Article extends Web
      */
     private function detail(string $uuid): void
     {
+        $settings = self::getSettings();
         $data = [];
         // 获取当前文章
         $svc = new ArticleService();
         $article = $svc->getPublishedArticleByUuid($uuid);
         if (!empty($article) && $article['is_published'] === PublishStatus::PUBLISHED->value) {
             $data['article'] = $article;
-            $this->setTitle(empty($article['seo_title']) ? $article['title'] : $article['seo_title'])
-                ->setDescription(empty($article['seo_desc']) ? $article['title'] : $article['seo_desc']);
+            $title = empty($article['seo_title']) ? $article['title'] : $article['seo_title'];
+            $title .= ' - ' . $settings['site_name'] ?? '';
+            $description = empty($article['seo_desc']) ? $article['title'] : $article['seo_desc'];
             $keywords = $article['seo_keywords'];
             if (!empty($keywords)) {
                 if ($this->isJsonStr($keywords)) {
                     $keywords = implode(',', json_decode($keywords, true));
                 }
-                $this->setKeywords($keywords);
             }
 
             // 获取上一篇文章
@@ -82,6 +83,10 @@ class Article extends Web
 
             // 更新浏览计数
             $svc->incrById((int)$article['id'], 'view_count');
+
+            $this->setTitle($title)
+                ->setDescription($description)
+                ->setKeywords($keywords);
         }
         $this->setTemplate('article')
             ->setPage('article')

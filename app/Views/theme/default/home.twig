@@ -8,6 +8,7 @@
 {# 主体 #}
 {% block content %}
     {% include 'header.twig' %}
+    {% set services = articles('service',false,6) | default(null) %}
     <div class="container-fluid p-0 pb-5 wow fadeIn" data-wow-delay="0.1s">
         <div class="owl-carousel header-carousel position-relative">
             <div class="owl-carousel-item position-relative" data-dot="<img src='img/carousel-1.jpg'>">
@@ -18,7 +19,8 @@
                             <div class="col-10 col-lg-8">
                                 <h1 class="display-2 text-white animated slideInDown">风舞动能，吹响清洁能源号角</h1>
                                 <p class="fs-5 fw-medium text-white mb-4 pb-3">探索风能无限潜力，构建绿色低碳未来</p>
-                                <a href="" class="btn btn-primary rounded-pill py-3 px-5 animated slideInLeft">阅读更多</a>
+                                <a href=""
+                                   class="btn btn-primary rounded-pill py-3 px-5 animated slideInLeft">阅读更多</a>
                             </div>
                         </div>
                     </div>
@@ -31,8 +33,10 @@
                         <div class="row justify-content-start">
                             <div class="col-10 col-lg-8">
                                 <h1 class="display-2 text-white animated slideInDown">光照未来，绿色能源革命</h1>
-                                <p class="fs-5 fw-medium text-white mb-4 pb-3">高效太阳能系统，降低碳排放，守护蓝天白云</p>
-                                <a href="" class="btn btn-primary rounded-pill py-3 px-5 animated slideInLeft">阅读更多</a>
+                                <p class="fs-5 fw-medium text-white mb-4 pb-3">
+                                    高效太阳能系统，降低碳排放，守护蓝天白云</p>
+                                <a href=""
+                                   class="btn btn-primary rounded-pill py-3 px-5 animated slideInLeft">阅读更多</a>
                             </div>
                         </div>
                     </div>
@@ -45,8 +49,10 @@
                         <div class="row justify-content-start">
                             <div class="col-10 col-lg-8">
                                 <h1 class="display-2 text-white animated slideInDown">赋能风之翼，唤醒蓝色能源宝藏</h1>
-                                <p class="fs-5 fw-medium text-white mb-4 pb-3">海陆并进，推进风电技术创新，实现能源结构转型升级</p>
-                                <a href="" class="btn btn-primary rounded-pill py-3 px-5 animated slideInLeft">阅读更多</a>
+                                <p class="fs-5 fw-medium text-white mb-4 pb-3">
+                                    海陆并进，推进风电技术创新，实现能源结构转型升级</p>
+                                <a href=""
+                                   class="btn btn-primary rounded-pill py-3 px-5 animated slideInLeft">阅读更多</a>
                             </div>
                         </div>
                     </div>
@@ -54,7 +60,6 @@
             </div>
         </div>
     </div>
-
 
     <div class="container-xxl py-5">
         <div class="container">
@@ -103,7 +108,6 @@
         </div>
     </div>
 
-
     <div class="container-fluid bg-light overflow-hidden my-5 px-lg-0">
         <div class="container about px-lg-0">
             <div class="row g-0 mx-lg-0">
@@ -117,17 +121,20 @@
                     <div class="p-lg-5 pe-lg-0">
                         <h6 class="text-primary">关于我们</h6>
                         <h1 class="mb-4">25年以上太阳能和可再生能源行业经验</h1>
-                        <p>自二十多年前投身于可再生能源领域以来，我们始终致力于推动太阳能技术的革新与应用，并以此为核心，不断拓展涵盖各类可再生能源解决方案的综合服务体系。作为行业的先驱者和领导者，我们积累了超过25年的深厚专业经验，见证了全球能源转型的重要历程。凭借对可持续发展的坚定承诺和卓越的工程技术实力，我们成功打造了一系列高效、可靠的太阳能系统项目，并广泛涉足风能、生物质能、地热能等多种可再生能源形式的开发与集成。</p>
-                        <p><i class="fa fa-check-circle text-primary me-3"></i>25年专业积淀，提供定制清洁能源解决方案与全程技术支持。</p>
-                        <p><i class="fa fa-check-circle text-primary me-3"></i>多元整合可再生能源，实现最优项目设计与高性价比。</p>
-                        <p><i class="fa fa-check-circle text-primary me-3"></i>持续创新与卓越服务，引领行业发展，保障客户长期价值与可持续成果。</p>
+                        <p>
+                            自二十多年前投身于可再生能源领域以来，我们始终致力于推动太阳能技术的革新与应用，并以此为核心，不断拓展涵盖各类可再生能源解决方案的综合服务体系。作为行业的先驱者和领导者，我们积累了超过25年的深厚专业经验，见证了全球能源转型的重要历程。凭借对可持续发展的坚定承诺和卓越的工程技术实力，我们成功打造了一系列高效、可靠的太阳能系统项目，并广泛涉足风能、生物质能、地热能等多种可再生能源形式的开发与集成。</p>
+                        <p><i class="fa fa-check-circle text-primary me-3"></i>25年专业积淀，提供定制清洁能源解决方案与全程技术支持。
+                        </p>
+                        <p><i class="fa fa-check-circle text-primary me-3"></i>多元整合可再生能源，实现最优项目设计与高性价比。
+                        </p>
+                        <p><i class="fa fa-check-circle text-primary me-3"></i>持续创新与卓越服务，引领行业发展，保障客户长期价值与可持续成果。
+                        </p>
                         <a href="" class="btn btn-primary rounded-pill py-3 px-5 mt-3">探索更多</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 
     <div class="container-xxl py-5">
         <div class="container">
@@ -136,84 +143,36 @@
                 <h1 class="mb-4">我们是可再生能源领域的先锋</h1>
             </div>
             <div class="row g-4">
-                <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.1s">
-                    <div class="service-item rounded overflow-hidden">
-                        <img class="img-fluid" src="img/img-600x400-1.jpg" alt="">
-                        <div class="position-relative p-4 pt-0">
-                            <div class="service-icon">
-                                <i class="fa fa-solar-panel fa-3x"></i>
+                {% if services %}
+                    {% for row in services | batch(3) %}
+                        {% for item in row %}
+                            {% set index = loop.index %}
+                            {% set dataDelay = '0.1' %}
+                            {% set icon = 'fa-solar-panel' %}
+                            {% if index % 2 == 0 %}
+                                {% set dataDelay = '0.3' %}
+                                {% set icon = 'fa-wind' %}
+                            {% elseif index % 3 == 0 %}
+                                {% set dataDelay = '0.5' %}
+                                {% set icon = 'fa-lightbulb' %}
+                            {% endif %}
+                            <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="{{ dataDelay ~ 's' }}">
+                                <div class="service-item rounded overflow-hidden">
+                                    <img class="img-fluid" src="{{ item.cover_image }}" alt="">
+                                    <div class="position-relative p-4 pt-0">
+                                        <div class="service-icon">
+                                            <i class="fa {{ icon }} fa-3x"></i>
+                                        </div>
+                                        <h4 class="mb-3">{{ item.title }}</h4>
+                                        <p>{{ item.summary | slice(0,50) ~ '...' }}</p>
+                                        <a class="small fw-medium" href="">阅读更多<i
+                                                    class="fa fa-arrow-right ms-2"></i></a>
+                                    </div>
+                                </div>
                             </div>
-                            <h4 class="mb-3">太阳能电池板</h4>
-                            <p>Stet stet justo dolor sed duo. Ut clita sea sit ipsum diam lorem diam.</p>
-                            <a class="small fw-medium" href="">Read More<i class="fa fa-arrow-right ms-2"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.3s">
-                    <div class="service-item rounded overflow-hidden">
-                        <img class="img-fluid" src="img/img-600x400-2.jpg" alt="">
-                        <div class="position-relative p-4 pt-0">
-                            <div class="service-icon">
-                                <i class="fa fa-wind fa-3x"></i>
-                            </div>
-                            <h4 class="mb-3">风力发电机</h4>
-                            <p>Stet stet justo dolor sed duo. Ut clita sea sit ipsum diam lorem diam.</p>
-                            <a class="small fw-medium" href="">Read More<i class="fa fa-arrow-right ms-2"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.5s">
-                    <div class="service-item rounded overflow-hidden">
-                        <img class="img-fluid" src="img/img-600x400-3.jpg" alt="">
-                        <div class="position-relative p-4 pt-0">
-                            <div class="service-icon">
-                                <i class="fa fa-lightbulb fa-3x"></i>
-                            </div>
-                            <h4 class="mb-3">Hydropower Plants</h4>
-                            <p>Stet stet justo dolor sed duo. Ut clita sea sit ipsum diam lorem diam.</p>
-                            <a class="small fw-medium" href="">Read More<i class="fa fa-arrow-right ms-2"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.1s">
-                    <div class="service-item rounded overflow-hidden">
-                        <img class="img-fluid" src="img/img-600x400-4.jpg" alt="">
-                        <div class="position-relative p-4 pt-0">
-                            <div class="service-icon">
-                                <i class="fa fa-solar-panel fa-3x"></i>
-                            </div>
-                            <h4 class="mb-3">Solar Panels</h4>
-                            <p>Stet stet justo dolor sed duo. Ut clita sea sit ipsum diam lorem diam.</p>
-                            <a class="small fw-medium" href="">Read More<i class="fa fa-arrow-right ms-2"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.3s">
-                    <div class="service-item rounded overflow-hidden">
-                        <img class="img-fluid" src="img/img-600x400-5.jpg" alt="">
-                        <div class="position-relative p-4 pt-0">
-                            <div class="service-icon">
-                                <i class="fa fa-wind fa-3x"></i>
-                            </div>
-                            <h4 class="mb-3">Wind Turbines</h4>
-                            <p>Stet stet justo dolor sed duo. Ut clita sea sit ipsum diam lorem diam.</p>
-                            <a class="small fw-medium" href="">Read More<i class="fa fa-arrow-right ms-2"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.5s">
-                    <div class="service-item rounded overflow-hidden">
-                        <img class="img-fluid" src="img/img-600x400-6.jpg" alt="">
-                        <div class="position-relative p-4 pt-0">
-                            <div class="service-icon">
-                                <i class="fa fa-lightbulb fa-3x"></i>
-                            </div>
-                            <h4 class="mb-3">Hydropower Plants</h4>
-                            <p>Stet stet justo dolor sed duo. Ut clita sea sit ipsum diam lorem diam.</p>
-                            <a class="small fw-medium" href="">Read More<i class="fa fa-arrow-right ms-2"></i></a>
-                        </div>
-                    </div>
-                </div>
+                        {% endfor %}
+                    {% endfor %}
+                {% endif %}
             </div>
         </div>
     </div>
@@ -224,8 +183,8 @@
             <div class="row g-0 mx-lg-0">
                 <div class="col-lg-6 feature-text py-5 wow fadeIn" data-wow-delay="0.1s">
                     <div class="p-lg-5 ps-lg-0">
-                        <h6 class="text-primary">Why Choose Us!</h6>
-                        <h1 class="mb-4">Complete Commercial & Residential Solar Systems</h1>
+                        <h6 class="text-primary">为什么选择我们！</h6>
+                        <h1 class="mb-4">完整的商业和住宅太阳能系统</h1>
                         <p class="mb-4 pb-2">Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit. Aliqu diam
                             amet diam et eos. Clita erat ipsum et lorem et sit, sed stet lorem sit clita duo justo erat
                             amet</p>

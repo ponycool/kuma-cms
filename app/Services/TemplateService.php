@@ -131,6 +131,7 @@ class TemplateService extends AbstractExtension
     {
         return [
             new TwigFunction('menu', [$this, 'getMenu']),
+            new TwigFunction('articles', [$this, 'getArticles']),
         ];
     }
 
@@ -141,5 +142,26 @@ class TemplateService extends AbstractExtension
     public function getMenu(): array
     {
         return [];
+    }
+
+    /**
+     * 获取文章列表
+     * @param string|null $categoryCode
+     * @param bool $isPage
+     * @param int|null $limit
+     * @return array
+     */
+    public function getArticles(?string $categoryCode = null, bool $isPage = true,
+                                ?int    $limit = null): array
+    {
+        $params = [
+            'page' => $this->getPage(),
+            'pageSize' => $this->getPageSize(),
+            'categoryCode' => $categoryCode,
+            'isPage' => $isPage,
+            'limit' => $limit,
+        ];
+        $svc = new ArticleService();
+        return $svc->getList($params);
     }
 }

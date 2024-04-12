@@ -58,9 +58,10 @@ class Web extends Base
         $this->setPage('index');
 
         // 初始化页面数据
-        $this->setTitle('')
-            ->setDescription('')
-            ->setKeywords('');
+        $settings = self::getSettings();
+        $this->setTitle($settings['site_name'] ?? '')
+            ->setDescription($settings['site_description'] ?? '')
+            ->setKeywords($settings['site_keywords'] ?? '');
 
         // 开发环境下需热同步静态资源
         if ('development' === ENVIRONMENT) {
