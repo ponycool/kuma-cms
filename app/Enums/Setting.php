@@ -22,6 +22,8 @@ enum Setting: string
     case SITE_KEYWORDS = 'site_keywords';
     // 系统版本
     case VERSION = 'version';
+    // 站点语言
+    case LANGUAGE = 'language';
     // 服务热线
     case SERVICE_PHONE = 'service_phone';
     // 服务邮箱
