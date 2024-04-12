@@ -158,9 +158,31 @@ class ArticleService extends BaseService
      */
     public function getList(array $params): array
     {
-        $page = $params['page'] ?? 1;
-        $pageSize = $params['pageSize'] ?? 10;
-        $res = $this->getPage($page, $pageSize);
+        $page = (int)($params['page'] ?? 1);
+        $pageSize = (int)($params['pageSize'] ?? 10);
+        $cid = $params['cid'] ?? null;
+        $keyword = $params['keyword'] ?? null;
+        $sql = [
+            'SELECT id,uuid,cid,title,cover_image,seo_title,seo_desc,seo_keywords,summary,content,author,custom_date,',
+            'is_published,sort_index,created_at,updated_at ',
+            'FROM swap_article AS a ',
+            'WHERE a.deleted_at IS NULL ',
+            'AND a.deleted = ? '
+        ];
+        $sqlParams = [
+            DeletedStatus::UNDELETED->value
+        ];
+        if (!is_null($cid)) {
+            $sql[] = 'AND a.cid = ?';
+            $sqlParams[] = $cid;
+        }
+        if (!is_null($keyword)) {
+            $sql[] = 'AND a.title LIKE ?';
+            $sqlParams[] = '%' . $keyword . '%';
+        }
+        $sql[] = 'order by a.sort_index DESC,a.id DESC';
+        $sql = $this->assembleSql($sql);
+        $res = $this->getPageByQuery($sql, $sqlParams, $page, $pageSize);
         if ($res['total'] > 0) {
             if (is_array($res['pageData'])) {
                 $res['pageData'] = $this->mergeMedia($res['pageData']);
