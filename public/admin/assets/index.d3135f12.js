@@ -1,1 +1,0 @@
-import{h as o}from"./index.87488f60.js";function s(t){return o.post("/api/log/login",t)}function i(t){return o.post("/api/log/system",t)}function r(t){return o.post("/api/log/run",{line:t})}export{s as l,r,i as s};
