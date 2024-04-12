@@ -161,11 +161,16 @@ class ArticleService extends BaseService
         $page = (int)($params['page'] ?? 1);
         $pageSize = (int)($params['pageSize'] ?? 10);
         $cid = $params['cid'] ?? null;
+        $categoryCode = $params['categoryCode'] ?? null;
         $keyword = $params['keyword'] ?? null;
+        $isPage = $params['isPage'] ?? true;
+        $limit = $params['limit'] ?? null;
         $sql = [
-            'SELECT id,uuid,cid,title,cover_image,seo_title,seo_desc,seo_keywords,summary,content,author,custom_date,',
-            'is_published,published_at,view_count,sort_index,created_at,updated_at ',
+            'SELECT a.id,a.uuid,a.cid,a.title,a.cover_image,a.seo_title,a.seo_desc,a.seo_keywords,a.summary,a.content,',
+            'a.author,a.custom_date,a.is_published,a.published_at,a.view_count,a.sort_index,a.created_at,a.updated_at,',
+            'c.name as category_name,c.code as category_code ',
             'FROM swap_article AS a ',
+            'LEFT JOIN swap_article_category AS c ON a.cid=c.id ',
             'WHERE a.deleted_at IS NULL ',
             'AND a.deleted = ? '
         ];
@@ -180,12 +185,27 @@ class ArticleService extends BaseService
             $sql[] = 'AND a.title LIKE ? ';
             $sqlParams[] = '%' . $keyword . '%';
         }
+        if (!is_null($categoryCode)) {
+            $sql[] = 'AND c.code = ? ';
+            $sqlParams[] = $categoryCode;
+        }
         $sql[] = 'ORDER BY a.sort_index DESC,a.id DESC';
+        if (!$isPage && !is_null($limit)) {
+            $sql[] = ' LIMIT ' . $limit;
+        }
         $sql = $this->assembleSql($sql);
-        $res = $this->getPageByQuery($sql, $sqlParams, $page, $pageSize);
-        if ($res['total'] > 0) {
-            if (is_array($res['pageData'])) {
-                $res['pageData'] = $this->mergeMedia($res['pageData']);
+        if ($isPage) {
+            $res = $this->getPageByQuery($sql, $sqlParams, $page, $pageSize);
+            if ($res['total'] > 0) {
+                if (is_array($res['pageData'])) {
+                    $res['pageData'] = $this->mergeMedia($res['pageData']);
+                }
+            }
+        } else {
+            $this->setResultType('array');
+            $res = $this->query($sql, $sqlParams);
+            if (count($res) > 0) {
+                $res = $this->mergeMedia($res);
             }
         }
         return $res;
