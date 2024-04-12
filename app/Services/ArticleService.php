@@ -164,7 +164,7 @@ class ArticleService extends BaseService
         $keyword = $params['keyword'] ?? null;
         $sql = [
             'SELECT id,uuid,cid,title,cover_image,seo_title,seo_desc,seo_keywords,summary,content,author,custom_date,',
-            'is_published,sort_index,created_at,updated_at ',
+            'is_published,published_at,view_count,sort_index,created_at,updated_at ',
             'FROM swap_article AS a ',
             'WHERE a.deleted_at IS NULL ',
             'AND a.deleted = ? '
