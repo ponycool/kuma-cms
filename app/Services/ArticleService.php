@@ -164,7 +164,7 @@ class ArticleService extends BaseService
         $keyword = $params['keyword'] ?? null;
         $sql = [
             'SELECT id,uuid,cid,title,cover_image,seo_title,seo_desc,seo_keywords,summary,content,author,custom_date,',
-            'is_published,sort_index,created_at,updated_at ',
+            'is_published,published_at,view_count,sort_index,created_at,updated_at ',
             'FROM swap_article AS a ',
             'WHERE a.deleted_at IS NULL ',
             'AND a.deleted = ? '
@@ -173,14 +173,14 @@ class ArticleService extends BaseService
             DeletedStatus::UNDELETED->value
         ];
         if (!is_null($cid)) {
-            $sql[] = 'AND a.cid = ?';
+            $sql[] = 'AND a.cid = ? ';
             $sqlParams[] = $cid;
         }
         if (!is_null($keyword)) {
-            $sql[] = 'AND a.title LIKE ?';
+            $sql[] = 'AND a.title LIKE ? ';
             $sqlParams[] = '%' . $keyword . '%';
         }
-        $sql[] = 'order by a.sort_index DESC,a.id DESC';
+        $sql[] = 'ORDER BY a.sort_index DESC,a.id DESC';
         $sql = $this->assembleSql($sql);
         $res = $this->getPageByQuery($sql, $sqlParams, $page, $pageSize);
         if ($res['total'] > 0) {
