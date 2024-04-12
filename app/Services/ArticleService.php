@@ -173,14 +173,14 @@ class ArticleService extends BaseService
             DeletedStatus::UNDELETED->value
         ];
         if (!is_null($cid)) {
-            $sql[] = 'AND a.cid = ?';
+            $sql[] = 'AND a.cid = ? ';
             $sqlParams[] = $cid;
         }
         if (!is_null($keyword)) {
-            $sql[] = 'AND a.title LIKE ?';
+            $sql[] = 'AND a.title LIKE ? ';
             $sqlParams[] = '%' . $keyword . '%';
         }
-        $sql[] = 'order by a.sort_index DESC,a.id DESC';
+        $sql[] = 'ORDER BY a.sort_index DESC,a.id DESC';
         $sql = $this->assembleSql($sql);
         $res = $this->getPageByQuery($sql, $sqlParams, $page, $pageSize);
         if ($res['total'] > 0) {
