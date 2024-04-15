@@ -237,6 +237,9 @@ class Base extends BaseController
      */
     protected function isJsonStr($str): bool
     {
+        if (is_numeric($str)) {
+            return false;
+        }
         if (is_string($str)) {
             @json_decode($str);
             return (json_last_error() === JSON_ERROR_NONE);
