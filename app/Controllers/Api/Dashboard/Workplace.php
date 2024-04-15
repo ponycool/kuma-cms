@@ -46,12 +46,13 @@ class Workplace extends Base
         $data = array_merge(
             $data,
             [
+                'version' => $this->version,
                 'systemInfo' => $systemUtil::systemInfo(),
                 'articleCount' => $articleCount,
                 'userCount' => $userCount,
                 'articleMonthly' => $articleMonthly,
                 'topArticle' => $topArticle,
-                'articleCategoryAnalysis'=>$articleCategoryAnalysis
+                'articleCategoryAnalysis' => $articleCategoryAnalysis
             ]
         );
         $this->render($data);

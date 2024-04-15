@@ -132,6 +132,7 @@ class TemplateService extends AbstractExtension
         return [
             new TwigFunction('menu', [$this, 'getMenu']),
             new TwigFunction('articles', [$this, 'getArticles']),
+            new TwigFunction('fetchArticleForCategory', [$this, 'fetchArticleForCategory']),
         ];
     }
 
@@ -163,5 +164,21 @@ class TemplateService extends AbstractExtension
         ];
         $svc = new ArticleService();
         return $svc->getList($params);
+    }
+
+    /**
+     * 根据分类编码获取分类下的文章
+     * @param string|array $categoryCode
+     * @param int $limit
+     * @return array
+     */
+    public function fetchArticleForCategory(string|array $categoryCode, int $limit = 10): array
+    {
+        $params = [
+            'categoryCode' => $categoryCode,
+            'limit' => $limit,
+        ];
+        $svc = new ArticleService();
+        return $svc->getListByCategoryCode($params);
     }
 }

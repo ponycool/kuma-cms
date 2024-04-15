@@ -2,14 +2,16 @@
 
 {% block content %}
     {% include 'header.twig' %}
+    {% set cases = fetchArticleForCategory(['solar panels', 'wind', 'hydropower'],6) | default(null) %}
+    {% set cases = cases | sort((a,b) => a.category_code <=> b.category_code ) %}
     <div class="container-fluid page-header py-5 mb-5">
         <div class="container py-5">
             <h1 class="display-3 text-white mb-3 animated slideInDown">Projects</h1>
             <nav aria-label="breadcrumb animated slideInDown">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a class="text-white" href="#">Home</a></li>
-                    <li class="breadcrumb-item"><a class="text-white" href="#">Pages</a></li>
-                    <li class="breadcrumb-item text-white active" aria-current="page">Projects</li>
+                    <li class="breadcrumb-item"><a class="text-white" href="/">首页</a></li>
+                    <li class="breadcrumb-item"><a class="text-white" href="#">页面</a></li>
+                    <li class="breadcrumb-item text-white active" aria-current="page">项目</li>
                 </ol>
             </nav>
         </div>
@@ -32,112 +34,40 @@
                 </div>
             </div>
             <div class="row g-4 portfolio-container wow fadeInUp" data-wow-delay="0.5s">
-                <div class="col-lg-4 col-md-6 portfolio-item first">
-                    <div class="portfolio-img rounded overflow-hidden">
-                        <img class="img-fluid" src="/img/img-600x400-6.jpg" alt="">
-                        <div class="portfolio-btn">
-                            <a class="btn btn-lg-square btn-outline-light rounded-circle mx-1"
-                               href="/img/img-600x400-6.jpg" data-lightbox="portfolio"><i
-                                        class="fa fa-eye"></i></a>
-                            <a class="btn btn-lg-square btn-outline-light rounded-circle mx-1" href=""><i
-                                        class="fa fa-link"></i></a>
-                        </div>
-                    </div>
-                    <div class="pt-3">
-                        <p class="text-primary mb-0">Solar Panels</p>
-                        <hr class="text-primary w-25 my-2">
-                        <h5 class="lh-base">We Are pioneers of solar & renewable energy industry</h5>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 portfolio-item second">
-                    <div class="portfolio-img rounded overflow-hidden">
-                        <img class="img-fluid" src="/img/img-600x400-5.jpg" alt="">
-                        <div class="portfolio-btn">
-                            <a class="btn btn-lg-square btn-outline-light rounded-circle mx-1"
-                               href="/img/img-600x400-5.jpg" data-lightbox="portfolio"><i
-                                        class="fa fa-eye"></i></a>
-                            <a class="btn btn-lg-square btn-outline-light rounded-circle mx-1" href=""><i
-                                        class="fa fa-link"></i></a>
-                        </div>
-                    </div>
-                    <div class="pt-3">
-                        <p class="text-primary mb-0">Wind Turbines</p>
-                        <hr class="text-primary w-25 my-2">
-                        <h5 class="lh-base">We Are pioneers of solar & renewable energy industry</h5>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 portfolio-item third">
-                    <div class="portfolio-img rounded overflow-hidden">
-                        <img class="img-fluid" src="/img/img-600x400-4.jpg" alt="">
-                        <div class="portfolio-btn">
-                            <a class="btn btn-lg-square btn-outline-light rounded-circle mx-1"
-                               href="/img/img-600x400-4.jpg" data-lightbox="portfolio"><i
-                                        class="fa fa-eye"></i></a>
-                            <a class="btn btn-lg-square btn-outline-light rounded-circle mx-1" href=""><i
-                                        class="fa fa-link"></i></a>
-                        </div>
-                    </div>
-                    <div class="pt-3">
-                        <p class="text-primary mb-0">Hydropower Plants</p>
-                        <hr class="text-primary w-25 my-2">
-                        <h5 class="lh-base">We Are pioneers of solar & renewable energy industry</h5>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 portfolio-item first">
-                    <div class="portfolio-img rounded overflow-hidden">
-                        <img class="img-fluid" src="/img/img-600x400-3.jpg" alt="">
-                        <div class="portfolio-btn">
-                            <a class="btn btn-lg-square btn-outline-light rounded-circle mx-1"
-                               href="/img/img-600x400-3.jpg" data-lightbox="portfolio"><i
-                                        class="fa fa-eye"></i></a>
-                            <a class="btn btn-lg-square btn-outline-light rounded-circle mx-1" href=""><i
-                                        class="fa fa-link"></i></a>
-                        </div>
-                    </div>
-                    <div class="pt-3">
-                        <p class="text-primary mb-0">Solar Panels</p>
-                        <hr class="text-primary w-25 my-2">
-                        <h5 class="lh-base">We Are pioneers of solar & renewable energy industry</h5>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 portfolio-item second">
-                    <div class="portfolio-img rounded overflow-hidden">
-                        <img class="img-fluid" src="/img/img-600x400-2.jpg" alt="">
-                        <div class="portfolio-btn">
-                            <a class="btn btn-lg-square btn-outline-light rounded-circle mx-1"
-                               href="/img/img-600x400-2.jpg" data-lightbox="portfolio"><i
-                                        class="fa fa-eye"></i></a>
-                            <a class="btn btn-lg-square btn-outline-light rounded-circle mx-1" href=""><i
-                                        class="fa fa-link"></i></a>
-                        </div>
-                    </div>
-                    <div class="pt-3">
-                        <p class="text-primary mb-0">Wind Turbines</p>
-                        <hr class="text-primary w-25 my-2">
-                        <h5 class="lh-base">We Are pioneers of solar & renewable energy industry</h5>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 portfolio-item third">
-                    <div class="portfolio-img rounded overflow-hidden">
-                        <img class="img-fluid" src="/img/img-600x400-1.jpg" alt="">
-                        <div class="portfolio-btn">
-                            <a class="btn btn-lg-square btn-outline-light rounded-circle mx-1"
-                               href="/img/img-600x400-1.jpg" data-lightbox="portfolio"><i
-                                        class="fa fa-eye"></i></a>
-                            <a class="btn btn-lg-square btn-outline-light rounded-circle mx-1" href=""><i
-                                        class="fa fa-link"></i></a>
-                        </div>
-                    </div>
-                    <div class="pt-3">
-                        <p class="text-primary mb-0">Hydropower Plants</p>
-                        <hr class="text-primary w-25 my-2">
-                        <h5 class="lh-base">We Are pioneers of solar & renewable energy industry</h5>
-                    </div>
-                </div>
+                {% if cases %}
+                    {% for row in cases | batch(3) %}
+                        {% for item in row %}
+                            {% set categoryCode = item.category_code %}
+                            {% if categoryCode == 'solar panels' %}
+                                {% set categoryIndex = 'first' %}
+                            {% elseif categoryCode == 'wind' %}
+                                {% set categoryIndex = 'second' %}
+                            {% elseif categoryCode == 'hydropower' %}
+                                {% set categoryIndex = 'third' %}
+                            {% endif %}
+                            <div class="col-lg-4 col-md-6 portfolio-item {{ categoryIndex }}">
+                                <div class="portfolio-img rounded overflow-hidden">
+                                    <img class="img-fluid" src="{{ item.cover_image }}" alt="">
+                                    <div class="portfolio-btn">
+                                        <a class="btn btn-lg-square btn-outline-light rounded-circle mx-1"
+                                           href="{{ item.cover_image }}" data-lightbox="portfolio"><i
+                                                    class="fa fa-eye"></i></a>
+                                        <a class="btn btn-lg-square btn-outline-light rounded-circle mx-1" href=""><i
+                                                    class="fa fa-link"></i></a>
+                                    </div>
+                                </div>
+                                <div class="pt-3">
+                                    <p class="text-primary mb-0">{{ item.title }}</p>
+                                    <hr class="text-primary w-25 my-2">
+                                    <h5 class="lh-base">{{ item.summary | slice(0,36) ~ '...' }}</h5>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                {% endif %}
             </div>
         </div>
     </div>
-
 
     <div class="container-fluid bg-light overflow-hidden my-5 px-lg-0">
         <div class="container quote px-lg-0">
