@@ -58,7 +58,7 @@ class Article extends Web
             $title = empty($article['seo_title']) ? $article['title'] : $article['seo_title'];
             $title .= ' - ' . $settings['site_name'] ?? '';
             $description = empty($article['seo_desc']) ? $article['title'] : $article['seo_desc'];
-            $keywords = $article['seo_keywords'];
+            $keywords = $article['seo_keywords'] ?? '';
             if (!empty($keywords)) {
                 if ($this->isJsonStr($keywords)) {
                     $keywords = implode(',', json_decode($keywords, true));
