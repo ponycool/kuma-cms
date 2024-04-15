@@ -212,6 +212,48 @@ class ArticleService extends BaseService
     }
 
     /**
+     * 根据分类编码获取分类文章列表
+     * @param array $params
+     * @return array
+     */
+    public function getListByCategoryCode(array $params): array
+    {
+        $categoryCode = $params['categoryCode'];
+        if (is_array($categoryCode)) {
+            $categoryCode = array_map(function ($element) {
+                return "'" . $element . "'";
+            }, $categoryCode);
+            $categoryCode = implode(',', $categoryCode);
+        }
+        $limit = (int)($params['limit'] ?? 10);
+        $sql = [
+            'SELECT a.id,a.uuid,a.cid,a.title,a.cover_image,a.seo_title,a.seo_desc,a.seo_keywords,a.summary,a.content,',
+            'a.author,a.custom_date,a.is_published,a.published_at,a.view_count,a.sort_index,a.created_at,a.updated_at,',
+            'c.name as category_name,c.code as category_code ',
+            'FROM swap_article AS a ',
+            'LEFT JOIN swap_article_category AS c ON a.cid=c.id ',
+            'WHERE a.deleted_at IS NULL ',
+            'AND c.code IN (',
+            $categoryCode,
+            ') ',
+            'AND a.deleted = ? ',
+            'ORDER BY a.sort_index DESC,a.id DESC ',
+            'LIMIT ?'
+        ];
+        $sqlParams = [
+            DeletedStatus::UNDELETED->value,
+            $limit
+        ];
+        $sql = $this->assembleSql($sql);
+        $this->setResultType('array');
+        $res = $this->query($sql, $sqlParams);
+        if (count($res) > 0) {
+            $res = $this->mergeMedia($res);
+        }
+        return $res;
+    }
+
+    /**
      * 根据UUID获取文章详情
      * @param string $uuid
      * @return array|null
