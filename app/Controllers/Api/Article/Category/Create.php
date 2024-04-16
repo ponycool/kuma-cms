@@ -28,7 +28,6 @@ class Create extends Base
         $this->verifyJsonInputByRules($rules);
         try {
             $params = $this->getJsonInputParams();
-            $svc = new ArticleCategorySvc();
             $res = $svc->createCategory($params);
             if ($res !== true) {
                 throw new Exception($res);
