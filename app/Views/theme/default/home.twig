@@ -8,62 +8,10 @@
 {# 主体 #}
 {% block content %}
     {% include 'header.twig' %}
-    {% set carousel = carousel() | default(null) %}
     {% set services = articles('service',false,6) | default(null) %}
     {% set cases = fetchArticleForCategory(['solar panels', 'wind', 'hydropower'],6) | default(null) %}
     {% set cases = cases | sort((a,b) => a.category_code <=> b.category_code ) %}
-    <div class="container-fluid p-0 pb-5 wow fadeIn" data-wow-delay="0.1s">
-        <div class="owl-carousel header-carousel position-relative">
-            <div class="owl-carousel-item position-relative" data-dot="<img src='img/carousel-1.jpg'>">
-                <img class="img-fluid" src="img/carousel-1.jpg" alt="">
-                <div class="owl-carousel-inner">
-                    <div class="container">
-                        <div class="row justify-content-start">
-                            <div class="col-10 col-lg-8">
-                                <h1 class="display-2 text-white animated slideInDown">风舞动能，吹响清洁能源号角</h1>
-                                <p class="fs-5 fw-medium text-white mb-4 pb-3">探索风能无限潜力，构建绿色低碳未来</p>
-                                <a href=""
-                                   class="btn btn-primary rounded-pill py-3 px-5 animated slideInLeft">阅读更多</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="owl-carousel-item position-relative" data-dot="<img src='img/carousel-2.jpg'>">
-                <img class="img-fluid" src="img/carousel-2.jpg" alt="">
-                <div class="owl-carousel-inner">
-                    <div class="container">
-                        <div class="row justify-content-start">
-                            <div class="col-10 col-lg-8">
-                                <h1 class="display-2 text-white animated slideInDown">光照未来，绿色能源革命</h1>
-                                <p class="fs-5 fw-medium text-white mb-4 pb-3">
-                                    高效太阳能系统，降低碳排放，守护蓝天白云</p>
-                                <a href=""
-                                   class="btn btn-primary rounded-pill py-3 px-5 animated slideInLeft">阅读更多</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="owl-carousel-item position-relative" data-dot="<img src='img/carousel-3.jpg'>">
-                <img class="img-fluid" src="img/carousel-3.jpg" alt="">
-                <div class="owl-carousel-inner">
-                    <div class="container">
-                        <div class="row justify-content-start">
-                            <div class="col-10 col-lg-8">
-                                <h1 class="display-2 text-white animated slideInDown">赋能风之翼，唤醒蓝色能源宝藏</h1>
-                                <p class="fs-5 fw-medium text-white mb-4 pb-3">
-                                    海陆并进，推进风电技术创新，实现能源结构转型升级</p>
-                                <a href=""
-                                   class="btn btn-primary rounded-pill py-3 px-5 animated slideInLeft">阅读更多</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    {% include 'carousel.twig' %}
     <div class="container-xxl py-5">
         <div class="container">
             <div class="row g-5">
