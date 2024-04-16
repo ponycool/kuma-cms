@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Enums\Code;
+use App\Enums\Language;
 use App\Enums\Setting;
 use App\Services\TemplateService;
 use App\Traits\TemplateTrait;
@@ -28,6 +29,9 @@ class Web extends Base
     // 主题
     protected ?string $theme;
 
+    // 语言
+    protected string $language;
+
     // 全局数据
     protected array $data;
 
@@ -44,12 +48,17 @@ class Web extends Base
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger): void
     {
         parent::initController($request, $response, $logger);
+        $settings = self::getSettings();
 
         // 设置默认模版
         $this->setTemplate('home');
 
         // 设置默认主题
-        $this->setTheme(self::getSettings()[Setting::THEME->value] ?? 'default');
+        $this->setTheme($settings[Setting::THEME->value] ?? 'default');
+
+        // 设置默认语言
+        $this->setLanguage($settings[Setting::LANGUAGE->value] ?? Language::SIMPLIFIED_CHINESE->value);
+        service('language')->setLocale($this->getLanguage());
 
         // 设置全局数据
         $this->setData([]);
@@ -58,7 +67,6 @@ class Web extends Base
         $this->setPage('index');
 
         // 初始化页面数据
-        $settings = self::getSettings();
         $this->setTitle($settings['site_name'] ?? '')
             ->setDescription($settings['site_description'] ?? '')
             ->setKeywords($settings['site_keywords'] ?? '');
@@ -88,6 +96,17 @@ class Web extends Base
     public function setTheme(?string $theme): Web
     {
         $this->theme = $theme;
+        return $this;
+    }
+
+    public function getLanguage(): string
+    {
+        return $this->language;
+    }
+
+    public function setLanguage(string $language): Web
+    {
+        $this->language = $language;
         return $this;
     }
 
