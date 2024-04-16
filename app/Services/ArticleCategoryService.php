@@ -17,7 +17,7 @@ class ArticleCategoryService extends BaseService
      * 获取验证规则
      * @return array[]
      */
-    public function getValidationRules(): array
+    public function getBaseRules(): array
     {
         return [
             'pid' => [
@@ -97,7 +97,7 @@ class ArticleCategoryService extends BaseService
             ],
         ];
         return array_merge(
-            $this->getValidationRules(),
+            $this->getBaseRules(),
             $rules
         );
     }

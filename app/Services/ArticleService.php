@@ -20,7 +20,7 @@ class ArticleService extends BaseService
      * 获取基础验证规则
      * @return array[]
      */
-    public function getValidationRules(): array
+    public function getBaseRules(): array
     {
         return [
             'cid' => [
@@ -118,7 +118,7 @@ class ArticleService extends BaseService
             ],
         ];
         return array_merge(
-            $this->getValidationRules(),
+            $this->getBaseRules(),
             $rules
         );
     }

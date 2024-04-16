@@ -20,7 +20,7 @@ class Create extends Base
     {
         $this->postFilter();
         $articleSvc = new ArticleService();
-        $rules = $articleSvc->getValidationRules();
+        $rules = $articleSvc->getBaseRules();
         $this->verifyJsonInputByRules($rules);
         try {
             $params = $this->getJsonInputParams();
