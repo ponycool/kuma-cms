@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entities\Carousel;
+use App\Enums\DeletedStatus;
 
 class CarouselService extends BaseService
 {
@@ -65,6 +66,10 @@ class CarouselService extends BaseService
         ];
     }
 
+    /**
+     * 获取创建验证规则
+     * @return array
+     */
     public function getCreateRules(): array
     {
         return array_merge($this->getBaseRules(), [
@@ -76,6 +81,28 @@ class CarouselService extends BaseService
                     ]
                 ]
             ]
+        );
+    }
+
+    /**
+     * 获取更新验证规则
+     * @return array
+     */
+    public function getUpdateRules(): array
+    {
+        $rules = [
+            'uuid' => [
+                'rules' => 'required|min_length[35]|max_length[37]',
+                'errors' => [
+                    'required' => '参数轮播UUID[uuid]为必填项',
+                    'min_length' => '参数轮播UUID[uuid]无效',
+                    'max_length' => '参数轮播UUID[uuid]无效',
+                ]
+            ],
+        ];
+        return array_merge(
+            $this->getBaseRules(),
+            $rules
         );
     }
 
@@ -107,6 +134,100 @@ class CarouselService extends BaseService
     }
 
     /**
+     * 获取轮播列表
+     * @return array
+     */
+    public function getList(): array
+    {
+        $sql = [
+            'SELECT id,uuid,image,link,target,title,description,status,sort_index,created_at,updated_at ',
+            'FROM swap_carousel ',
+            'WHERE deleted_at IS NULL ',
+            'AND deleted = ? ',
+            'ORDER BY sort_index ASC, id DESC ',
+        ];
+        $sqlParams = [
+            DeletedStatus::UNDELETED->value,
+        ];
+
+        $sql = $this->assembleSql($sql);
+        $this->setResultType('array');
+        $res = $this->query($sql, $sqlParams);
+        if (count($res) > 0) {
+            $res = self::mergeMedia($res);
+        }
+        return $res;
+    }
+
+    /**
+     * 根据UUID获取轮播
+     * @param string $uuid
+     * @return array|null
+     */
+    public function getCarouselByUUID(string $uuid): ?array
+    {
+        if ($this->validateUUID($uuid) !== true) {
+            return null;
+        }
+        $res = $this->getFirstByUuid($uuid);
+        if (count($res) > 0) {
+            $res = self::mergeMedia([$res])[0];
+        }
+        return $res;
+    }
+
+    /**
+     * 更新轮播
+     * @param array $params
+     * @return bool|string
+     */
+    public function update(array $params): bool|string
+    {
+        // 准备数据
+        $data = self::prepare($params);
+        if (is_string($data)) {
+            return $data;
+        }
+
+        $raw = $this->getFirstByUuid($data['uuid']);
+        if (empty($raw)) {
+            return '轮播UUID不存在';
+        }
+
+        $carousel = new Carousel();
+        $carousel->fillData($data)
+            ->filterInvalidProperties();
+        if (!is_null($data['image'] ?? null)) {
+            $carousel->setImage($data['image']);
+        }
+
+        $res = $this->updateByUuid($carousel);
+        if ($res !== true) {
+            return '更新轮播失败';
+        }
+        return true;
+    }
+
+    /**
+     * 删除轮播
+     * @param string $uuid
+     * @return bool|string
+     */
+    public function del(string $uuid): bool|string
+    {
+        $carousel = $this->getFirstByUuid($uuid);
+        if (empty($carousel)) {
+            return '轮播UUID不存在';
+        }
+        $id = (int)$carousel['id'];
+        $res = $this->delete($id);
+        if ($res !== true) {
+            return '删除轮播失败';
+        }
+        return true;
+    }
+
+    /**
      * 准备数据以供保存和更新，返回处理后的数据或错误消息
      * @param array $data
      * @return string|array 处理后的数据或错误消息
@@ -132,5 +253,33 @@ class CarouselService extends BaseService
         }
 
         return $data;
+    }
+
+    /**
+     * 合并图片
+     * @param array $list
+     * @return array
+     */
+    private function mergeMedia(array $list): array
+    {
+        $imageIds = [];
+        foreach ($list as $item) {
+            if (!is_null($item['image'])) {
+                $imageIds[] = $item['image'];
+            }
+        }
+        $mediaSvc = new MediaService();
+        if (!empty($imageIds)) {
+            $imageList = $mediaSvc->getMedia($imageIds);
+            foreach ($imageList as $img) {
+                foreach ($list as &$item) {
+                    if ($img['id'] === $item['image']) {
+                        $item['image'] = $img['file_url'];
+                    }
+                }
+            }
+        }
+
+        return $list;
     }
 }
