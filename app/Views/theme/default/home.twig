@@ -8,6 +8,7 @@
 {# 主体 #}
 {% block content %}
     {% include 'header.twig' %}
+    {% set carousel = carousel() | default(null) %}
     {% set services = articles('service',false,6) | default(null) %}
     {% set cases = fetchArticleForCategory(['solar panels', 'wind', 'hydropower'],6) | default(null) %}
     {% set cases = cases | sort((a,b) => a.category_code <=> b.category_code ) %}
@@ -288,7 +289,7 @@
                                 <div class="pt-3">
                                     <p class="text-primary mb-0">{{ item.title }}</p>
                                     <hr class="text-primary w-25 my-2">
-                                    <h5 class="lh-base">{{ item.summary | slice(0,36) ~ '...'}}</h5>
+                                    <h5 class="lh-base">{{ item.summary | slice(0,36) ~ '...' }}</h5>
                                 </div>
                             </div>
                         {% endfor %}

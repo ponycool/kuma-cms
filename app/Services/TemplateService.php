@@ -131,6 +131,7 @@ class TemplateService extends AbstractExtension
     {
         return [
             new TwigFunction('menu', [$this, 'getMenu']),
+            new TwigFunction('carousel', [$this, 'getCarousel']),
             new TwigFunction('articles', [$this, 'getArticles']),
             new TwigFunction('fetchArticleForCategory', [$this, 'fetchArticleForCategory']),
         ];
@@ -180,5 +181,15 @@ class TemplateService extends AbstractExtension
         ];
         $svc = new ArticleService();
         return $svc->getListByCategoryCode($params);
+    }
+
+    /**
+     * 获取轮播图
+     * @return array
+     */
+    public function getCarousel(): array
+    {
+        $svc = new CarouselService();
+        return $svc->getEnableList();
     }
 }
