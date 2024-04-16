@@ -160,6 +160,33 @@ class CarouselService extends BaseService
     }
 
     /**
+     * 获取启用的轮播列表
+     * @return array
+     */
+    public function getEnableList(): array
+    {
+        $sql = [
+            'SELECT id,uuid,image,link,target,title,description,status,sort_index,created_at,updated_at ',
+            'FROM swap_carousel ',
+            'WHERE status = 1 ',
+            'AND deleted_at IS NULL ',
+            'AND deleted = ? ',
+            'ORDER BY sort_index ASC, id DESC ',
+        ];
+        $sqlParams = [
+            DeletedStatus::UNDELETED->value,
+        ];
+
+        $sql = $this->assembleSql($sql);
+        $this->setResultType('array');
+        $res = $this->query($sql, $sqlParams);
+        if (count($res) > 0) {
+            $res = self::mergeMedia($res);
+        }
+        return $res;
+    }
+
+    /**
      * 根据UUID获取轮播
      * @param string $uuid
      * @return array|null
