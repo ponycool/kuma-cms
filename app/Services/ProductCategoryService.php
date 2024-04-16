@@ -2,16 +2,16 @@
 /**
  * Created by PhpStorm.
  * User: Pony
- * Date: 2024/01/04
- * Time: 01:49 上午
+ * Date: 2024/04/16
+ * Time: 08:37 上午
  */
 declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entities\ArticleCategory;
+use App\Entities\ProductCategory;
 
-class ArticleCategoryService extends BaseService
+class ProductCategoryService extends BaseService
 {
     /**
      * 获取验证规则
@@ -33,9 +33,9 @@ class ArticleCategoryService extends BaseService
             'uuid' => [
                 'rules' => 'required|min_length[35]|max_length[37]',
                 'errors' => [
-                    'required' => '参数文章分类UUID[uuid]为必填项',
-                    'min_length' => '参数文章分类UUID[uuid]无效',
-                    'max_length' => '参数文章分类UUID[uuid]无效',
+                    'required' => '参数产品分类UUID[uuid]为必填项',
+                    'min_length' => '参数产品分类UUID[uuid]无效',
+                    'max_length' => '参数产品分类UUID[uuid]无效',
                 ]
             ],
             'pid' => [
@@ -64,24 +64,23 @@ class ArticleCategoryService extends BaseService
     }
 
     /**
-     * 创建文章分类
+     * 创建产品分类
      * @param array $params
      * @return bool|string
      */
-    public function createCategory(array $params): bool|string
+    public function create(array $params): bool|string
     {
-        $data = $this->convertParamsToSnakeCase($params);
         // 准备数据
-        $data = $this->prepareData($data);
+        $data = self::prepare($params);
         if (is_string($data)) {
             return $data;
         }
 
-        $articleCategory = new ArticleCategory();
-        $articleCategory->fill($data);
-        $res = $this->insert($articleCategory);
+        $category = new ProductCategory();
+        $category->fill($data);
+        $res = $this->insert($category);
         if ($res !== true) {
-            return '创建文章分类失败';
+            return '创建产品分类失败';
         }
         return true;
     }
@@ -91,40 +90,39 @@ class ArticleCategoryService extends BaseService
      * @param array $params
      * @return bool|string
      */
-    public function updateCategory(array $params): bool|string
+    public function update(array $params): bool|string
     {
-        $data = $this->convertParamsToSnakeCase($params);
         // 准备数据
-        $data = $this->prepareData($data);
+        $data = self::prepare($params);
         if (is_string($data)) {
             return $data;
         }
 
-        $category = $this->getFirstByUuid($data['uuid']);
-        if (empty($category)) {
-            return '文章分类UUID不存在';
+        $raw = $this->getFirstByUuid($data['uuid']);
+        if (empty($raw)) {
+            return '产品分类UUID不存在';
         }
 
-        $articleCategory = new ArticleCategory();
-        $articleCategory->fillData($data)
+        $category = new ProductCategory();
+        $category->fillData($data)
             ->filterInvalidProperties();
-        $res = $this->updateByUuid($articleCategory);
+        $res = $this->updateByUuid($category);
         if ($res !== true) {
-            return '更新文章分类失败';
+            return '更新产品分类失败';
         }
         return true;
     }
 
     /**
-     * 删除文章分类
+     * 删除产品分类
      * @param string $uuid
      * @return bool|string
      */
-    public function deleteCategory(string $uuid): bool|string
+    public function del(string $uuid): bool|string
     {
         $category = $this->getFirstByUuid($uuid);
         if (empty($category)) {
-            return '文章分类UUID不存在';
+            return '产品分类UUID不存在';
         }
 
         $cond = [
@@ -139,7 +137,7 @@ class ArticleCategoryService extends BaseService
 
         $res = $this->batchDelByIds($ids);
         if ($res !== true) {
-            return '删除文章分类失败';
+            return '删除产品分类失败';
         }
         return true;
     }
@@ -149,8 +147,10 @@ class ArticleCategoryService extends BaseService
      * @param array $data
      * @return string|array 处理后的数据或错误消息
      */
-    public function prepareData(array $data): string|array
+    public function prepare(array $data): string|array
     {
+        $data = $this->convertParamsToSnakeCase($data);
+
         // 校验图片
         $mediaSvc = new MediaService();
         $iconName = $data['icon'] ?? null;
