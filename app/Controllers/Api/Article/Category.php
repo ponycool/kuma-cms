@@ -48,7 +48,7 @@ class Category extends Base
     {
         $this->postFilter();
         $svc = new ArticleCategorySvc();
-        $rules = $svc->getValidationRules();
+        $rules = $svc->getBaseRules();
         $this->verifyJsonInputByRules($rules);
         try {
             $params = $this->getJsonInputParams();
