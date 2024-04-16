@@ -147,4 +147,4 @@ Mail:pony@ponycool.com
 
 ## License
 
-MIT
+Apache License 2.0
