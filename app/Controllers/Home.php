@@ -8,7 +8,7 @@ class Home extends Web
     public function index(): void
     {
         $settings = self::getSettings();
-        $title = '首页 - ' . $settings['site_name'] ?? '酷码内容管理系统';
+        $title = lang('App.home') . ' - ' . $settings['site_name'] ?? '酷码内容管理系统';
         $description = $settings['site_description'] ?? '酷码内容管理系统';
         $keywords = $settings['site_keywords'] ?? '酷码内容管理系统';
         $this->setTitle($title)

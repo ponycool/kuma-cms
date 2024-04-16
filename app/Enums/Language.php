@@ -13,4 +13,8 @@ enum Language: string
 {
     // 中文简体
     case SIMPLIFIED_CHINESE = 'zh-CN';
+    // 英文
+    case ENGLISH = 'en-US';
+    // 俄文
+    case RUSSIAN = 'ru-RU';
 }
