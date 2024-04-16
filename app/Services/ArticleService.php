@@ -360,7 +360,7 @@ class ArticleService extends BaseService
     {
         $sql = [
             'SELECT article.id,article.cid,article.count, ',
-            'category.name AS category ',
+            'category.name AS category,category.pid AS category_pid ',
             'FROM (',
             'SELECT id,cid,count(`id`) AS count ',
             'FROM swap_article ',
@@ -380,18 +380,43 @@ class ArticleService extends BaseService
         $sql = $this->assembleSql($sql);
         $this->setResultType('array');
         $res = $this->query($sql, $params);
+        $categorySvc = new ArticleCategoryService();
+        $categories = $categorySvc->get();
         $total = 0;
         $analyzeResult = [];
         if (!empty($res)) {
             foreach ($res as $item) {
                 $total += (int)$item['count'];
+                $category = $item['category'];
+                if ($item['category_pid'] !== 0) {
+                    foreach ($categories as $c) {
+                        if ($item['category_pid'] === $c['id']) {
+                            $category = $c['name'];
+                        }
+                    }
+                }
                 $analyzeResult[] = [
-                    'category' => $item['category'],
+                    'category' => $category,
                     'count' => $item['count']
                 ];
             }
+            // 合并相同的项
+            $analyzeResult = array_reduce($analyzeResult, function ($carry, $item) {
+                $key = $item['category'];
+                // 如果当前`category`已存在于结果数组中，累加`count`
+                if (isset($carry[$key])) {
+                    $carry[$key]['count'] += $item['count'];
+                } else {
+                    // 否则，直接将当前项添加到结果数组
+                    $carry[$key] = $item;
+                }
+                return $carry;
+            }, []);
+            $analyzeResult = array_values($analyzeResult);
+
             foreach ($analyzeResult as &$item) {
                 $item['rate'] = ((int)$item['count'] / $total) * 100;
+                $item['rate'] = round($item['rate'], 2);
             }
         }
         return $analyzeResult;
