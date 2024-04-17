@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: Pony
  * Date: 2024/04/17
- * Time: 08:07 上午
+ * Time: 08:44 上午
  */
 declare(strict_types=1);
 
@@ -29,6 +29,7 @@ class ProductModel extends BaseModel
         'stock_quantity',
         'sort_index',
         'status',
+        'view_count',
     ];
     protected $useTimestamps = true;
     protected $createdField = 'created_at';

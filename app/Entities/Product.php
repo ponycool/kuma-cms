@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: Pony
  * Date: 2024/04/17
- * Time: 08:06 上午
+ * Time: 08:43 上午
  */
 declare(strict_types=1);
 
@@ -27,6 +27,7 @@ class Product extends Base
     protected int $stock_quantity;
     protected int $sort_index;
     protected int $status;
+    protected int $view_count;
     protected string $created_at;
     protected string $updated_at;
     protected string $deleted_at;
@@ -315,6 +316,25 @@ class Product extends Base
     {
         $this->status = $status;
         $this->attributes['status'] = $this->status;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getViewCount(): int
+    {
+        return $this->view_count;
+    }
+
+    /**
+     * @param int $view_count
+     * @return $this
+     */
+    public function setViewCount(int $view_count): Product
+    {
+        $this->view_count = $view_count;
+        $this->attributes['view_count'] = $this->view_count;
         return $this;
     }
 
