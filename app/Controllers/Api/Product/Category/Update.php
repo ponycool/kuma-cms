@@ -16,6 +16,10 @@ use Exception;
 
 class Update extends Base
 {
+    /**
+     * 更新产品分类
+     * @return void
+     */
     public function index(): void
     {
         $this->postFilter();
