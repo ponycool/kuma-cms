@@ -33,7 +33,6 @@ class Update extends Base
                 throw new Exception('无效的文章分类UUID');
             }
 
-            $svc = new ArticleCategorySvc();
             $res = $svc->updateCategory($params);
             if ($res !== true) {
                 throw new Exception($res);
