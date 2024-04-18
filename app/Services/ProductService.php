@@ -231,6 +231,30 @@ class ProductService extends BaseService
     }
 
     /**
+     * 获取TOP产品列表
+     * @param int $count
+     * @return array
+     */
+    public function getTop(int $count = 10): array
+    {
+        $sql = [
+            'SELECT ',
+            implode(',', $this->getSelectFields()) . ' ',
+            'FROM swap_product ',
+            'WHERE deleted_at IS NULL ',
+            'AND deleted=? ',
+            'ORDER BY view_count DESC ',
+            'LIMIT ?'
+        ];
+        $params = [
+            DeletedStatus::UNDELETED->value,
+            $count
+        ];
+        $sql = $this->assembleSql($sql);
+        return $this->query($sql, $params);
+    }
+
+    /**
      * 创建产品
      * @param array $params
      * @return bool|string
@@ -282,6 +306,24 @@ class ProductService extends BaseService
         }
         return true;
     }
+
+    /**
+     * 更新产品状态
+     * @param string $uuid
+     * @param int $status
+     * @return true|string
+     */
+    public function updateStatus(string $uuid, int $status): true|string
+    {
+        $product = new Product();
+        $product->setStatus($status);
+        $res = $this->updateByUuid($product, $uuid);
+        if ($res !== true) {
+            return '更新产品状态失败';
+        }
+        return true;
+    }
+
 
     /**
      * 删除产品

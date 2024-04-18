@@ -329,11 +329,11 @@ class ArticleService extends BaseService
 
 
     /**
-     * 根据API记录获取前10的适配器
+     * 获取TOP文章列表
      * @param int $count
      * @return array
      */
-    public function getTopArticle(int $count = 10): array
+    public function getTop(int $count = 10): array
     {
         $sql = [
             'SELECT ',
