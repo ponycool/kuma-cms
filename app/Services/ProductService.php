@@ -148,6 +148,23 @@ class ProductService extends BaseService
     }
 
     /**
+     * 根据UUID获取产品
+     * @param string $uuid
+     * @return array|null
+     */
+    public function getByUUID(string $uuid): ?array
+    {
+        if ($this->validateUUID($uuid) !== true) {
+            return null;
+        }
+        $res = $this->getFirstByUuid($uuid);
+        if (count($res) > 0) {
+            $res = self::mergeMedia([$res])[0];
+        }
+        return $res;
+    }
+
+    /**
      * 创建产品
      * @param array $params
      * @return bool|string
@@ -196,6 +213,25 @@ class ProductService extends BaseService
         $res = $this->updateByUuid($product);
         if ($res !== true) {
             return '更新产品失败';
+        }
+        return true;
+    }
+
+    /**
+     * 删除产品
+     * @param string $uuid
+     * @return bool|string
+     */
+    public function del(string $uuid): bool|string
+    {
+        $article = $this->getFirstByUuid($uuid);
+        if (empty($article)) {
+            return '产品UUID不存在';
+        }
+        $id = (int)$article['id'];
+        $res = $this->delete($id);
+        if ($res !== true) {
+            return '删除产品失败';
         }
         return true;
     }
@@ -253,5 +289,51 @@ class ProductService extends BaseService
         }
 
         return $data;
+    }
+
+    /**
+     * 合并媒体
+     * @param array $list
+     * @return array
+     */
+    private function mergeMedia(array $list): array
+    {
+        $coverImageList = [];
+        $detailImageList = [];
+        foreach ($list as $item) {
+            if (!is_null($item['cover_image'])) {
+                $coverImageList[] = $item['cover_image'];
+            }
+            if (!is_null($item['detail_images'])) {
+                $detailImageList = array_merge($detailImageList, json_decode($item['detail_images'], true));
+            }
+        }
+        $mediaSvc = new MediaService();
+        if (!empty($coverImageList)) {
+            $imageList = $mediaSvc->getMedia($coverImageList);
+            foreach ($imageList as $img) {
+                foreach ($list as &$item) {
+                    if ($img['id'] === $item['cover_image']) {
+                        $item['cover_image'] = $img['file_url'];
+                    }
+                }
+            }
+        }
+        if (!empty($detailImageList)) {
+            $imageList = $mediaSvc->getMedia($detailImageList);
+            foreach ($imageList as $img) {
+                foreach ($list as &$item) {
+                    $detailImages = json_decode($item['detail_images'], true);
+                    foreach ($detailImages as &$image) {
+                        if ($img['id'] === $image) {
+                            $image = $img['file_url'];
+                        }
+                    }
+                    $item['detail_images'] = json_encode($detailImages);
+                }
+            }
+        }
+
+        return $list;
     }
 }
