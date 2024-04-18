@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entities\Product;
+use App\Enums\DeletedStatus;
 
 class ProductService extends BaseService
 {
@@ -145,6 +146,71 @@ class ProductService extends BaseService
             $this->getBaseRules(),
             $rules
         );
+    }
+
+    /**
+     * 获取产品列表
+     * @param array $params
+     * @return array
+     */
+    public function getList(array $params): array
+    {
+        $page = (int)($params['page'] ?? 1);
+        $pageSize = (int)($params['pageSize'] ?? 10);
+        $cid = $params['cid'] ?? null;
+        $name = $params['name'] ?? null;
+        $categoryCode = $params['categoryCode'] ?? null;
+        $keyword = $params['keyword'] ?? null;
+        $isPage = $params['isPage'] ?? true;
+        $limit = $params['limit'] ?? null;
+        $sql = [
+            'SELECT p.id,p.uuid,p.cid,p.name,p.cover_image,p.detail_images,p.seo_title,p.seo_desc,p.seo_keywords,',
+            'p.description,p.price,p.stock_quantity,p.sort_index,p.status,p.view_count,p.created_at,p.updated_at,',
+            'c.name as category_name,c.code as category_code ',
+            'FROM swap_product AS p ',
+            'LEFT JOIN swap_product_category AS c ON p.cid=c.id ',
+            'WHERE p.deleted_at IS NULL ',
+            'AND p.deleted = ? '
+        ];
+        $sqlParams = [
+            DeletedStatus::UNDELETED->value
+        ];
+        if (!is_null($cid)) {
+            $sql[] = 'AND p.cid = ? ';
+            $sqlParams[] = $cid;
+        }
+        if (!is_null($name)) {
+            $sql[] = 'AND p.name = ? ';
+            $sqlParams[] = $name;
+        }
+        if (!is_null($categoryCode)) {
+            $sql[] = 'AND c.code = ? ';
+            $sqlParams[] = $categoryCode;
+        }
+        if (!is_null($keyword)) {
+            $sql[] = 'AND p.name LIKE ? ';
+            $sqlParams[] = '%' . $keyword . '%';
+        }
+        $sql[] = 'ORDER BY p.sort_index DESC,p.id DESC';
+        if (!$isPage && !is_null($limit)) {
+            $sql[] = ' LIMIT ' . $limit;
+        }
+        $sql = $this->assembleSql($sql);
+        if ($isPage) {
+            $res = $this->getPageByQuery($sql, $sqlParams, $page, $pageSize);
+            if ($res['total'] > 0) {
+                if (is_array($res['pageData'])) {
+                    $res['pageData'] = self::mergeMedia($res['pageData']);
+                }
+            }
+        } else {
+            $this->setResultType('array');
+            $res = $this->query($sql, $sqlParams);
+            if (count($res) > 0) {
+                $res = self::mergeMedia($res);
+            }
+        }
+        return $res;
     }
 
     /**
@@ -305,9 +371,14 @@ class ProductService extends BaseService
                 $coverImageList[] = $item['cover_image'];
             }
             if (!is_null($item['detail_images'])) {
-                $detailImageList = array_merge($detailImageList, json_decode($item['detail_images'], true));
+                $detailImages = json_decode($item['detail_images'], true);
+                if (!is_array($detailImages)) {
+                    continue;
+                }
+                $detailImageList = array_merge($detailImageList, $detailImages);
             }
         }
+
         $mediaSvc = new MediaService();
         if (!empty($coverImageList)) {
             $imageList = $mediaSvc->getMedia($coverImageList);
@@ -324,6 +395,9 @@ class ProductService extends BaseService
             foreach ($imageList as $img) {
                 foreach ($list as &$item) {
                     $detailImages = json_decode($item['detail_images'], true);
+                    if (!is_array($detailImages)) {
+                        continue;
+                    }
                     foreach ($detailImages as &$image) {
                         if ($img['id'] === $image) {
                             $image = $img['file_url'];
