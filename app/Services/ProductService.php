@@ -21,16 +21,14 @@ class ProductService extends BaseService
     {
         return [
             'cid' => [
-                'rules' => 'required|is_natural_no_zero',
+                'rules' => 'if_exist|is_natural_no_zero',
                 'errors' => [
-                    'required' => '参数产品分类ID[cid]无效,产品分类ID为必填项',
                     'is_natural_no_zero' => '参数产品分类ID[cid]无效,产品分类ID必须为非零自然数',
                 ]
             ],
             'name' => [
-                'rules' => 'required|max_length[200]',
+                'rules' => 'if_exist|max_length[200]',
                 'errors' => [
-                    'required' => '参数产品名称[name]无效，产品名称为必填项',
                     'max_length' => '参数产品名称[name]无效，字符长度不能超过200个字符',
                 ]
             ],
@@ -100,6 +98,56 @@ class ProductService extends BaseService
     }
 
     /**
+     * 获取创建验证规则
+     * @return array
+     */
+    public function getCreateRules(): array
+    {
+        $rules = [
+            'cid' => [
+                'rules' => 'required|is_natural_no_zero',
+                'errors' => [
+                    'required' => '参数产品分类ID[cid]无效,产品分类ID为必填项',
+                    'is_natural_no_zero' => '参数产品分类ID[cid]无效,产品分类ID必须为非零自然数',
+                ]
+            ],
+            'name' => [
+                'rules' => 'required|max_length[200]',
+                'errors' => [
+                    'required' => '参数产品名称[name]无效，产品名称为必填项',
+                    'max_length' => '参数产品名称[name]无效，字符长度不能超过200个字符',
+                ]
+            ],
+        ];
+        return array_merge(
+            $this->getBaseRules(),
+            $rules
+        );
+    }
+
+    /**
+     * 获取更新验证规则
+     * @return array
+     */
+    public function getUpdateRules(): array
+    {
+        $rules = [
+            'uuid' => [
+                'rules' => 'required|min_length[35]|max_length[37]',
+                'errors' => [
+                    'required' => '参数产品UUID[uuid]为必填项',
+                    'min_length' => '参数产品UUID[uuid]无效',
+                    'max_length' => '参数产品UUID[uuid]无效',
+                ]
+            ],
+        ];
+        return array_merge(
+            $this->getBaseRules(),
+            $rules
+        );
+    }
+
+    /**
      * 创建产品
      * @param array $params
      * @return bool|string
@@ -119,6 +167,35 @@ class ProductService extends BaseService
         $res = $this->insert($product);
         if ($res !== true) {
             return '创建产品失败';
+        }
+        return true;
+    }
+
+    /**
+     * 更新产品
+     * @param array $params
+     * @return bool|string
+     */
+    public function update(array $params): bool|string
+    {
+        // 准备数据
+        $data = self::prepare($params);
+        if (is_string($data)) {
+            return $data;
+        }
+
+        $raw = $this->getFirstByUuid($data['uuid']);
+        if (empty($raw)) {
+            return '产品UUID不存在';
+        }
+
+        $product = new Product();
+        $product->fillData($data)
+            ->filterInvalidProperties();
+
+        $res = $this->updateByUuid($product);
+        if ($res !== true) {
+            return '更新产品失败';
         }
         return true;
     }
