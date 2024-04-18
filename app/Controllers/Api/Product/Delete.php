@@ -2,8 +2,8 @@
 /**
  * Created By PhpStorm
  * User: Pony
- * Data: 2024/4/17
- * Time: 下午4:25
+ * Data: 2024/4/18
+ * Time: 上午9:26
  */
 declare(strict_types=1);
 
@@ -14,34 +14,34 @@ use App\Enums\Code;
 use App\Services\ProductService;
 use Exception;
 
-class Create extends Base
+class Delete extends Base
 {
     /**
-     * 创建产品
+     * 删除产品
      * @return void
      */
     public function index(): void
     {
         $this->postFilter();
-        $svc = new ProductService();
-        $rules = $svc->getCreateRules();
-        $this->verifyJsonInputByRules($rules);
         try {
             $params = $this->getJsonInputParams();
-            // 创建业务逻辑
-            $res = $svc->create($params);
+            $uuid = $params['uuid'] ?? null;
+            if ($this->validateUUID($uuid) !== true) {
+                throw new Exception('无效的产品UUID');
+            }
+            $svc = new ProductService();
+            $res = $svc->del($uuid);
             if ($res !== true) {
                 throw new Exception($res);
             }
-
             $data = [
                 'code' => Code::OK,
-                'message' => '创建产品成功',
+                'message' => '删除产品成功',
             ];
         } catch (Exception $e) {
             $data = [
                 'code' => Code::FAIL,
-                'message' => $e->getMessage() ?: '创建产品失败'
+                'message' => $e->getMessage() ?: '删除产品失败'
             ];
         }
         $this->render($data);

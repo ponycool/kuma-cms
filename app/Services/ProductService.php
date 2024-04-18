@@ -21,16 +21,14 @@ class ProductService extends BaseService
     {
         return [
             'cid' => [
-                'rules' => 'required|is_natural_no_zero',
+                'rules' => 'if_exist|is_natural_no_zero',
                 'errors' => [
-                    'required' => '参数产品分类ID[cid]无效,产品分类ID为必填项',
                     'is_natural_no_zero' => '参数产品分类ID[cid]无效,产品分类ID必须为非零自然数',
                 ]
             ],
             'name' => [
-                'rules' => 'required|max_length[200]',
+                'rules' => 'if_exist|max_length[200]',
                 'errors' => [
-                    'required' => '参数产品名称[name]无效，产品名称为必填项',
                     'max_length' => '参数产品名称[name]无效，字符长度不能超过200个字符',
                 ]
             ],
@@ -100,6 +98,73 @@ class ProductService extends BaseService
     }
 
     /**
+     * 获取创建验证规则
+     * @return array
+     */
+    public function getCreateRules(): array
+    {
+        $rules = [
+            'cid' => [
+                'rules' => 'required|is_natural_no_zero',
+                'errors' => [
+                    'required' => '参数产品分类ID[cid]无效,产品分类ID为必填项',
+                    'is_natural_no_zero' => '参数产品分类ID[cid]无效,产品分类ID必须为非零自然数',
+                ]
+            ],
+            'name' => [
+                'rules' => 'required|max_length[200]',
+                'errors' => [
+                    'required' => '参数产品名称[name]无效，产品名称为必填项',
+                    'max_length' => '参数产品名称[name]无效，字符长度不能超过200个字符',
+                ]
+            ],
+        ];
+        return array_merge(
+            $this->getBaseRules(),
+            $rules
+        );
+    }
+
+    /**
+     * 获取更新验证规则
+     * @return array
+     */
+    public function getUpdateRules(): array
+    {
+        $rules = [
+            'uuid' => [
+                'rules' => 'required|min_length[35]|max_length[37]',
+                'errors' => [
+                    'required' => '参数产品UUID[uuid]为必填项',
+                    'min_length' => '参数产品UUID[uuid]无效',
+                    'max_length' => '参数产品UUID[uuid]无效',
+                ]
+            ],
+        ];
+        return array_merge(
+            $this->getBaseRules(),
+            $rules
+        );
+    }
+
+    /**
+     * 根据UUID获取产品
+     * @param string $uuid
+     * @return array|null
+     */
+    public function getByUUID(string $uuid): ?array
+    {
+        if ($this->validateUUID($uuid) !== true) {
+            return null;
+        }
+        $res = $this->getFirstByUuid($uuid);
+        if (count($res) > 0) {
+            $res = self::mergeMedia([$res])[0];
+        }
+        return $res;
+    }
+
+    /**
      * 创建产品
      * @param array $params
      * @return bool|string
@@ -119,6 +184,54 @@ class ProductService extends BaseService
         $res = $this->insert($product);
         if ($res !== true) {
             return '创建产品失败';
+        }
+        return true;
+    }
+
+    /**
+     * 更新产品
+     * @param array $params
+     * @return bool|string
+     */
+    public function update(array $params): bool|string
+    {
+        // 准备数据
+        $data = self::prepare($params);
+        if (is_string($data)) {
+            return $data;
+        }
+
+        $raw = $this->getFirstByUuid($data['uuid']);
+        if (empty($raw)) {
+            return '产品UUID不存在';
+        }
+
+        $product = new Product();
+        $product->fillData($data)
+            ->filterInvalidProperties();
+
+        $res = $this->updateByUuid($product);
+        if ($res !== true) {
+            return '更新产品失败';
+        }
+        return true;
+    }
+
+    /**
+     * 删除产品
+     * @param string $uuid
+     * @return bool|string
+     */
+    public function del(string $uuid): bool|string
+    {
+        $article = $this->getFirstByUuid($uuid);
+        if (empty($article)) {
+            return '产品UUID不存在';
+        }
+        $id = (int)$article['id'];
+        $res = $this->delete($id);
+        if ($res !== true) {
+            return '删除产品失败';
         }
         return true;
     }
@@ -176,5 +289,51 @@ class ProductService extends BaseService
         }
 
         return $data;
+    }
+
+    /**
+     * 合并媒体
+     * @param array $list
+     * @return array
+     */
+    private function mergeMedia(array $list): array
+    {
+        $coverImageList = [];
+        $detailImageList = [];
+        foreach ($list as $item) {
+            if (!is_null($item['cover_image'])) {
+                $coverImageList[] = $item['cover_image'];
+            }
+            if (!is_null($item['detail_images'])) {
+                $detailImageList = array_merge($detailImageList, json_decode($item['detail_images'], true));
+            }
+        }
+        $mediaSvc = new MediaService();
+        if (!empty($coverImageList)) {
+            $imageList = $mediaSvc->getMedia($coverImageList);
+            foreach ($imageList as $img) {
+                foreach ($list as &$item) {
+                    if ($img['id'] === $item['cover_image']) {
+                        $item['cover_image'] = $img['file_url'];
+                    }
+                }
+            }
+        }
+        if (!empty($detailImageList)) {
+            $imageList = $mediaSvc->getMedia($detailImageList);
+            foreach ($imageList as $img) {
+                foreach ($list as &$item) {
+                    $detailImages = json_decode($item['detail_images'], true);
+                    foreach ($detailImages as &$image) {
+                        if ($img['id'] === $image) {
+                            $image = $img['file_url'];
+                        }
+                    }
+                    $item['detail_images'] = json_encode($detailImages);
+                }
+            }
+        }
+
+        return $list;
     }
 }

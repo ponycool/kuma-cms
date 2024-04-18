@@ -2,8 +2,8 @@
 /**
  * Created By PhpStorm
  * User: Pony
- * Data: 2024/4/17
- * Time: 下午4:25
+ * Data: 2024/4/18
+ * Time: 上午9:49
  */
 declare(strict_types=1);
 
@@ -14,34 +14,29 @@ use App\Enums\Code;
 use App\Services\ProductService;
 use Exception;
 
-class Create extends Base
+class Query extends Base
 {
     /**
-     * 创建产品
+     * 获取产品列表信息
      * @return void
      */
     public function index(): void
     {
         $this->postFilter();
+        $this->validatePageParamsFromJsonInput();
         $svc = new ProductService();
-        $rules = $svc->getCreateRules();
-        $this->verifyJsonInputByRules($rules);
         try {
             $params = $this->getJsonInputParams();
-            // 创建业务逻辑
-            $res = $svc->create($params);
-            if ($res !== true) {
-                throw new Exception($res);
-            }
-
+            $list = $svc->getList($params);
             $data = [
                 'code' => Code::OK,
-                'message' => '创建产品成功',
+                'message' => '获取产品列表成功',
             ];
+            $data = array_merge($data, $list);
         } catch (Exception $e) {
             $data = [
                 'code' => Code::FAIL,
-                'message' => $e->getMessage() ?: '创建产品失败'
+                'message' => $e->getMessage() ?: '获取产品列表失败',
             ];
         }
         $this->render($data);
