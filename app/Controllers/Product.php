@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Services\ProductService;
+
 class Product extends Web
 {
     /**
@@ -17,19 +19,56 @@ class Product extends Web
      */
     public function index(): void
     {
-        $this->setTemplate('product')
-            ->setPage('product')
-            ->render();
+        $uuid = $this->getParam('uuid');
+        if ($this->validateUUID($uuid) === true) {
+            self::detail($uuid);
+        } else {
+            self::list();
+        }
     }
 
     /**
      * 产品列表
      * @return void
      */
-    public function list(): void
+    private function list(): void
     {
         $this->setTemplate('product_list')
             ->setPage('product_list')
             ->render();
+    }
+
+    /**
+     * 产品详情
+     * @param string $uuid
+     * @return void
+     */
+    private function detail(string $uuid): void
+    {
+        $settings = self::getSettings();
+        $data = [];
+        $svc = new ProductService();
+        $product = $svc->getByUUID($uuid);
+        if (!empty($product) && $product['status'] === 1) {
+            $data['product'] = $product;
+            $title = empty($product['seo_title']) ? $product['name'] : $product['seo_title'];
+            $title .= ' - ' . $settings['site_name'] ?? '';
+            $description = empty($product['seo_desc']) ? $product['name'] : $product['seo_desc'];
+            $keywords = $product['seo_keywords'] ?? '';
+            if (!empty($keywords)) {
+                if ($this->isJsonStr($keywords)) {
+                    $keywords = implode(',', json_decode($keywords, true));
+                }
+            }
+            // 更新浏览计数
+            $svc->incrById((int)$product['id'], 'view_count');
+
+            $this->setTitle($title)
+                ->setDescription($description)
+                ->setKeywords($keywords);
+        }
+        $this->setTemplate('article')
+            ->setPage('article')
+            ->render($data);
     }
 }

@@ -9,7 +9,7 @@
 {% block content %}
     {% include 'header.twig' %}
     {% set services = articles('service',false,6) | default(null) %}
-    {% set cases = fetchArticleForCategory(['solar panels', 'wind', 'hydropower'],6) | default(null) %}
+    {% set cases = fetchArticleByCategory(['solar panels', 'wind', 'hydropower'],6) | default(null) %}
     {% set cases = cases | sort((a,b) => a.category_code <=> b.category_code ) %}
     {% include 'carousel.twig' %}
     <div class="container-xxl py-5">

@@ -2,7 +2,7 @@
 
 {% block content %}
     {% include 'header.twig' %}
-    {% set cases = fetchArticleForCategory(['solar panels', 'wind', 'hydropower'],6) | default(null) %}
+    {% set cases = fetchArticleByCategory(['solar panels', 'wind', 'hydropower'],6) | default(null) %}
     {% set cases = cases | sort((a,b) => a.category_code <=> b.category_code ) %}
     <div class="container-fluid page-header py-5 mb-5">
         <div class="container py-5">
