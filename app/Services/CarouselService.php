@@ -36,7 +36,7 @@ class CarouselService extends BaseService
             'target' => [
                 'rules' => 'if_exist|in_list[_self,_blank,_parent,_top]',
                 'errors' => [
-                    'valid_date' => '参数链接打开方式[target]无效，必须是_self,_blank,_parent,_top',
+                    'in_list' => '参数链接打开方式[target]无效，必须是_self,_blank,_parent,_top',
                 ]
             ],
             'title' => [
@@ -72,16 +72,16 @@ class CarouselService extends BaseService
      */
     public function getCreateRules(): array
     {
-        return array_merge($this->getBaseRules(), [
-                'image' => [
-                    'rules' => 'required|max_length[100]',
-                    'errors' => [
-                        'required' => '参数轮播图片[image]不能为空',
-                        'max_length' => '参数轮播图片[image]无效，字符长度不能超过100个字符',
-                    ]
+        $rules = [
+            'image' => [
+                'rules' => 'required|max_length[100]',
+                'errors' => [
+                    'required' => '参数轮播图片[image]不能为空',
+                    'max_length' => '参数轮播图片[image]无效，字符长度不能超过100个字符',
                 ]
             ]
-        );
+        ];
+        return array_merge($this->getBaseRules(), $rules);
     }
 
     /**
