@@ -133,7 +133,8 @@ class TemplateService extends AbstractExtension
             new TwigFunction('menu', [$this, 'getMenu']),
             new TwigFunction('carousel', [$this, 'getCarousel']),
             new TwigFunction('articles', [$this, 'getArticles']),
-            new TwigFunction('fetchArticleForCategory', [$this, 'fetchArticleForCategory']),
+            new TwigFunction('fetchArticleByCategory', [$this, 'fetchArticleByCategory']),
+            new TwigFunction('products', [$this, 'getProducts']),
         ];
     }
 
@@ -173,7 +174,7 @@ class TemplateService extends AbstractExtension
      * @param int $limit
      * @return array
      */
-    public function fetchArticleForCategory(string|array $categoryCode, int $limit = 10): array
+    public function fetchArticleByCategory(string|array $categoryCode, int $limit = 10): array
     {
         $params = [
             'categoryCode' => $categoryCode,
@@ -191,5 +192,26 @@ class TemplateService extends AbstractExtension
     {
         $svc = new CarouselService();
         return $svc->getEnableList();
+    }
+
+    /**
+     * 获取产品列表
+     * @param string|null $categoryCode
+     * @param bool $isPage
+     * @param int|null $limit
+     * @return array
+     */
+    public function getProducts(?string $categoryCode = null, bool $isPage = true,
+                                ?int    $limit = null): array
+    {
+        $params = [
+            'page' => $this->getPage(),
+            'pageSize' => $this->getPageSize(),
+            'categoryCode' => $categoryCode,
+            'isPage' => $isPage,
+            'limit' => $limit,
+        ];
+        $svc = new ProductService();
+        return $svc->getList($params);
     }
 }
