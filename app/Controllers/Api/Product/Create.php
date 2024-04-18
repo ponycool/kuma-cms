@@ -24,7 +24,7 @@ class Create extends Base
     {
         $this->postFilter();
         $svc = new ProductService();
-        $rules = $svc->getBaseRules();
+        $rules = $svc->getCreateRules();
         $this->verifyJsonInputByRules($rules);
         try {
             $params = $this->getJsonInputParams();
