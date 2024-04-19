@@ -331,11 +331,11 @@ class ProductService extends BaseService
      */
     public function del(string $uuid): bool|string
     {
-        $article = $this->getFirstByUuid($uuid);
-        if (empty($article)) {
+        $raw = $this->getFirstByUuid($uuid);
+        if (empty($raw)) {
             return '产品UUID不存在';
         }
-        $id = (int)$article['id'];
+        $id = (int)$raw['id'];
         $res = $this->delete($id);
         if ($res !== true) {
             return '删除产品失败';
