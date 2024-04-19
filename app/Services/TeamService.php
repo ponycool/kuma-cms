@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entities\Team;
+use App\Enums\DeletedStatus;
 
 class TeamService extends BaseService
 {
@@ -113,6 +114,77 @@ class TeamService extends BaseService
             $this->getBaseRules(),
             $rules
         );
+    }
+
+    /**
+     * 获取产品列表
+     * @param array $params
+     * @return array
+     */
+    public function getList(array $params): array
+    {
+        $page = (int)($params['page'] ?? 1);
+        $pageSize = (int)($params['pageSize'] ?? 10);
+        $name = $params['name'] ?? null;
+        $keyword = $params['keyword'] ?? null;
+        $isPage = $params['isPage'] ?? true;
+        $limit = $params['limit'] ?? null;
+        $sql = [
+            'SELECT t.id,t.uuid,t.name,t.profile_image,t.job_title,t.introduction,t.email,t.phone,t.joined_date,',
+            't.sort_index,t.created_at,t.updated_at ',
+            'FROM swap_team AS t ',
+            'WHERE t.deleted_at IS NULL ',
+            'AND t.deleted = ? '
+        ];
+        $sqlParams = [
+            DeletedStatus::UNDELETED->value
+        ];
+
+        if (!is_null($name)) {
+            $sql[] = 'AND t.name = ? ';
+            $sqlParams[] = $name;
+        }
+        if (!is_null($keyword)) {
+            $sql[] = 'AND t.name LIKE ? ';
+            $sqlParams[] = '%' . $keyword . '%';
+        }
+        $sql[] = 'ORDER BY t.sort_index ASC,t.created_at DESC';
+        if (!$isPage && !is_null($limit)) {
+            $sql[] = ' LIMIT ' . $limit;
+        }
+        $sql = $this->assembleSql($sql);
+        if ($isPage) {
+            $res = $this->getPageByQuery($sql, $sqlParams, $page, $pageSize);
+            if ($res['total'] > 0) {
+                if (is_array($res['pageData'])) {
+                    $res['pageData'] = self::mergeMedia($res['pageData']);
+                }
+            }
+        } else {
+            $this->setResultType('array');
+            $res = $this->query($sql, $sqlParams);
+            if (count($res) > 0) {
+                $res = self::mergeMedia($res);
+            }
+        }
+        return $res;
+    }
+
+    /**
+     * 根据UUID获取团队成员
+     * @param string $uuid
+     * @return array|null
+     */
+    public function getByUUID(string $uuid): ?array
+    {
+        if ($this->validateUUID($uuid) !== true) {
+            return null;
+        }
+        $res = $this->getFirstByUuid($uuid);
+        if (count($res) > 0) {
+            $res = self::mergeMedia([$res])[0];
+        }
+        return $res;
     }
 
     /**
