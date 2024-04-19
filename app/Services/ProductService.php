@@ -67,7 +67,6 @@ class ProductService extends BaseService
             'description' => [
                 'rules' => 'if_exist|max_length[100000]',
                 'errors' => [
-                    'required' => '参数产品描述[description]无效，产品描述为必填项',
                     'max_length' => '参数产品描述[description]无效，字符长度不能超过10万个字符',
                 ]
             ],
