@@ -3,27 +3,27 @@
  * Created by PhpStorm.
  * User: Pony
  * Date: 2024/04/19
- * Time: 08:49 上午
+ * Time: 06:19 上午
  */
 declare(strict_types=1);
 
 namespace App\Models;
 
-class LinkModel extends BaseModel
+class TeamModel extends BaseModel
 {
-    protected $table = 'link';
+    protected $table = 'team';
     protected $primaryKey = 'id';
-    protected $returnType = 'App\Entities\Link';
+    protected $returnType = 'App\Entities\Team';
     protected $useSoftDeletes = true;
     protected $allowedFields = [
         'uuid',
         'name',
-        'url',
-        'icon',
-        'description',
-        'target',
-        'group',
-        'status',
+        'profile_image',
+        'job_title',
+        'introduction',
+        'email',
+        'phone',
+        'joined_date',
         'sort_index',
     ];
     protected $useTimestamps = true;

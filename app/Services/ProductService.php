@@ -67,7 +67,6 @@ class ProductService extends BaseService
             'description' => [
                 'rules' => 'if_exist|max_length[100000]',
                 'errors' => [
-                    'required' => '参数产品描述[description]无效，产品描述为必填项',
                     'max_length' => '参数产品描述[description]无效，字符长度不能超过10万个字符',
                 ]
             ],
@@ -332,11 +331,11 @@ class ProductService extends BaseService
      */
     public function del(string $uuid): bool|string
     {
-        $article = $this->getFirstByUuid($uuid);
-        if (empty($article)) {
+        $raw = $this->getFirstByUuid($uuid);
+        if (empty($raw)) {
             return '产品UUID不存在';
         }
-        $id = (int)$article['id'];
+        $id = (int)$raw['id'];
         $res = $this->delete($id);
         if ($res !== true) {
             return '删除产品失败';

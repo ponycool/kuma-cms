@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: Pony
  * Date: 2024/04/19
- * Time: 08:48 上午
+ * Time: 06:18 上午
  */
 declare(strict_types=1);
 
@@ -11,17 +11,17 @@ namespace App\Entities;
 
 use Exception;
 
-class Link extends Base
+class Team extends Base
 {
     protected int $id = 0;
     protected string $uuid;
     protected string $name;
-    protected string $url;
-    protected int $icon;
-    protected string $description;
-    protected string $target;
-    protected string $group;
-    protected int $status;
+    protected int $profile_image;
+    protected string $job_title;
+    protected string $introduction;
+    protected string $email;
+    protected string $phone;
+    protected string $joined_date;
     protected int $sort_index;
     protected string $created_at;
     protected string $updated_at;
@@ -41,7 +41,7 @@ class Link extends Base
         } catch (Exception $e) {
             log_message(
                 'error',
-                '初始化 Link Entity 失败，error：{msg}',
+                '初始化 Team Entity 失败，error：{msg}',
                 ['msg' => $e->getMessage()]
             );
         }
@@ -59,7 +59,7 @@ class Link extends Base
      * @param int $id
      * @return $this
      */
-    public function setId(int $id): Link
+    public function setId(int $id): Team
     {
         $this->id = $id;
         $this->attributes['id'] = $this->id;
@@ -79,7 +79,7 @@ class Link extends Base
      * @return $this
      * @throws Exception
      */
-    public function setUuid(string $uuid = ''): Link
+    public function setUuid(string $uuid = ''): Team
     {
         $this->uuid = $uuid ?: $this->generateUuid();
         $this->attributes['uuid'] = $this->uuid;
@@ -98,7 +98,7 @@ class Link extends Base
      * @param string $name
      * @return $this
      */
-    public function setName(string $name): Link
+    public function setName(string $name): Team
     {
         $this->name = $name;
         $this->attributes['name'] = $this->name;
@@ -106,116 +106,116 @@ class Link extends Base
     }
 
     /**
-     * @return string
-     */
-    public function getUrl(): string
-    {
-        return $this->url;
-    }
-
-    /**
-     * @param string $url
-     * @return $this
-     */
-    public function setUrl(string $url): Link
-    {
-        $this->url = $url;
-        $this->attributes['url'] = $this->url;
-        return $this;
-    }
-
-    /**
      * @return int
      */
-    public function getIcon(): int
+    public function getProfileImage(): int
     {
-        return $this->icon;
+        return $this->profile_image;
     }
 
     /**
-     * @param int $icon
+     * @param int $profile_image
      * @return $this
      */
-    public function setIcon(int $icon): Link
+    public function setProfileImage(int $profile_image): Team
     {
-        $this->icon = $icon;
-        $this->attributes['icon'] = $this->icon;
+        $this->profile_image = $profile_image;
+        $this->attributes['profile_image'] = $this->profile_image;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getDescription(): string
+    public function getJobTitle(): string
     {
-        return $this->description;
+        return $this->job_title;
     }
 
     /**
-     * @param string $description
+     * @param string $job_title
      * @return $this
      */
-    public function setDescription(string $description): Link
+    public function setJobTitle(string $job_title): Team
     {
-        $this->description = $description;
-        $this->attributes['description'] = $this->description;
+        $this->job_title = $job_title;
+        $this->attributes['job_title'] = $this->job_title;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getTarget(): string
+    public function getIntroduction(): string
     {
-        return $this->target;
+        return $this->introduction;
     }
 
     /**
-     * @param string $target
+     * @param string $introduction
      * @return $this
      */
-    public function setTarget(string $target): Link
+    public function setIntroduction(string $introduction): Team
     {
-        $this->target = $target;
-        $this->attributes['target'] = $this->target;
+        $this->introduction = $introduction;
+        $this->attributes['introduction'] = $this->introduction;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getGroup(): string
+    public function getEmail(): string
     {
-        return $this->group;
+        return $this->email;
     }
 
     /**
-     * @param string $group
+     * @param string $email
      * @return $this
      */
-    public function setGroup(string $group): Link
+    public function setEmail(string $email): Team
     {
-        $this->group = $group;
-        $this->attributes['group'] = $this->group;
+        $this->email = $email;
+        $this->attributes['email'] = $this->email;
         return $this;
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getStatus(): int
+    public function getPhone(): string
     {
-        return $this->status;
+        return $this->phone;
     }
 
     /**
-     * @param int $status
+     * @param string $phone
      * @return $this
      */
-    public function setStatus(int $status): Link
+    public function setPhone(string $phone): Team
     {
-        $this->status = $status;
-        $this->attributes['status'] = $this->status;
+        $this->phone = $phone;
+        $this->attributes['phone'] = $this->phone;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getJoinedDate(): string
+    {
+        return $this->joined_date;
+    }
+
+    /**
+     * @param string $joined_date
+     * @return $this
+     */
+    public function setJoinedDate(string $joined_date): Team
+    {
+        $this->joined_date = $joined_date;
+        $this->attributes['joined_date'] = $this->joined_date;
         return $this;
     }
 
@@ -231,7 +231,7 @@ class Link extends Base
      * @param int $sort_index
      * @return $this
      */
-    public function setSortIndex(int $sort_index): Link
+    public function setSortIndex(int $sort_index): Team
     {
         $this->sort_index = $sort_index;
         $this->attributes['sort_index'] = $this->sort_index;
