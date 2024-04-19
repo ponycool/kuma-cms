@@ -144,7 +144,7 @@ class CarouselService extends BaseService
             'FROM swap_carousel ',
             'WHERE deleted_at IS NULL ',
             'AND deleted = ? ',
-            'ORDER BY sort_index ASC, id DESC ',
+            'ORDER BY sort_index ASC, created_at DESC ',
         ];
         $sqlParams = [
             DeletedStatus::UNDELETED->value,
