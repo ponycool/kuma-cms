@@ -2,22 +2,27 @@
 /**
  * Created by PhpStorm.
  * User: Pony
- * Date: 2024/01/04
- * Time: 01:47 上午
+ * Date: 2024/04/19
+ * Time: 08:48 上午
  */
 declare(strict_types=1);
 
 namespace App\Entities;
 
+use Exception;
+
 class Link extends Base
 {
     protected int $id = 0;
-    protected string $link_name;
-    protected string $link_url;
-    protected string $link_desc;
-    protected string $link_image;
+    protected string $uuid;
+    protected string $name;
+    protected string $url;
+    protected int $icon;
+    protected string $description;
     protected string $target;
-    protected int $is_visible;
+    protected string $group;
+    protected int $status;
+    protected int $sort_index;
     protected string $created_at;
     protected string $updated_at;
     protected string $deleted_at;
@@ -31,6 +36,15 @@ class Link extends Base
     public function __construct(array $data = null)
     {
         parent::__construct($data);
+        try {
+            $this->setUuid();
+        } catch (Exception $e) {
+            log_message(
+                'error',
+                '初始化 Link Entity 失败，error：{msg}',
+                ['msg' => $e->getMessage()]
+            );
+        }
     }
 
     /**
@@ -55,76 +69,96 @@ class Link extends Base
     /**
      * @return string
      */
-    public function getLinkName(): string
+    public function getUuid(): string
     {
-        return $this->link_name;
+        return $this->uuid;
     }
 
     /**
-     * @param string $link_name
+     * @param string $uuid
      * @return $this
+     * @throws Exception
      */
-    public function setLinkName(string $link_name): Link
+    public function setUuid(string $uuid = ''): Link
     {
-        $this->link_name = $link_name;
-        $this->attributes['link_name'] = $this->link_name;
+        $this->uuid = $uuid ?: $this->generateUuid();
+        $this->attributes['uuid'] = $this->uuid;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getLinkUrl(): string
+    public function getName(): string
     {
-        return $this->link_url;
+        return $this->name;
     }
 
     /**
-     * @param string $link_url
+     * @param string $name
      * @return $this
      */
-    public function setLinkUrl(string $link_url): Link
+    public function setName(string $name): Link
     {
-        $this->link_url = $link_url;
-        $this->attributes['link_url'] = $this->link_url;
+        $this->name = $name;
+        $this->attributes['name'] = $this->name;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getLinkDesc(): string
+    public function getUrl(): string
     {
-        return $this->link_desc;
+        return $this->url;
     }
 
     /**
-     * @param string $link_desc
+     * @param string $url
      * @return $this
      */
-    public function setLinkDesc(string $link_desc): Link
+    public function setUrl(string $url): Link
     {
-        $this->link_desc = $link_desc;
-        $this->attributes['link_desc'] = $this->link_desc;
+        $this->url = $url;
+        $this->attributes['url'] = $this->url;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getIcon(): int
+    {
+        return $this->icon;
+    }
+
+    /**
+     * @param int $icon
+     * @return $this
+     */
+    public function setIcon(int $icon): Link
+    {
+        $this->icon = $icon;
+        $this->attributes['icon'] = $this->icon;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getLinkImage(): string
+    public function getDescription(): string
     {
-        return $this->link_image;
+        return $this->description;
     }
 
     /**
-     * @param string $link_image
+     * @param string $description
      * @return $this
      */
-    public function setLinkImage(string $link_image): Link
+    public function setDescription(string $description): Link
     {
-        $this->link_image = $link_image;
-        $this->attributes['link_image'] = $this->link_image;
+        $this->description = $description;
+        $this->attributes['description'] = $this->description;
         return $this;
     }
 
@@ -148,21 +182,59 @@ class Link extends Base
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getIsVisible(): int
+    public function getGroup(): string
     {
-        return $this->is_visible;
+        return $this->group;
     }
 
     /**
-     * @param int $is_visible
+     * @param string $group
      * @return $this
      */
-    public function setIsVisible(int $is_visible): Link
+    public function setGroup(string $group): Link
     {
-        $this->is_visible = $is_visible;
-        $this->attributes['is_visible'] = $this->is_visible;
+        $this->group = $group;
+        $this->attributes['group'] = $this->group;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStatus(): int
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param int $status
+     * @return $this
+     */
+    public function setStatus(int $status): Link
+    {
+        $this->status = $status;
+        $this->attributes['status'] = $this->status;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSortIndex(): int
+    {
+        return $this->sort_index;
+    }
+
+    /**
+     * @param int $sort_index
+     * @return $this
+     */
+    public function setSortIndex(int $sort_index): Link
+    {
+        $this->sort_index = $sort_index;
+        $this->attributes['sort_index'] = $this->sort_index;
         return $this;
     }
 
