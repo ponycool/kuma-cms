@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entities\Link;
+use App\Enums\DeletedStatus;
 
 class LinkService extends BaseService
 {
@@ -124,6 +125,63 @@ class LinkService extends BaseService
     }
 
     /**
+     * 获取友情链接列表
+     * @param array $params
+     * @return array
+     */
+    public function getList(array $params): array
+    {
+        $page = (int)($params['page'] ?? 1);
+        $pageSize = (int)($params['pageSize'] ?? 10);
+        $name = $params['name'] ?? null;
+        $group = $params['group'] ?? null;
+        $keyword = $params['keyword'] ?? null;
+        $isPage = $params['isPage'] ?? true;
+        $limit = $params['limit'] ?? null;
+        $sql = [
+            'SELECT l.id,l.uuid,l.name,l.url,l.icon,l.description,l.target,l.`group`,l.status,',
+            'l.sort_index,l.created_at,l.updated_at ',
+            'FROM swap_link AS l ',
+            'WHERE l.deleted_at IS NULL ',
+            'AND l.deleted = ? '
+        ];
+        $sqlParams = [
+            DeletedStatus::UNDELETED->value
+        ];
+
+        if (!is_null($name)) {
+            $sql[] = 'AND l.name = ? ';
+            $sqlParams[] = $name;
+        }
+        if (!is_null($group)) {
+            $sql[] = 'AND l.`group` = ? ';
+            $sqlParams[] = $group;
+        }
+        if (!is_null($keyword)) {
+            $sql[] = 'AND l.name LIKE ? ';
+            $sqlParams[] = '%' . $keyword . '%';
+        }
+        $sql[] = 'ORDER BY l.sort_index ASC,l.created_at DESC';
+        if (!$isPage && !is_null($limit)) {
+            $sql[] = ' LIMIT ' . $limit;
+        }
+        $sql = $this->assembleSql($sql);
+        if ($isPage) {
+            $res = $this->getPageByQuery($sql, $sqlParams, $page, $pageSize);
+            if ($res['total'] > 0 && is_array($res['pageData'])) {
+                $res['pageData'] = self::mergeMedia($res['pageData']);
+            }
+        } else {
+            $this->setResultType('array');
+            $res = $this->query($sql, $sqlParams);
+            if (count($res) > 0) {
+                $res = self::mergeMedia($res);
+            }
+        }
+        return $res;
+    }
+
+    /**
      * 根据UUID获取友情链接
      * @param string $uuid
      * @return array|null
@@ -138,6 +196,28 @@ class LinkService extends BaseService
             $res = self::mergeMedia([$res])[0];
         }
         return $res;
+    }
+
+    /**
+     * 获取分组列表
+     * @return array
+     */
+    public function getGroup(): array
+    {
+        $sql = [
+            'SELECT `group` ',
+            'FROM swap_link ',
+            'WHERE deleted_at IS NULL ',
+            'AND deleted = ? ',
+            'GROUP BY `group` ',
+            'ORDER BY `group` ASC'
+        ];
+        $params = [
+            DeletedStatus::UNDELETED->value
+        ];
+        $sql = $this->assembleSql($sql);
+        $this->setResultType('array');
+        return $this->query($sql, $params);
     }
 
     /**
@@ -189,6 +269,23 @@ class LinkService extends BaseService
         $res = $this->updateByUuid($link);
         if ($res !== true) {
             return '更新友情链接失败';
+        }
+        return true;
+    }
+
+    /**
+     * 更新友情链接状态
+     * @param string $uuid
+     * @param int $status
+     * @return true|string
+     */
+    public function updateStatus(string $uuid, int $status): true|string
+    {
+        $link = new Link();
+        $link->setStatus($status);
+        $res = $this->updateByUuid($link, $uuid);
+        if ($res !== true) {
+            return '更新友情链接状态失败';
         }
         return true;
     }

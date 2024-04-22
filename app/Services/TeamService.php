@@ -117,7 +117,7 @@ class TeamService extends BaseService
     }
 
     /**
-     * 获取产品列表
+     * 获取团队列表
      * @param array $params
      * @return array
      */
@@ -155,10 +155,8 @@ class TeamService extends BaseService
         $sql = $this->assembleSql($sql);
         if ($isPage) {
             $res = $this->getPageByQuery($sql, $sqlParams, $page, $pageSize);
-            if ($res['total'] > 0) {
-                if (is_array($res['pageData'])) {
-                    $res['pageData'] = self::mergeMedia($res['pageData']);
-                }
+            if ($res['total'] > 0 && is_array($res['pageData'])) {
+                $res['pageData'] = self::mergeMedia($res['pageData']);
             }
         } else {
             $this->setResultType('array');
