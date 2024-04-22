@@ -470,9 +470,6 @@ class ArticleService extends BaseService
         $article = new Article();
         $article->fillData($data)
             ->filterInvalidProperties();
-        if (!is_null($data['cover_image'] ?? null)) {
-            $article->setCoverImage($data['cover_image']);
-        }
 
         $res = $this->updateByUuid($article);
         if ($res !== true) {
