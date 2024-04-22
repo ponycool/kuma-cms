@@ -16,6 +16,10 @@ use Exception;
 
 class Create extends Base
 {
+    /**
+     * 创建文章
+     * @return void
+     */
     public function index(): void
     {
         $this->postFilter();
@@ -24,7 +28,6 @@ class Create extends Base
         $this->verifyJsonInputByRules($rules);
         try {
             $params = $this->getJsonInputParams();
-            // 创建业务逻辑
             $res = $articleSvc->createArticle($params);
             if ($res !== true) {
                 throw new Exception($res);
