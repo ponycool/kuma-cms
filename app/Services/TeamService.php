@@ -117,7 +117,7 @@ class TeamService extends BaseService
     }
 
     /**
-     * 获取产品列表
+     * 获取团队列表
      * @param array $params
      * @return array
      */
