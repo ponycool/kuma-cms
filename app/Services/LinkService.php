@@ -217,7 +217,12 @@ class LinkService extends BaseService
         ];
         $sql = $this->assembleSql($sql);
         $this->setResultType('array');
-        return $this->query($sql, $params);
+        $res = $this->query($sql, $params);
+        $list = [];
+        foreach ($res as $item) {
+            $list[] = $item['group'];
+        }
+        return $list;
     }
 
     /**
