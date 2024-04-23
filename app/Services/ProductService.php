@@ -79,7 +79,7 @@ class ProductService extends BaseService
             'stockQuantity' => [
                 'rules' => 'if_exist|is_natural',
                 'errors' => [
-                    'is_natural_no_zero' => '参数库存数量[stockQuantity]无效，必须为自然数',
+                    'is_natural' => '参数库存数量[stockQuantity]无效，必须为自然数',
                 ]
             ],
             'sortIndex' => [
