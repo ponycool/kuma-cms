@@ -49,7 +49,7 @@ class Detail extends Base
                 'code' => Code::OK,
                 'message' => '获取单页成功',
             ];
-            $data = array_merge($data, $res);
+            $data = array_merge($data, ['page' => $res]);
         } catch (Exception $e) {
             $data = [
                 'code' => Code::FAIL,
