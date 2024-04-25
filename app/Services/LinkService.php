@@ -220,7 +220,9 @@ class LinkService extends BaseService
         $res = $this->query($sql, $params);
         $list = [];
         foreach ($res as $item) {
-            $list[] = $item['group'];
+            if (!is_null($item['group'])) {
+                $list[] = $item['group'];
+            }
         }
         return $list;
     }
