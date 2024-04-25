@@ -8,6 +8,7 @@
 {# 主体 #}
 {% block content %}
     {% include 'header.twig' %}
+    {% set team = team(3) | default(null) %}
     <div class="container-fluid page-header py-5 mb-5">
         <div class="container py-5">
             <h1 class="display-3 text-white mb-3 animated slideInDown">关于我们</h1>
@@ -83,10 +84,14 @@
                     <div class="p-lg-5 pe-lg-0">
                         <h6 class="text-primary">关于我们</h6>
                         <h1 class="mb-4">25年以上太阳能和可再生能源行业经验</h1>
-                        <p>自二十多年前投身于可再生能源领域以来，我们始终致力于推动太阳能技术的革新与应用，并以此为核心，不断拓展涵盖各类可再生能源解决方案的综合服务体系。作为行业的先驱者和领导者，我们积累了超过25年的深厚专业经验，见证了全球能源转型的重要历程。凭借对可持续发展的坚定承诺和卓越的工程技术实力，我们成功打造了一系列高效、可靠的太阳能系统项目，并广泛涉足风能、生物质能、地热能等多种可再生能源形式的开发与集成。</p>
-                        <p><i class="fa fa-check-circle text-primary me-3"></i>25年专业积淀，提供定制清洁能源解决方案与全程技术支持。</p>
-                        <p><i class="fa fa-check-circle text-primary me-3"></i>多元整合可再生能源，实现最优项目设计与高性价比。</p>
-                        <p><i class="fa fa-check-circle text-primary me-3"></i>持续创新与卓越服务，引领行业发展，保障客户长期价值与可持续成果。</p>
+                        <p>
+                            自二十多年前投身于可再生能源领域以来，我们始终致力于推动太阳能技术的革新与应用，并以此为核心，不断拓展涵盖各类可再生能源解决方案的综合服务体系。作为行业的先驱者和领导者，我们积累了超过25年的深厚专业经验，见证了全球能源转型的重要历程。凭借对可持续发展的坚定承诺和卓越的工程技术实力，我们成功打造了一系列高效、可靠的太阳能系统项目，并广泛涉足风能、生物质能、地热能等多种可再生能源形式的开发与集成。</p>
+                        <p><i class="fa fa-check-circle text-primary me-3"></i>25年专业积淀，提供定制清洁能源解决方案与全程技术支持。
+                        </p>
+                        <p><i class="fa fa-check-circle text-primary me-3"></i>多元整合可再生能源，实现最优项目设计与高性价比。
+                        </p>
+                        <p><i class="fa fa-check-circle text-primary me-3"></i>持续创新与卓越服务，引领行业发展，保障客户长期价值与可持续成果。
+                        </p>
                         <a href="" class="btn btn-primary rounded-pill py-3 px-5 mt-3">探索更多</a>
                     </div>
                 </div>
@@ -98,67 +103,43 @@
     <div class="container-xxl py-5">
         <div class="container">
             <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 600px;">
-                <h6 class="text-primary">Team Member</h6>
-                <h1 class="mb-4">Experienced Team Members</h1>
+                <h6 class="text-primary">团队成员</h6>
+                <h1 class="mb-4">经验丰富的团队成员</h1>
             </div>
             <div class="row g-4">
-                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-                    <div class="team-item rounded overflow-hidden">
-                        <div class="d-flex">
-                            <img class="img-fluid w-75" src="{{ "#{assetRelativePath}img/team-1.jpg" }}" alt="">
-                            <div class="team-social w-25">
-                                <a class="btn btn-lg-square btn-outline-primary rounded-circle mt-3" href=""><i
-                                            class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-lg-square btn-outline-primary rounded-circle mt-3" href=""><i
-                                            class="fab fa-twitter"></i></a>
-                                <a class="btn btn-lg-square btn-outline-primary rounded-circle mt-3" href=""><i
-                                            class="fab fa-instagram"></i></a>
+                {% if team %}
+                    {% for item in team %}
+                        {% set index = loop.index %}
+                        {% set delay = '0.1' %}
+                        {% if index % 2 == 0 %}
+                            {% set delay = '0.3' %}
+                        {% elseif index % 3 == 0 %}
+                            {% set delay = '0.5' %}
+                        {% endif %}
+                        <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="{{ delay ~ 's' }}">
+                            <div class="team-item rounded overflow-hidden">
+                                <div class="d-flex">
+                                    <img class="img-fluid w-75" src="{{ item.profile_image }}" alt="">
+                                    <div class="team-social w-25">
+                                        <a class="btn btn-lg-square btn-outline-primary rounded-circle mt-3"
+                                           href="https://www.facebook.com/"><i
+                                                    class="fab fa-facebook-f"></i></a>
+                                        <a class="btn btn-lg-square btn-outline-primary rounded-circle mt-3"
+                                           href="https://twitter.com/"><i
+                                                    class="fab fa-twitter"></i></a>
+                                        <a class="btn btn-lg-square btn-outline-primary rounded-circle mt-3"
+                                           href="https://www.instagram.com/"><i
+                                                    class="fab fa-instagram"></i></a>
+                                    </div>
+                                </div>
+                                <div class="p-4">
+                                    <h5>{{ item.name }}</h5>
+                                    <span>{{ item.job_title }}</span>
+                                </div>
                             </div>
                         </div>
-                        <div class="p-4">
-                            <h5>Full Name</h5>
-                            <span>Designation</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
-                    <div class="team-item rounded overflow-hidden">
-                        <div class="d-flex">
-                            <img class="img-fluid w-75" src="{{ "#{assetRelativePath}img/team-2.jpg" }}" alt="">
-                            <div class="team-social w-25">
-                                <a class="btn btn-lg-square btn-outline-primary rounded-circle mt-3" href=""><i
-                                            class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-lg-square btn-outline-primary rounded-circle mt-3" href=""><i
-                                            class="fab fa-twitter"></i></a>
-                                <a class="btn btn-lg-square btn-outline-primary rounded-circle mt-3" href=""><i
-                                            class="fab fa-instagram"></i></a>
-                            </div>
-                        </div>
-                        <div class="p-4">
-                            <h5>Full Name</h5>
-                            <span>Designation</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
-                    <div class="team-item rounded overflow-hidden">
-                        <div class="d-flex">
-                            <img class="img-fluid w-75" src="/img/team-3.jpg" alt="">
-                            <div class="team-social w-25">
-                                <a class="btn btn-lg-square btn-outline-primary rounded-circle mt-3" href=""><i
-                                            class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-lg-square btn-outline-primary rounded-circle mt-3" href=""><i
-                                            class="fab fa-twitter"></i></a>
-                                <a class="btn btn-lg-square btn-outline-primary rounded-circle mt-3" href=""><i
-                                            class="fab fa-instagram"></i></a>
-                            </div>
-                        </div>
-                        <div class="p-4">
-                            <h5>Full Name</h5>
-                            <span>Designation</span>
-                        </div>
-                    </div>
-                </div>
+                    {% endfor %}
+                {% endif %}
             </div>
         </div>
     </div>
