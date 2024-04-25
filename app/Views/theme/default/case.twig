@@ -1,5 +1,11 @@
 {% extends 'base.twig' %}
 
+{# CSS #}
+{% block css %}
+    {{ parent() }}
+    <link href="/js/layui-v2.9.8/css/layui.css" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
     {% include 'header.twig' %}
     {% set cases = fetchArticleByCategory(['solar panels', 'wind', 'hydropower'],6) | default(null) %}
@@ -80,38 +86,39 @@
                 </div>
                 <div class="col-lg-6 quote-text py-5 wow fadeIn" data-wow-delay="0.5s">
                     <div class="p-lg-5 pe-lg-0">
-                        <h6 class="text-primary">Free Quote</h6>
-                        <h1 class="mb-4">Get A Free Quote</h1>
-                        <p class="mb-4 pb-2">Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit. Aliqu diam
-                            amet diam et eos. Clita erat ipsum et lorem et sit, sed stet lorem sit clita duo justo erat
-                            amet</p>
+                        <h6 class="text-primary">免费报价</h6>
+                        <h1 class="mb-4">获取免费报价</h1>
+                        <p class="mb-4 pb-2">欢迎来到我们的免费报价页面，这里为您提供便捷、透明的太阳能及可再生能源解决方案定制报价服务。
+                            我们理解每一位客户的需求都是独一无二的，因此，我们竭诚为您提供个性化、精准的报价，帮助您轻松迈出向清洁、可持续能源转型的步伐。</p>
                         <form>
                             <div class="row g-3">
                                 <div class="col-12 col-sm-6">
-                                    <input type="text" class="form-control border-0" placeholder="Your Name"
+                                    <input type="text" class="form-control border-0" placeholder="姓名" id="name"
                                            style="height: 55px;">
                                 </div>
                                 <div class="col-12 col-sm-6">
-                                    <input type="email" class="form-control border-0" placeholder="Your Email"
+                                    <input type="email" class="form-control border-0" placeholder="电子邮箱" id="email"
                                            style="height: 55px;">
                                 </div>
                                 <div class="col-12 col-sm-6">
-                                    <input type="text" class="form-control border-0" placeholder="Your Mobile"
+                                    <input type="text" class="form-control border-0" placeholder="手机号码" id="phone"
                                            style="height: 55px;">
                                 </div>
                                 <div class="col-12 col-sm-6">
                                     <select class="form-select border-0" style="height: 55px;">
-                                        <option selected="">Select A Service</option>
-                                        <option value="1">Service 1</option>
-                                        <option value="2">Service 2</option>
-                                        <option value="3">Service 3</option>
+                                        <option selected="">选择一项服务</option>
+                                        <option value="1">太阳能</option>
+                                        <option value="2">风力发电</option>
+                                        <option value="3">水力发电</option>
                                     </select>
                                 </div>
                                 <div class="col-12">
-                                    <textarea class="form-control border-0" placeholder="Special Note"></textarea>
+                                    <textarea class="form-control border-0" placeholder="特别说明" id="content"></textarea>
                                 </div>
                                 <div class="col-12">
-                                    <button class="btn btn-primary rounded-pill py-3 px-5" type="submit">Submit</button>
+                                    <button class="btn btn-primary rounded-pill py-3 px-5" lay-submit
+                                            lay-filter="submit" type="submit">提交
+                                    </button>
                                 </div>
                             </div>
                         </form>
@@ -178,4 +185,61 @@
         </div>
     </div>
     {% include 'footer.twig' %}
+{% endblock %}
+
+{% block script %}
+    {{ parent() }}
+    <script>
+        layui.use(function () {
+            const form = layui.form;
+            const layer = layui.layer;
+            const $ = layui.jquery;
+            form.on('submit(submit)', function () {
+                const name = $('#name').val();
+                const email = $('#email').val();
+                const phone = $('#phone').val();
+                const content = $('#content').val();
+                if (!name) {
+                    layer.msg('请输入姓名', {icon: 0});
+                    return false;
+                }
+                if (!email) {
+                    layer.msg('请输入电子邮箱', {icon: 0});
+                    return false;
+                }
+                if (!phone) {
+                    layer.msg('请输入手机号码', {icon: 0});
+                    return false;
+                }
+                const url = '/api/open/message'
+                const data = {
+                    subject: '获取免费报价',
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    content: content,
+                    source: 'website',
+                    registrationEntry: 'case'
+                }
+                $.post({
+                    url: url,
+                    data: JSON.stringify(data),
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    success: function (res, status) {
+                        if (status !== 'success') {
+                            layer.msg('提交失败', {icon: 2});
+                            return false;
+                        }
+                        if (res.code === 0) {
+                            layer.msg('提交成功', {icon: 1});
+                        } else {
+                            layer.msg(res.message, {icon: 2});
+                        }
+                    }
+                });
+                return false;
+            });
+        });
+    </script>
 {% endblock %}
