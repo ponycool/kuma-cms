@@ -10,6 +10,44 @@
 <script src="js/lightbox.min.js" type="abde1e19203d8affdb577a67-text/javascript"></script>
 <script src="js/main.js" type="abde1e19203d8affdb577a67-text/javascript"></script>
 <script src="js/rocket-loader.min.js" data-cf-settings="abde1e19203d8affdb577a67-|49" defer=""></script>
+<script src="js/layui-v2.9.8/layui.js"></script>
+<script>
+    layui.use(function () {
+        const layer = layui.layer;
+        const $ = layui.jquery;
+        $('#subscribe').click(function () {
+            const email = $('#subscribe-email').val();
+            if (!email) {
+                layer.msg('请输入电子邮箱', {icon: 0});
+                return false;
+            }
+            const url = '/api/open/message'
+            const data = {
+                subject: '订阅消息',
+                email: email,
+                source: 'website',
+                registrationEntry: 'home'
+            }
+            $.post({
+                url: url,
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function (res, status) {
+                    if (status !== 'success') {
+                        layer.msg('提交失败', {icon: 2});
+                        return false;
+                    }
+                    if (res.code === 0) {
+                        layer.msg('提交成功', {icon: 1});
+                    } else {
+                        layer.msg(res.message, {icon: 2});
+                    }
+                }
+            });
+        });
+    });
+</script>
 {# 统计脚本 #}
 {% if settings.statistical_script %}
     {{ settings.statistical_script | raw }}
