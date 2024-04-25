@@ -12,6 +12,7 @@ namespace App\Controllers\Api\Dashboard;
 use App\Controllers\Api\Base;
 use App\Enums\Code;
 use App\Services\ArticleService;
+use App\Services\LeadsService;
 use App\Services\ProductService;
 use App\Services\UserService;
 use PonyCool\Core\SystemUtil;
@@ -37,6 +38,8 @@ class Workplace extends Base
         $productSvc = new ProductService();
         $productCount = $productSvc->getCount();
         // 线索数量
+        $leadsSvc = new LeadsService();
+        $leadsCount = $leadsSvc->getCount();
         // 用户数量
         $userSvc = new UserService();
         $userCount = $userSvc->getCount();
@@ -55,6 +58,7 @@ class Workplace extends Base
                 'systemInfo' => $systemUtil::systemInfo(),
                 'articleCount' => $articleCount,
                 'productCount' => $productCount,
+                'leadsCount' => $leadsCount,
                 'userCount' => $userCount,
                 'articleMonthly' => $articleMonthly,
                 'productMonthly' => $productMonthly,
