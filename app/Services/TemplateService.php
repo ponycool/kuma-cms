@@ -135,6 +135,7 @@ class TemplateService extends AbstractExtension
             new TwigFunction('articles', [$this, 'getArticles']),
             new TwigFunction('fetchArticleByCategory', [$this, 'fetchArticleByCategory']),
             new TwigFunction('products', [$this, 'getProducts']),
+            new TwigFunction('team', [$this, 'getTeam']),
         ];
     }
 
@@ -213,5 +214,16 @@ class TemplateService extends AbstractExtension
         ];
         $svc = new ProductService();
         return $svc->getList($params);
+    }
+
+    /**
+     * 获取团队成员
+     * @param int|null $count
+     * @return array
+     */
+    public function getTeam(?int $count = null): array
+    {
+        $svc = new TeamService();
+        return $svc->getTeamMember($count);
     }
 }

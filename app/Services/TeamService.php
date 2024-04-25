@@ -186,6 +186,37 @@ class TeamService extends BaseService
     }
 
     /**
+     * 获取团队成员
+     * @param int|null $count
+     * @return array
+     */
+    public function getTeamMember(?int $count = null): array
+    {
+        $sql = [
+            'SELECT t.id,t.uuid,t.name,t.profile_image,t.job_title,t.introduction,t.email,t.phone,t.joined_date,',
+            't.sort_index,t.created_at,t.updated_at ',
+            'FROM swap_team AS t ',
+            'WHERE t.deleted_at IS NULL ',
+            'AND t.deleted = ? '
+        ];
+        $sqlParams = [
+            DeletedStatus::UNDELETED->value
+        ];
+
+        $sql[] = 'ORDER BY t.sort_index ASC,t.created_at DESC';
+        if (!is_null($count)) {
+            $sql[] = ' LIMIT ' . $count;
+        }
+        $sql = $this->assembleSql($sql);
+        $this->setResultType('array');
+        $res = $this->query($sql, $sqlParams);
+        if (count($res) > 0) {
+            $res = self::mergeMedia($res);
+        }
+        return $res;
+    }
+
+    /**
      * 创建团队成员
      * @param array $params
      * @return bool|string
