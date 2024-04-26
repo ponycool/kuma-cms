@@ -11,6 +11,16 @@
 用户名: admin
 密码: kumacms
 
+## 预览
+
+#### WEB端
+
+<img src="https://cdn.static.ponycool.com/img/cms/screenshot/web.png" width="100%">
+
+#### 管理后台
+
+<img src="https://cdn.static.ponycool.com/img/cms/screenshot/admin.png" width="100%">
+
 ## 安装
 
 ### 系统要求
