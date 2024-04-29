@@ -4,7 +4,7 @@
     {% include 'header.twig' %}
     <div class="container-fluid page-header py-5 mb-5">
         <div class="container py-5">
-            <h1 class="display-3 text-white mb-3 animated slideInDown">Contact</h1>
+            <h1 class="display-3 text-white mb-3 animated slideInDown">联系我们</h1>
             <nav aria-label="breadcrumb animated slideInDown">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a class="text-white" href="/">首页</a></li>
@@ -23,38 +23,37 @@
                     <div class="p-lg-5 ps-lg-0">
                         <h6 class="text-primary">联系我们</h6>
                         <h1 class="mb-4">请随时联系我们</h1>
-                        <p class="mb-4">The contact form is currently inactive. Get a functional and working contact
-                            form with Ajax & PHP in a few minutes. Just copy and paste the files, add a little code and
-                            you're done. <a href="javascript:;">Download Now</a>.</p>
+                        <p class="mb-4">留下您的宝贵意见或疑问，我们用心倾听！</p>
                         <form>
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="form-floating">
-                                        <input type="text" class="form-control" id="name" placeholder="Your Name">
-                                        <label for="name">Your Name</label>
+                                        <input type="text" class="form-control" id="name" placeholder="姓名">
+                                        <label for="name">姓名</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating">
-                                        <input type="email" class="form-control" id="email" placeholder="Your Email">
-                                        <label for="email">Your Email</label>
+                                        <input type="email" class="form-control" id="email" placeholder="电子邮箱">
+                                        <label for="email">电子邮箱</label>
                                     </div>
                                 </div>
                                 <div class="col-12">
                                     <div class="form-floating">
-                                        <input type="text" class="form-control" id="subject" placeholder="Subject">
-                                        <label for="subject">Subject</label>
+                                        <input type="text" class="form-control" id="subject" placeholder="主题">
+                                        <label for="subject">主题</label>
                                     </div>
                                 </div>
                                 <div class="col-12">
                                     <div class="form-floating">
-                                        <textarea class="form-control" placeholder="Leave a message here" id="message"
+                                        <textarea class="form-control" placeholder="在此留言" id="message"
                                                   style="height: 100px"></textarea>
-                                        <label for="message">Message</label>
+                                        <label for="message">留言</label>
                                     </div>
                                 </div>
                                 <div class="col-12">
-                                    <button class="btn btn-primary rounded-pill py-3 px-5" type="submit">Send Message
+                                    <button class="btn btn-primary rounded-pill py-3 px-5" lay-submit
+                                            lay-filter="submit" type="submit">发送消息
                                     </button>
                                 </div>
                             </div>
@@ -71,4 +70,60 @@
         </div>
     </div>
     {% include 'footer.twig' %}
+{% endblock %}
+
+{% block script %}
+    {{ parent() }}
+    <script>
+        layui.use(function () {
+            const form = layui.form;
+            const layer = layui.layer;
+            const $ = layui.jquery;
+            form.on('submit(submit)', function () {
+                const name = $('#name').val();
+                const email = $('#email').val();
+                const subject = $('#subject').val();
+                const content = $('#message').val();
+                if (!name) {
+                    layer.msg('请输入姓名', {icon: 0});
+                    return false;
+                }
+                if (!email) {
+                    layer.msg('请输入电子邮箱', {icon: 0});
+                    return false;
+                }
+                if (!subject) {
+                    layer.msg('请输入主题', {icon: 0});
+                    return false;
+                }
+                const url = '/api/open/message'
+                const data = {
+                    name: name,
+                    email: email,
+                    subject: subject,
+                    content: content,
+                    source: 'website',
+                    registrationEntry: 'contact'
+                }
+                $.post({
+                    url: url,
+                    data: JSON.stringify(data),
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    success: function (res, status) {
+                        if (status !== 'success') {
+                            layer.msg('提交失败', {icon: 2});
+                            return false;
+                        }
+                        if (res.code === 0) {
+                            layer.msg('提交成功', {icon: 1});
+                        } else {
+                            layer.msg(res.message, {icon: 2});
+                        }
+                    }
+                });
+                return false;
+            });
+        });
+    </script>
 {% endblock %}
