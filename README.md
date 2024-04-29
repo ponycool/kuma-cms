@@ -56,10 +56,6 @@ JWT密钥，必须为32位随机字符串，示例如下：
 
 jwt.secret = 0W************IZAa
 
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of
-usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably
-include in the README.
-
 ### 编译镜像
 
 ```shell
@@ -149,9 +145,15 @@ Mail:pony@ponycool.com
 
 [CodeIgniter4](https://github.com/codeigniter4/CodeIgniter4)
 
+[Arco Design](https://github.com/arco-design/arco-design)
+
+[React](https://reactjs.org/)
+
 [Twig](https://twig.symfony.com/)
 
 [UUID](https://github.com/ramsey/uuid)
+
+[JetBrains](https://www.jetbrains.com/)
 
 <img alt="JetBrains" height="80" src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" width="80"/>
 
