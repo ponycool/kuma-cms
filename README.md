@@ -56,9 +56,6 @@ JWT密钥，必须为32位随机字符串，示例如下：
 
 jwt.secret = 0W************IZAa
 
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of
-usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably
-include in the README.
 
 ### 编译镜像
 
