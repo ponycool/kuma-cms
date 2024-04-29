@@ -11,6 +11,7 @@ namespace App\Services;
 
 use App\Entities\Leads;
 use App\Enums\DeletedStatus;
+use Carbon\Carbon;
 
 class LeadsService extends BaseService
 {
@@ -344,6 +345,11 @@ class LeadsService extends BaseService
             return '线索已存在';
         }
 
+        $assignedTo = $data['assigned_to'] ?? null;
+        if (!is_null($assignedTo)) {
+            $data['assigned_at'] = Carbon::now()->toDateString();
+        }
+
         $leads = new Leads();
         $leads->fill($data)
             ->filterInvalidProperties();
@@ -393,6 +399,11 @@ class LeadsService extends BaseService
             } elseif (count($res) > 1) {
                 return '线索已存在，请检查线索信息';
             }
+        }
+
+        $assignedTo = $data['assigned_to'] ?? null;
+        if (!is_null($assignedTo) && $raw['assigned_to'] !== $assignedTo) {
+            $data['assigned_at'] = Carbon::now()->toDateString();
         }
 
         $leads = new Leads();
