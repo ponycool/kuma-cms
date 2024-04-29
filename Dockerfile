@@ -86,6 +86,11 @@ RUN chown -R www.www /var/www/html && \
     rm -rf $APP_PATH/writable/logs/*.log && \
     echo "jwt.secret=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)" >> "$APP_PATH/.env"
 
+# 修改配置文件
+RUN set -eux; \
+    sed -i 's/public array \$proxyIPs = [];/public array \$proxyIPs = ["172.0.0.1/8"=> "X-Forwarded-For"];/g' "$APP_PATH/app/Config/App.php"
+
+
 VOLUME "$APP_PATH/writable"
 
 WORKDIR "$APP_PATH"
