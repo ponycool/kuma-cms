@@ -109,6 +109,30 @@ class LeadsService extends BaseService
                     'in_list' => '参数排序类型[orderType]无效，必须是ASC或DESC',
                 ]
             ],
+            'startTime' => [
+                'rules' => 'if_exist|valid_date[Y-m-d]',
+                'errors' => [
+                    'valid_date' => '参数查询开始时间[startTime]无效，必须为"Y-m-d"格式的字符串',
+                ]
+            ],
+            'endTime' => [
+                'rules' => 'if_exist|valid_date[Y-m-d]',
+                'errors' => [
+                    'valid_date' => '参数查询结束时间[endTime]无效，必须为"Y-m-d"格式的字符串',
+                ]
+            ],
+            'assignedStartTime' => [
+                'rules' => 'if_exist|valid_date[Y-m-d]',
+                'errors' => [
+                    'valid_date' => '参数分配开始时间[assignedStartTime]无效，必须为"Y-m-d"格式的字符串',
+                ]
+            ],
+            'assignedEndTime' => [
+                'rules' => 'if_exist|valid_date[Y-m-d]',
+                'errors' => [
+                    'valid_date' => '参数分配结束时间[assignedEndTime]无效，必须为"Y-m-d"格式的字符串',
+                ]
+            ],
         ];
     }
 
@@ -171,6 +195,10 @@ class LeadsService extends BaseService
         $registrationEntry = $params['registrationEntry'] ?? null;
         $group = $params['group'] ?? null;
         $status = $params['status'] ?? null;
+        $startTime = $params['startTime'] ?? null;
+        $endTime = $params['endTime'] ?? null;
+        $assignedStartTime = $params['assignedStartTime'] ?? null;
+        $assignedEndTime = $params['assignedEndTime'] ?? null;
         $keyword = $params['keyword'] ?? null;
         $orderField = $params['orderField'] ?? 'created_at';
         $orderType = $params['orderType'] ?? 'DESC';
@@ -220,6 +248,22 @@ class LeadsService extends BaseService
         if (!is_null($status)) {
             $sql[] = 'AND l.status = ? ';
             $sqlParams[] = $status;
+        }
+        if (!is_null($startTime)) {
+            $sql[] = "AND DATE(l.created_at) >= ? ";
+            $sqlParams[] = $startTime;
+        }
+        if (!is_null($endTime)) {
+            $sql[] = "AND DATE(l.created_at) <= ? ";
+            $sqlParams[] = $endTime;
+        }
+        if (!is_null($assignedStartTime)) {
+            $sql[] = "AND DATE(l.assigned_at) >= ? ";
+            $sqlParams[] = $assignedStartTime;
+        }
+        if (!is_null($assignedEndTime)) {
+            $sql[] = "AND DATE(l.assigned_at) <= ? ";
+            $sqlParams[] = $assignedEndTime;
         }
         if (!is_null($keyword)) {
             $sql = array_merge($sql, [
