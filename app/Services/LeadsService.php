@@ -283,7 +283,7 @@ class LeadsService extends BaseService
                 '%' . $keyword . '%',
             ]);
         }
-        $sql[] = sprintf('ORDER BY %s %s', $orderField, $orderType);
+        $sql[] = sprintf('ORDER BY `%s` %s', $orderField, $orderType);
         $sql = $this->assembleSql($sql);
         return $this->getPageByQuery($sql, $sqlParams, $page, $pageSize);
     }
