@@ -269,10 +269,10 @@ class LeadsService extends BaseService
             $sql = array_merge($sql, [
                 'AND ( ',
                 'l.name LIKE ? ',
-                'l.email LIKE ? ',
-                'l.phone LIKE ? ',
-                'l.company LIKE ? ',
-                'l.additional_contacts LIKE ? ',
+                'OR l.email LIKE ? ',
+                'OR l.phone LIKE ? ',
+                'OR l.company LIKE ? ',
+                'OR l.additional_contacts LIKE ? ',
                 ')'
             ]);
             $sqlParams = array_merge($sqlParams, [
@@ -393,6 +393,10 @@ class LeadsService extends BaseService
         if (!is_null($assignedTo)) {
             $data['assigned_at'] = Carbon::now()->toDateString();
         }
+
+        // 通过管理后台创建的线索，来源、注册入口使用默认值
+        $data['source'] = 'Control Panel';
+        $data['registration_entry'] = 'Control Panel';
 
         $leads = new Leads();
         $leads->fill($data)
