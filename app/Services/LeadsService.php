@@ -360,6 +360,35 @@ class LeadsService extends BaseService
     }
 
     /**
+     * 获取分配人列表
+     * @return array
+     */
+    public function getAssignerList(): array
+    {
+        $sql = [
+            'SELECT assigned_to ',
+            'FROM swap_leads ',
+            'WHERE deleted_at IS NULL ',
+            'AND deleted = ? ',
+            'GROUP BY assigned_to ',
+            'ORDER BY assigned_to ASC'
+        ];
+        $params = [
+            DeletedStatus::UNDELETED->value
+        ];
+        $sql = $this->assembleSql($sql);
+        $this->setResultType('array');
+        $res = $this->query($sql, $params);
+        $list = [];
+        foreach ($res as $item) {
+            if (!is_null($item['assigned_to'])) {
+                $list[] = $item['assigned_to'];
+            }
+        }
+        return $list;
+    }
+
+    /**
      * 创建线索
      * @param array $params
      * @return bool|string
