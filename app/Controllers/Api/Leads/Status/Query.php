@@ -29,13 +29,13 @@ class Query extends Base
             $list = $svc->getStatus();
             $data = [
                 'code' => Code::OK,
-                'message' => '获取线索分组列表成功',
+                'message' => '获取线索状态列表成功',
             ];
             $data = array_merge($data, $list);
         } catch (Exception $e) {
             $data = [
                 'code' => Code::FAIL,
-                'message' => $e->getMessage() ?: '获取线索分组列表失败',
+                'message' => $e->getMessage() ?: '获取线索状态列表失败',
             ];
         }
         $this->render($data);
