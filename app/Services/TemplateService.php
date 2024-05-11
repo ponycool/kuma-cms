@@ -134,6 +134,7 @@ class TemplateService extends AbstractExtension
             new TwigFunction('carousel', [$this, 'getCarousel']),
             new TwigFunction('articles', [$this, 'getArticles']),
             new TwigFunction('fetchArticleByCategory', [$this, 'fetchArticleByCategory']),
+            new TwigFunction('fetchCategoryArticleCounts', [$this, 'fetchCategoryArticleCounts']),
             new TwigFunction('products', [$this, 'getProducts']),
             new TwigFunction('team', [$this, 'getTeam']),
         ];
@@ -161,6 +162,7 @@ class TemplateService extends AbstractExtension
         $params = [
             'page' => $this->getPage(),
             'pageSize' => $this->getPageSize(),
+            'cid' => $this->getCid(),
             'categoryCode' => $categoryCode,
             'isPage' => $isPage,
             'limit' => $limit,
@@ -225,5 +227,15 @@ class TemplateService extends AbstractExtension
     {
         $svc = new TeamService();
         return $svc->getTeamMember($count);
+    }
+
+    /**
+     * 获取分类文章数量
+     * @return array
+     */
+    public function fetchCategoryArticleCounts(): array
+    {
+        $svc = new ArticleService();
+        return $svc->getCategoryArticleCounts();
     }
 }

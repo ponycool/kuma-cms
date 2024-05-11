@@ -353,6 +353,34 @@ class ArticleService extends BaseService
     }
 
     /**
+     * 获取文章类别文章数量
+     * @return array
+     */
+    public function getCategoryArticleCounts(): array
+    {
+        $sql = [
+            'SELECT category.id,category.name,category.pid,count(article.id) as count ',
+            'FROM swap_article AS article ',
+            'LEFT JOIN swap_article_category AS category ',
+            'ON article.cid=category.id ',
+            'WHERE article.deleted_at IS NULL ',
+            'AND article.deleted=? ',
+            'AND article.is_published=1 ',
+            'AND category.deleted_at IS NULL ',
+            'AND category.deleted=? ',
+            'GROUP BY article.cid ',
+            'ORDER BY count DESC'
+        ];
+        $params = [
+            DeletedStatus::UNDELETED->value,
+            DeletedStatus::UNDELETED->value,
+        ];
+        $sql = $this->assembleSql($sql);
+        $this->setResultType('array');
+        return $this->query($sql, $params);
+    }
+
+    /**
      * 文章类别占比分析
      * @return array
      */
