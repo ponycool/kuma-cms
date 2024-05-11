@@ -137,6 +137,7 @@ class TemplateService extends AbstractExtension
             new TwigFunction('fetchCategoryArticleCounts', [$this, 'fetchCategoryArticleCounts']),
             new TwigFunction('products', [$this, 'getProducts']),
             new TwigFunction('team', [$this, 'getTeam']),
+            new TwigFunction('fetchRecentArticles', [$this, 'fetchRecentArticles']),
         ];
     }
 
@@ -237,5 +238,23 @@ class TemplateService extends AbstractExtension
     {
         $svc = new ArticleService();
         return $svc->getCategoryArticleCounts();
+    }
+
+    /**
+     * 获取最近文章
+     * @param int $count
+     * @return array
+     */
+    public function fetchRecentArticles(int $count = 10): array
+    {
+        $params = [
+            'cid' => $this->getCid(),
+            'isPage' => false,
+            'sortField' => 'created_at',
+            'sortType' => 'DESC',
+            'limit' => $count,
+        ];
+        $svc = new ArticleService();
+        return $svc->getList($params);
     }
 }
