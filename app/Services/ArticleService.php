@@ -163,6 +163,8 @@ class ArticleService extends BaseService
         $cid = $params['cid'] ?? null;
         $categoryCode = $params['categoryCode'] ?? null;
         $keyword = $params['keyword'] ?? null;
+        $sortField = $params['sortField'] ?? null;
+        $sortType = $params['sortType'] ?? 'ASC';
         $isPage = $params['isPage'] ?? true;
         $limit = $params['limit'] ?? null;
         $sql = [
@@ -189,7 +191,11 @@ class ArticleService extends BaseService
             $sql[] = 'AND c.code = ? ';
             $sqlParams[] = $categoryCode;
         }
-        $sql[] = 'ORDER BY a.sort_index DESC,a.id DESC';
+        if (is_null($sortField)) {
+            $sql[] = 'ORDER BY a.sort_index DESC,a.id DESC';
+        } else {
+            $sql[] = 'ORDER BY a.' . $sortField . ' ' . $sortType;
+        }
         if (!$isPage && !is_null($limit)) {
             $sql[] = ' LIMIT ' . $limit;
         }
