@@ -233,9 +233,9 @@ class PageService extends BaseService
      */
     public function updateStatus(string $uuid, int $status): true|string
     {
-        $link = new Link();
-        $link->setStatus($status);
-        $res = $this->updateByUuid($link, $uuid);
+        $page = new Page();
+        $page->setStatus($status);
+        $res = $this->updateByUuid($page, $uuid);
         if ($res !== true) {
             return '更新单页状态失败';
         }
