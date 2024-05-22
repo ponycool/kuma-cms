@@ -435,7 +435,7 @@ class ProductService extends BaseService
             $imageList = $mediaSvc->getMedia($detailImageList);
             foreach ($imageList as $img) {
                 foreach ($list as &$item) {
-                    $detailImages = json_decode($item['detail_images'], true);
+                    $detailImages = json_decode($item['detail_images'] ?? '[]', true);
                     if (!is_array($detailImages)) {
                         continue;
                     }
