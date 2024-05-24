@@ -138,6 +138,8 @@ class TemplateService extends AbstractExtension
             new TwigFunction('products', [$this, 'getProducts']),
             new TwigFunction('team', [$this, 'getTeam']),
             new TwigFunction('fetchRecentArticles', [$this, 'fetchRecentArticles']),
+            new TwigFunction('fetchCategoriesProductsCount', [$this, 'fetchCategoriesProductsCount']),
+            new TwigFunction('fetchTopCategoriesProductsCount', [$this, 'fetchTopCategoriesProductsCount']),
         ];
     }
 
@@ -256,5 +258,25 @@ class TemplateService extends AbstractExtension
         ];
         $svc = new ArticleService();
         return $svc->getList($params);
+    }
+
+    /**
+     * 获取所有产品分类及分类下的产品数量
+     * @return array
+     */
+    public function fetchCategoriesProductsCount(): array
+    {
+        $svc = new ProductService();
+        return $svc->getCountByCategory();
+    }
+
+    /**
+     * 获取所有一级产品分类及分类下的产品数量
+     * @return array
+     */
+    public function fetchTopCategoriesProductsCount(): array
+    {
+        $svc = new ProductService();
+        return $svc->getCountByTopCategory();
     }
 }
