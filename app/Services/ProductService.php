@@ -254,6 +254,67 @@ class ProductService extends BaseService
     }
 
     /**
+     * 获取所有分类下的产品数量
+     * @return array
+     */
+    public function getCountByCategory(): array
+    {
+        $sql = [
+            'SELECT c.id AS category_id,c.uuid as category_uuid,c.name AS category_name,c.pid,c.icon as category_icon,',
+            'COUNT(p.id) AS product_count ',
+            'FROM swap_product_category  as c ',
+            'LEFT JOIN swap_product as  p ON c.id = p.cid ',
+            'WHERE c.deleted_at IS NULL ',
+            'AND c.deleted=? ',
+            'AND p.deleted_at IS NULL ',
+            'AND p.deleted=? ',
+            'AND p.status=1 ',
+            'GROUP BY c.id ',
+            'ORDER BY c.sort_index ASC,c.id DESC'
+        ];
+        $params = [
+            DeletedStatus::UNDELETED->value,
+            DeletedStatus::UNDELETED->value,
+        ];
+        $sql = $this->assembleSql($sql);
+        $this->setResultType('array');
+        return $this->query($sql, $params);
+    }
+
+    /**
+     * 计算顶级类别及其所有子类别的产品总数
+     *
+     * 此方法首先获取所有类别及其产品数量，然后通过递归计算，
+     * 将每个子类别的产品数量累加到其父类别上，最终返回一个数组，
+     * 包含每个顶级类别及其累加的子类别产品总数。
+     *
+     * @return array 结果数组，每个元素代表一个顶级类别，包含
+     *               category_id, category_name, pid, product_count,
+     *               以及新增的 product_total_count 字段表示总产品数
+     */
+    public function getCountByTopCategory(): array
+    {
+        $categories = $this->getCountByCategory();
+        $result = [];
+        $accumulateCounts = function ($list, $item) use (&$accumulateCounts) {
+            $count = (int)$item['product_count'];
+            foreach ($list as $i) {
+                if ((int)$i['pid'] === (int)$item['category_id']) {
+                    $count += $accumulateCounts($list, $i);
+                }
+            }
+            return $count;
+        };
+        foreach ($categories as $category) {
+            if ((int)$category['pid'] === 0) {
+                $category['product_total_count'] = $accumulateCounts($categories, $category);
+                $result[] = $category;
+            }
+        }
+        return $result;
+    }
+
+    /**
      * 创建产品
      * @param array $params
      * @return bool|string
