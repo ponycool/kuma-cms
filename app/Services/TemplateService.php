@@ -140,6 +140,8 @@ class TemplateService extends AbstractExtension
             new TwigFunction('fetchRecentArticles', [$this, 'fetchRecentArticles']),
             new TwigFunction('fetchCategoriesProductsCount', [$this, 'fetchCategoriesProductsCount']),
             new TwigFunction('fetchTopCategoriesProductsCount', [$this, 'fetchTopCategoriesProductsCount']),
+            new TwigFunction('fetchTopProductsByCategory', [$this, 'fetchTopProductsByCategory']),
+            new TwigFunction('fetchTopViewedProducts', [$this, 'fetchTopViewedProducts']),
         ];
     }
 
@@ -278,5 +280,36 @@ class TemplateService extends AbstractExtension
     {
         $svc = new ProductService();
         return $svc->getCountByTopCategory();
+    }
+
+    /**
+     * 获取每个产品分类前N条产品数据
+     * @param int $count
+     * @param string $sortField
+     * @param string $sortType
+     * @return array
+     */
+    public function fetchTopProductsByCategory(int    $count = 10,
+                                               string $sortField = 'created_at',
+                                               string $sortType = 'DESC'): array
+    {
+        $svc = new ProductService();
+        $list = $svc->getTopByCategory($count, $sortField, $sortType);
+        $result = [];
+        foreach ($list as $item) {
+            $result[$item['category_name']][] = $item;
+        }
+        return $result;
+    }
+
+    /**
+     * 获取浏览量最高的产品
+     * @param int $count
+     * @return array
+     */
+    public function fetchTopViewedProducts(int $count = 10): array
+    {
+        $svc = new ProductService();
+        return $svc->getTopViewed($count);
     }
 }

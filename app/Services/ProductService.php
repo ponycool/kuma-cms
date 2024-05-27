@@ -315,6 +315,69 @@ class ProductService extends BaseService
     }
 
     /**
+     * 获取每个分类前N条产品数据
+     * @param int $count 要返回的产品数量，默认为10
+     * @param string $sortField 排序字段，默认为'created_at'
+     * @param string $sortType 排序类型，默认为'DESC'
+     * @return array
+     */
+    public function getTopByCategory(int $count = 10, string $sortField = 'created_at', string $sortType = 'DESC'): array
+    {
+        $sql = [
+            'WITH CategorizedProducts AS ( ',
+            'SELECT ',
+            'id,uuid,cid,name,cover_image,price,status,view_count,sort_index,deleted,deleted_at,created_at,',
+            'ROW_NUMBER() OVER (PARTITION BY cid ORDER BY id) AS row_num ',
+            'FROM swap_product ',
+            'WHERE deleted_at IS NULL ',
+            'AND deleted=? ',
+            'AND status=1 ',
+            'ORDER BY ? ',
+            ') ',
+            'SELECT t.id,t.uuid,t.cid,c.name AS category_name,c.id AS category_id,c.uuid AS category_uuid,',
+            't.name,t.cover_image,t.price,t.status,t.view_count,t.sort_index,t.deleted,t.deleted_at,t.created_at ',
+            'FROM CategorizedProducts as t ',
+            'LEFT JOIN swap_product_category as c ON t.cid = c.id ',
+            'WHERE t.row_num <= ? ',
+            'AND c.deleted_at IS NULL ',
+            'AND c.deleted=?'
+        ];
+        $params = [
+            DeletedStatus::UNDELETED->value,
+            $sortField . ' ' . $sortType,
+            $count,
+            DeletedStatus::UNDELETED->value,
+        ];
+        $sql = $this->assembleSql($sql);
+        $this->setResultType('array');
+        $result = $this->query($sql, $params);
+
+        if (count($result) > 0) {
+            $result = self::mergeMedia($result);
+        }
+        return $result;
+    }
+
+    /**
+     * 获取热门产品
+     * @param int $count 要返回的产品数量，默认为10
+     * @return array
+     */
+    public function getTopViewed(int $count = 10): array
+    {
+        $model = $this->getModel();
+        $builder = $model->asArray();
+        $result = $builder->where('deleted', DeletedStatus::UNDELETED->value)
+            ->orderBy('view_count', 'DESC')
+            ->limit($count)
+            ->findAll();
+        if (count($result) > 0) {
+            $result = self::mergeMedia($result);
+        }
+        return $result;
+    }
+
+    /**
      * 创建产品
      * @param array $params
      * @return bool|string
@@ -469,10 +532,10 @@ class ProductService extends BaseService
         $coverImageList = [];
         $detailImageList = [];
         foreach ($list as $item) {
-            if (!is_null($item['cover_image'])) {
+            if (!is_null($item['cover_image'] ?? null)) {
                 $coverImageList[] = $item['cover_image'];
             }
-            if (!is_null($item['detail_images'])) {
+            if (!is_null($item['detail_images'] ?? null)) {
                 $detailImages = json_decode($item['detail_images'], true);
                 if (!is_array($detailImages)) {
                     continue;
