@@ -67,8 +67,8 @@ class Product extends Web
                 ->setDescription($description)
                 ->setKeywords($keywords);
         }
-        $this->setTemplate('article')
-            ->setPage('article')
+        $this->setTemplate('product')
+            ->setPage('product')
             ->render($data);
     }
 }
