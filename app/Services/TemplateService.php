@@ -215,6 +215,7 @@ class TemplateService extends AbstractExtension
         $params = [
             'page' => $this->getPage(),
             'pageSize' => $this->getPageSize(),
+            'cid' => $this->getCid(),
             'categoryCode' => $categoryCode,
             'isPage' => $isPage,
             'limit' => $limit,
