@@ -24,11 +24,8 @@ class Query extends Base
     {
         $this->postFilter();
         try {
-            $params = $this->getJsonInputParams();
-            $page = $params['page'] ?? 1;
-            $pageSize = $params['pageSize'] ?? 10;
             $svc = new ProductCategoryService();
-            $res = $svc->getPage($page, $pageSize);
+            $res = $svc->get();
             $data = [
                 'code' => Code::OK,
                 'message' => '获取产品分类列表成功',
