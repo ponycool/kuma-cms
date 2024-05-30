@@ -36,8 +36,8 @@ class Article extends Web
     private function list(): void
     {
         $data = [];
-        $this->setTemplate('article_list')
-            ->setPage('article_list')
+        $this->setTemplate('article-list')
+            ->setPage('article-list')
             ->render($data);
     }
 

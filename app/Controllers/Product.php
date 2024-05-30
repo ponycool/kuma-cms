@@ -33,8 +33,8 @@ class Product extends Web
      */
     private function list(): void
     {
-        $this->setTemplate('product_list')
-            ->setPage('product_list')
+        $this->setTemplate('product-list')
+            ->setPage('product-list')
             ->render();
     }
 
