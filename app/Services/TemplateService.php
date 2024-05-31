@@ -130,6 +130,7 @@ class TemplateService extends AbstractExtension
     public function getFunctions(): array
     {
         return [
+            new TwigFunction('urlParams', [$this, 'getUrlParams']),
             new TwigFunction('menu', [$this, 'getMenu']),
             new TwigFunction('carousel', [$this, 'getCarousel']),
             new TwigFunction('articles', [$this, 'getArticles']),
@@ -143,6 +144,19 @@ class TemplateService extends AbstractExtension
             new TwigFunction('fetchTopProductsByCategory', [$this, 'fetchTopProductsByCategory']),
             new TwigFunction('fetchTopViewedProducts', [$this, 'fetchTopViewedProducts']),
         ];
+    }
+
+    /**
+     * 获取URL参数
+     * @return array
+     */
+    public function getUrlParams(): array
+    {
+        $uri = service('uri');
+        $query = $uri->getQuery();
+        $params = [];
+        parse_str($query, $params);
+        return $params;
     }
 
     /**
@@ -219,6 +233,7 @@ class TemplateService extends AbstractExtension
             'categoryCode' => $categoryCode,
             'isPage' => $isPage,
             'limit' => $limit,
+            'keyword' => $this->getKeyword()
         ];
         $svc = new ProductService();
         return $svc->getList($params);
