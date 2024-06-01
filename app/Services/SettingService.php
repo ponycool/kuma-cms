@@ -139,9 +139,11 @@ class SettingService extends BaseService
                 return '批量新增系统设置失败';
             }
         }
-        $res = $this->updateBatch($updateList, 'key');
-        if ($res !== true) {
-            return '批量更新系统设置失败';
+        if (!empty($updateList)) {
+            $res = $this->updateBatch($updateList, 'key');
+            if ($res !== true) {
+                return '批量更新系统设置失败';
+            }
         }
         return true;
     }

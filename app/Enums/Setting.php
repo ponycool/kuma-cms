@@ -38,4 +38,8 @@ enum Setting: string
     case STATISTICAL_SCRIPT = 'statistical_script';
     // 客服脚本
     case SERVICE_SCRIPT = 'service_script';
+    // 网站地图类型
+    case SITEMAP_TYPE = 'sitemap_type';
+    // 网站地图附加链接
+    case SITEMAP_ADDITIONAL_LINK = 'sitemap_additional_link';
 }
