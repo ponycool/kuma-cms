@@ -162,6 +162,7 @@ class ProductService extends BaseService
         $keyword = $params['keyword'] ?? null;
         $isPage = $params['isPage'] ?? true;
         $limit = $params['limit'] ?? null;
+        $sort = $params['sort'] ?? null;
         $sql = [
             'SELECT p.id,p.uuid,p.cid,p.name,p.cover_image,p.detail_images,p.seo_title,p.seo_desc,p.seo_keywords,',
             'p.description,p.price,p.stock_quantity,p.sort_index,p.status,p.view_count,p.created_at,p.updated_at,',
@@ -190,7 +191,26 @@ class ProductService extends BaseService
             $sql[] = 'AND p.name LIKE ? ';
             $sqlParams[] = '%' . $keyword . '%';
         }
-        $sql[] = 'ORDER BY p.sort_index DESC,p.id DESC';
+        // 处理排序
+        $sortList = [
+            'new',
+            'hot',
+            'price',
+            'price-desc'
+        ];
+        if (!is_null($sort) && in_array($sort, $sortList, true)) {
+            $sortStr = match ($sort) {
+                'new' => 'p.created_at DESC',
+                'hot' => 'p.view_count DESC',
+                'price' => 'p.price ASC',
+                'price-desc' => 'p.price DESC',
+                default => 'p.sort_index DESC,p.id DESC'
+            };
+            $sql[] = 'ORDER BY ' . $sortStr;
+        } else {
+            $sql[] = 'ORDER BY p.sort_index DESC,p.id DESC';
+        }
+
         if (!$isPage && !is_null($limit)) {
             $sql[] = ' LIMIT ' . $limit;
         }

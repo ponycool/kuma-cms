@@ -23,6 +23,8 @@ class TemplateService extends AbstractExtension
     // 父级ID
     public ?int $pid;
     public ?string $uuid;
+    // 排序
+    public ?string $sort;
     // 搜索关键词
     public ?string $keyword;
 
@@ -36,6 +38,7 @@ class TemplateService extends AbstractExtension
         $pid = is_null($pid) ? $pid : (int)$pid;
         $uuid = request()->getGetPost('uuid') ?? null;
         $keyword = request()->getGetPost('keyword', FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?? null;
+        $sort = request()->getGetPost('sort') ?? null;
         $language = request()->getGetPost('lang') ?? Language::SIMPLIFIED_CHINESE->value;
         $this->setLanguage($language)
             ->setPage((int)$page)
@@ -43,7 +46,8 @@ class TemplateService extends AbstractExtension
             ->setCid($cid)
             ->setPid($pid)
             ->setUuid($uuid)
-            ->setKeyword($keyword);
+            ->setKeyword($keyword)
+            ->setSort($sort);
     }
 
     public function getLanguage(): string
@@ -120,6 +124,17 @@ class TemplateService extends AbstractExtension
     public function setKeyword(?string $keyword): TemplateService
     {
         $this->keyword = $keyword;
+        return $this;
+    }
+
+    public function getSort(): ?string
+    {
+        return $this->sort;
+    }
+
+    public function setSort(?string $sort): TemplateService
+    {
+        $this->sort = $sort;
         return $this;
     }
 
@@ -233,7 +248,8 @@ class TemplateService extends AbstractExtension
             'categoryCode' => $categoryCode,
             'isPage' => $isPage,
             'limit' => $limit,
-            'keyword' => $this->getKeyword()
+            'keyword' => $this->getKeyword(),
+            'sort' => $this->sort
         ];
         $svc = new ProductService();
         return $svc->getList($params);
