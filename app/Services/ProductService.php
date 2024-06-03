@@ -170,7 +170,8 @@ class ProductService extends BaseService
             'FROM swap_product AS p ',
             'LEFT JOIN swap_product_category AS c ON p.cid=c.id ',
             'WHERE p.deleted_at IS NULL ',
-            'AND p.deleted = ? '
+            'AND p.deleted = ? ',
+            'AND p.status=1 '
         ];
         $sqlParams = [
             DeletedStatus::UNDELETED->value
