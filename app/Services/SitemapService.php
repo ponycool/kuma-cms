@@ -130,7 +130,7 @@ class SitemapService extends BaseService
             'sitemapType' => json_encode($sitemapType)
         ];
         if (!is_null($additionalLink)) {
-            $settings['sitemapAdditionalLink'] = json_encode($additionalLink);
+            $settings['sitemapAdditionalLink'] = $additionalLink;
         }
         $settingSvc = new SettingService();
         $res = $settingSvc->updateSetting($settings);
