@@ -174,10 +174,12 @@ class ArticleService extends BaseService
             'FROM swap_article AS a ',
             'LEFT JOIN swap_article_category AS c ON a.cid=c.id ',
             'WHERE a.deleted_at IS NULL ',
-            'AND a.deleted = ? '
+            'AND a.deleted = ? ',
+            'AND a.is_published = ? '
         ];
         $sqlParams = [
-            DeletedStatus::UNDELETED->value
+            DeletedStatus::UNDELETED->value,
+            PublishStatus::PUBLISHED->value
         ];
         if (!is_null($cid)) {
             $sql[] = 'AND a.cid = ? ';
