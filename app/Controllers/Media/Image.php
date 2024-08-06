@@ -25,6 +25,10 @@ class Image extends Base
         if (is_null($filename)) {
             exit();
         }
+        // anjv:验证文件名是否合法
+        if (!preg_match('/^[a-zA-Z0-9_\-\.]+$/', $filename)) {
+            exit();
+        }
         $path = WRITEPATH . 'uploads/';
         $filePath = $path . $filename;
         if (!file_exists($filePath)) {
