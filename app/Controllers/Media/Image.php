@@ -27,7 +27,7 @@ class Image extends Base
         }
 
         // 验证文件名是否合法
-        if (!preg_match('/^[a-zA-Z0-9_\-.]+$/', $filename)) {
+        if (!self::validateFilename($filename)) {
             exit();
         }
 
