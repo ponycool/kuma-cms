@@ -116,6 +116,36 @@ trait CoreTrait
         return $conditionsMet >= 3; // 至少符合三种条件
     }
 
+
+    /**
+     * 校验文件名
+     * @param string $filename
+     * @return bool
+     */
+    protected function validateFilename(string $filename): bool
+    {
+        // 定义允许的字符
+        $allowedChars = '/^[a-zA-Z0-9_\-.]+$/';
+
+        // 检查文件名是否只包含允许的字符
+        if (!preg_match($allowedChars, $filename)) {
+            return false;
+        }
+
+        // 额外检查：避免文件名中的点出现在文件名的开头或结尾
+        if (str_starts_with($filename, '.') || strrpos($filename, '.') === strlen($filename) - 1) {
+            return false;
+        }
+
+        // 额外检查：避免文件名中的双点
+        if (str_contains($filename, '..')) {
+            return false;
+        }
+
+        // 如果通过了所有检查，则文件名有效
+        return true;
+    }
+
     /**
      * 生成盐值
      * @param int $length
