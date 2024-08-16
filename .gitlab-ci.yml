@@ -15,7 +15,10 @@ build:
     - docker login "$CI_REGISTRY_SERVER" -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
     - composer install
     # 手动启动 DinD 容器，仅services 配置来启动 Docker-in-Docker无法执行时，使用手动启动DinD 容器
-    - docker run --name dind-service -d --privileged -p 127.0.0.1:2375:2375 -v /var/run/docker.sock:/var/run/docker.sock docker:dind
+    - CONTAINER_NAME=dind-service
+    # 尝试删除容器，如果不存在则忽略错误
+    - docker container rm -f $CONTAINER_NAME || true
+    - docker run --name $CONTAINER_NAME -d --privileged -p 127.0.0.1:2375:2375 -v /var/run/docker.sock:/var/run/docker.sock docker:dind
   script:
     # docker in docker跨平台编译遇到无法解决的错误，暂时使用手动编译
     - docker build -t "$DOCKER_IMAGE_NAME" .
