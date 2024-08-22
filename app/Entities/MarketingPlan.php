@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: Pony
- * Date: 2024/08/21
- * Time: 15:56 下午
+ * Date: 2024/08/22
+ * Time: 09:49 上午
  */
 declare(strict_types=1);
 
@@ -16,7 +16,7 @@ class MarketingPlan extends Base
     protected int $id = 0;
     protected string $uuid;
     protected string $name;
-    protected int $cover;
+    protected int $cove_image;
     protected string $content;
     protected string $location;
     protected string $start_datetime;
@@ -106,19 +106,19 @@ class MarketingPlan extends Base
     /**
      * @return int
      */
-    public function getCover(): int
+    public function getCoveImage(): int
     {
-        return $this->cover;
+        return $this->cove_image;
     }
 
     /**
-     * @param int $cover
+     * @param int $cove_image
      * @return $this
      */
-    public function setCover(int $cover): MarketingPlan
+    public function setCoveImage(int $cove_image): MarketingPlan
     {
-        $this->cover = $cover;
-        $this->attributes['cover'] = $this->cover;
+        $this->cove_image = $cove_image;
+        $this->attributes['cove_image'] = $this->cove_image;
         return $this;
     }
 
