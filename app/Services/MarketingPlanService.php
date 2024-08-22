@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entities\MarketingPlan;
+use App\Enums\DeletedStatus;
 use App\Enums\MarketingPlanStatus;
-use Carbon\Carbon;
 
 class MarketingPlanService extends BaseService
 {
@@ -123,6 +123,112 @@ class MarketingPlanService extends BaseService
     }
 
     /**
+     * 获取列表
+     * @param array $params
+     * @return array
+     */
+    public function getList(array $params): array
+    {
+        $page = (int)($params['page'] ?? 1);
+        $pageSize = (int)($params['pageSize'] ?? 10);
+        $name = $params['name'] ?? null;
+        $startDatetime = $params['startDatetime'] ?? null;
+        $endDatetime = $params['endDatetime'] ?? null;
+        $isActive = $params['isActive'] ?? null;
+        $status = $params['status'] ?? null;
+        $keyword = $params['keyword'] ?? null;
+        $sortField = $params['sortField'] ?? null;
+        $sortType = $params['sortType'] ?? 'ASC';
+        $isPage = $params['isPage'] ?? true;
+        $limit = $params['limit'] ?? null;
+        $sql = [
+            'SELECT p.id,p.uuid,p.name,p.content,p.cover_image,p.location,p.start_datetime,p.end_datetime,p.is_active,',
+            'p.status,p.sort_index,p.created_at,p.updated_at ',
+            'FROM swap_marketing_plan AS p ',
+            'WHERE p.deleted_at IS NULL ',
+            'AND p.deleted = ? ',
+        ];
+        $sqlParams = [
+            DeletedStatus::UNDELETED->value,
+        ];
+        if (!is_null($name)) {
+            $sql[] = 'AND p.name = ? ';
+            $sqlParams[] = $name;
+        }
+        if (!is_null($startDatetime)) {
+            $sql[] = 'AND p.start_datetime >= ? ';
+            $sqlParams[] = $startDatetime;
+        }
+        if (!is_null($endDatetime)) {
+            $sql[] = 'AND p.end_datetime <= ? ';
+            $sqlParams[] = $endDatetime;
+        }
+        if (!is_null($isActive)) {
+            $sql[] = 'AND p.is_active = ? ';
+            $sqlParams[] = $isActive;
+        }
+        if (!is_null($status)) {
+            $sql[] = 'AND p.status = ? ';
+            $sqlParams[] = $status;
+        }
+        if (!is_null($keyword) && is_null($name)) {
+            $sql = array_merge($sql, [
+                'AND ( ',
+                'p.name LIKE ? ',
+                'OR p.content LIKE ? ',
+                'OR p.location LIKE ? ',
+                ') ',
+            ]);
+            $sqlParams = array_merge($sqlParams, [
+                '%' . $keyword . '%',
+                '%' . $keyword . '%',
+                '%' . $keyword . '%',
+            ]);
+        }
+        if (is_null($sortField)) {
+            $sql[] = 'ORDER BY p.sort_index DESC,p.id DESC';
+        } else {
+            $sql[] = 'ORDER BY p.' . $sortField . ' ' . $sortType;
+        }
+        if (!$isPage && !is_null($limit)) {
+            $sql[] = ' LIMIT ' . $limit;
+        }
+        $sql = $this->assembleSql($sql);
+        if ($isPage) {
+            $res = $this->getPageByQuery($sql, $sqlParams, $page, $pageSize);
+            if ($res['total'] > 0) {
+                if (is_array($res['pageData'])) {
+                    $res['pageData'] = self::mergeMedia($res['pageData']);
+                }
+            }
+        } else {
+            $this->setResultType('array');
+            $res = $this->query($sql, $sqlParams);
+            if (count($res) > 0) {
+                $res = self::mergeMedia($res);
+            }
+        }
+        return $res;
+    }
+
+    /**
+     * 根据UUID获取营销计划
+     * @param string $uuid
+     * @return array|null
+     */
+    public function getPlanByUuid(string $uuid): ?array
+    {
+        if ($this->validateUUID($uuid) !== true) {
+            return null;
+        }
+        $res = $this->getFirstByUuid($uuid);
+        if (count($res) > 0) {
+            $res = $this->mergeMedia([$res])[0];
+        }
+        return $res;
+    }
+
+    /**
      * 创建营销计划
      * @param array $params
      * @return bool|string
@@ -140,6 +246,70 @@ class MarketingPlanService extends BaseService
         $res = $this->insert($plan);
         if ($res !== true) {
             return '创建营销计划失败';
+        }
+        return true;
+    }
+
+    /**
+     * 更新营销计划
+     * @param array $params
+     * @return bool|string
+     */
+    public function update(array $params): bool|string
+    {
+        $data = self::prepare($params);
+        if (is_string($data)) {
+            return $data;
+        }
+
+        $raw = $this->getFirstByUuid($data['uuid']);
+        if (empty($raw)) {
+            return '营销计划UUID不存在';
+        }
+
+        $plan = new MarketingPlan();
+        $plan->fillData($data)
+            ->filterInvalidProperties();
+
+        $res = $this->updateByUuid($plan);
+        if ($res !== true) {
+            return '更新营销计划失败';
+        }
+        return true;
+    }
+
+    /**
+     * 更新营销计划激活状态
+     * @param string $uuid
+     * @param int $status
+     * @return true|string
+     */
+    public function updateActiveStatus(string $uuid, int $status): true|string
+    {
+        $plan = new MarketingPlan();
+        $plan->setIsActive($status);
+        $res = $this->updateByUuid($plan, $uuid);
+        if ($res !== true) {
+            return '更新营销计划激活状态失败';
+        }
+        return true;
+    }
+
+    /**
+     * 删除营销计划
+     * @param string $uuid
+     * @return bool|string
+     */
+    public function del(string $uuid): bool|string
+    {
+        $plan = $this->getFirstByUuid($uuid);
+        if (empty($plan)) {
+            return '营销计划UUID不存在';
+        }
+        $id = (int)$plan['id'];
+        $res = $this->delete($id);
+        if ($res !== true) {
+            return '删除营销计划失败';
         }
         return true;
     }
@@ -197,5 +367,33 @@ class MarketingPlanService extends BaseService
         }
 
         return $data;
+    }
+
+    /**
+     * 合并媒体
+     * @param array $list
+     * @return array
+     */
+    private function mergeMedia(array $list): array
+    {
+        $coverList = [];
+        foreach ($list as $item) {
+            if (!is_null($item['cover_image'])) {
+                $coverList[] = $item['cover_image'];
+            }
+        }
+        $mediaSvc = new MediaService();
+        if (!empty($coverList)) {
+            $imageList = $mediaSvc->getMedia($coverList);
+            foreach ($imageList as $img) {
+                foreach ($list as &$item) {
+                    if ($img['id'] === $item['cover_image']) {
+                        $item['cover_image'] = $img['file_url'];
+                    }
+                }
+            }
+        }
+
+        return $list;
     }
 }
