@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: Pony
  * Date: 2024/08/22
- * Time: 09:49 上午
+ * Time: 10:40 上午
  */
 declare(strict_types=1);
 
@@ -23,6 +23,8 @@ class MarketingPlanModel extends BaseModel
         'location',
         'start_datetime',
         'end_datatime',
+        'is_active',
+        'status',
     ];
     protected $useTimestamps = true;
     protected $createdField = 'created_at';
