@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: Pony
  * Date: 2024/08/22
- * Time: 14:09 下午
+ * Time: 14:29 下午
  */
 declare(strict_types=1);
 
@@ -20,7 +20,7 @@ class MarketingPlan extends Base
     protected string $content;
     protected string $location;
     protected string $start_datetime;
-    protected string $end_datatime;
+    protected string $end_datetime;
     protected int $is_active;
     protected string $status;
     protected int $view_count;
@@ -186,19 +186,19 @@ class MarketingPlan extends Base
     /**
      * @return string
      */
-    public function getEndDatatime(): string
+    public function getEndDatetime(): string
     {
-        return $this->end_datatime;
+        return $this->end_datetime;
     }
 
     /**
-     * @param string $end_datatime
+     * @param string $end_datetime
      * @return $this
      */
-    public function setEndDatatime(string $end_datatime): MarketingPlan
+    public function setEndDatetime(string $end_datetime): MarketingPlan
     {
-        $this->end_datatime = $end_datatime;
-        $this->attributes['end_datatime'] = $this->end_datatime;
+        $this->end_datetime = $end_datetime;
+        $this->attributes['end_datetime'] = $this->end_datetime;
         return $this;
     }
 
