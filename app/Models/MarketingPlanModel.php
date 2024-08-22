@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: Pony
  * Date: 2024/08/22
- * Time: 10:52 上午
+ * Time: 14:09 下午
  */
 declare(strict_types=1);
 
@@ -18,7 +18,7 @@ class MarketingPlanModel extends BaseModel
     protected $allowedFields = [
         'uuid',
         'name',
-        'cove_image',
+        'cover_image',
         'content',
         'location',
         'start_datetime',
