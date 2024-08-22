@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: Pony
  * Date: 2024/08/22
- * Time: 09:49 上午
+ * Time: 10:40 上午
  */
 declare(strict_types=1);
 
@@ -21,6 +21,8 @@ class MarketingPlan extends Base
     protected string $location;
     protected string $start_datetime;
     protected string $end_datatime;
+    protected string $is_active;
+    protected string $status;
     protected string $created_at;
     protected string $updated_at;
     protected string $deleted_at;
@@ -195,6 +197,44 @@ class MarketingPlan extends Base
     {
         $this->end_datatime = $end_datatime;
         $this->attributes['end_datatime'] = $this->end_datatime;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIsActive(): string
+    {
+        return $this->is_active;
+    }
+
+    /**
+     * @param string $is_active
+     * @return $this
+     */
+    public function setIsActive(string $is_active): MarketingPlan
+    {
+        $this->is_active = $is_active;
+        $this->attributes['is_active'] = $this->is_active;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param string $status
+     * @return $this
+     */
+    public function setStatus(string $status): MarketingPlan
+    {
+        $this->status = $status;
+        $this->attributes['status'] = $this->status;
         return $this;
     }
 
