@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: Pony
  * Date: 2024/08/22
- * Time: 10:40 上午
+ * Time: 10:51 上午
  */
 declare(strict_types=1);
 
@@ -21,8 +21,10 @@ class MarketingPlan extends Base
     protected string $location;
     protected string $start_datetime;
     protected string $end_datatime;
-    protected string $is_active;
+    protected int $is_active;
     protected string $status;
+    protected int $view_count;
+    protected int $sort_index;
     protected string $created_at;
     protected string $updated_at;
     protected string $deleted_at;
@@ -201,18 +203,18 @@ class MarketingPlan extends Base
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getIsActive(): string
+    public function getIsActive(): int
     {
         return $this->is_active;
     }
 
     /**
-     * @param string $is_active
+     * @param int $is_active
      * @return $this
      */
-    public function setIsActive(string $is_active): MarketingPlan
+    public function setIsActive(int $is_active): MarketingPlan
     {
         $this->is_active = $is_active;
         $this->attributes['is_active'] = $this->is_active;
@@ -235,6 +237,44 @@ class MarketingPlan extends Base
     {
         $this->status = $status;
         $this->attributes['status'] = $this->status;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getViewCount(): int
+    {
+        return $this->view_count;
+    }
+
+    /**
+     * @param int $view_count
+     * @return $this
+     */
+    public function setViewCount(int $view_count): MarketingPlan
+    {
+        $this->view_count = $view_count;
+        $this->attributes['view_count'] = $this->view_count;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSortIndex(): int
+    {
+        return $this->sort_index;
+    }
+
+    /**
+     * @param int $sort_index
+     * @return $this
+     */
+    public function setSortIndex(int $sort_index): MarketingPlan
+    {
+        $this->sort_index = $sort_index;
+        $this->attributes['sort_index'] = $this->sort_index;
         return $this;
     }
 
