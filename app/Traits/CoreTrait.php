@@ -164,6 +164,23 @@ trait CoreTrait
     }
 
     /**
+     * 生成随机字符串
+     * @param int $length
+     * @return bool|string
+     */
+    public function generateRandomStr(int $length = 6): bool|string
+    {
+        try {
+            return bin2hex(random_bytes($length / 2));
+        } catch (Exception $exc) {
+            log_message("error", "生成随机字符串发生异常，err：{err}",
+                ["err" => $exc->getMessage()]
+            );
+            return false;
+        }
+    }
+
+    /**
      * 根据MimeType获取文件类型
      * @param string $mimeType
      * @return string
