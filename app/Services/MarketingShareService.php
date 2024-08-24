@@ -33,7 +33,7 @@ class MarketingShareService extends BaseService
     }
 
     /**
-     * 创建分享记录
+     * 创建分享
      * @param int $planId
      * @param string|null $name
      * @param string|null $phone
@@ -44,9 +44,8 @@ class MarketingShareService extends BaseService
     {
         $model = $this->getModel();
         $builder = $model->asArray();
-        $raw = $builder->where('plan_id', $planId)
-            ->orWhere('phone_number', $phone)
-            ->orWhere('email', $email)
+        $where = sprintf("plan_id='%s' AND (phone_number='%s' OR email='%s')", $planId, $phone, $email);
+        $raw = $builder->where($where)
             ->first();
         if ($raw) {
             return false;
