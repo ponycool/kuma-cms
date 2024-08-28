@@ -24,7 +24,7 @@ class MarketingShare extends Base
     protected int $share_count;
     protected string $created_at;
     protected string $updated_at;
-    protected string $deleted_at	;
+    protected string $deleted_at;
     protected int $deleted;
     protected $dates = [
     ];
