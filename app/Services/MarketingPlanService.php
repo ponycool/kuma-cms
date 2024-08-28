@@ -143,7 +143,7 @@ class MarketingPlanService extends BaseService
         $limit = $params['limit'] ?? null;
         $sql = [
             'SELECT p.id,p.uuid,p.name,p.content,p.cover_image,p.location,p.start_datetime,p.end_datetime,p.is_active,',
-            'p.status,p.sort_index,p.created_at,p.updated_at ',
+            'p.view_count,p.status,p.sort_index,p.created_at,p.updated_at ',
             'FROM swap_marketing_plan AS p ',
             'WHERE p.deleted_at IS NULL ',
             'AND p.deleted = ? ',
