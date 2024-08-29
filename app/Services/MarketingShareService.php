@@ -33,6 +33,24 @@ class MarketingShareService extends BaseService
     }
 
     /**
+     * 查询分享记录
+     * @param int $planId
+     * @param string|null $name
+     * @param string|null $phone
+     * @param string|null $email
+     * @return array|null
+     */
+    public function getShareRecord(int $planId, ?string $name = null, ?string $phone = null, ?string $email = null): ?array
+    {
+        $model = $this->getModel();
+        $builder = $model->asArray();
+        $where = sprintf("plan_id='%s' AND (phone_number='%s' OR email='%s')", $planId, $phone, $email);
+        $result = $builder->where($where)
+            ->first();
+        return (array)$result ?: null;
+    }
+
+    /**
      * 创建分享
      * @param int $planId
      * @param string|null $name

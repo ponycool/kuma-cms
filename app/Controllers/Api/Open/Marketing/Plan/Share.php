@@ -76,9 +76,6 @@ class Share extends Base
             $data = [
                 'code' => Code::OK,
                 'message' => '营销计划分享成功',
-                'data' => [
-                    'shareCode' => $shareCode
-                ]
             ];
         } catch (Exception $e) {
             $data = [
