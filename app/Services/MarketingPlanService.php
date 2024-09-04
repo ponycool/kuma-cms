@@ -34,6 +34,12 @@ class MarketingPlanService extends BaseService
                     'max_length' => '参数封面图片[coverImage]无效，字符长度不能超过50个字符',
                 ]
             ],
+            'summary' => [
+                'rules' => 'if_exist|max_length[1000]',
+                'errors' => [
+                    'max_length' => '参数营销计划摘要[summary]无效，字符长度不能超过1000个字符',
+                ]
+            ],
             'content' => [
                 'rules' => 'if_exist|max_length[10000]',
                 'errors' => [
@@ -44,6 +50,18 @@ class MarketingPlanService extends BaseService
                 'rules' => 'if_exist|max_length[50]',
                 'errors' => [
                     'max_length' => '参数活动地点[location]无效，字符长度不能超过50个字符',
+                ]
+            ],
+            'posterImage' => [
+                'rules' => 'if_exist|max_length[50]',
+                'errors' => [
+                    'max_length' => '参数海报图片[posterImage]无效，字符长度不能超过50个字符',
+                ]
+            ],
+            'posterContent' => [
+                'rules' => 'if_exist|max_length[1000]',
+                'errors' => [
+                    'max_length' => '参数营销计划海报内容[posterContent]无效，字符长度不能超过1000个字符',
                 ]
             ],
             'startDatetime' => [
@@ -142,8 +160,8 @@ class MarketingPlanService extends BaseService
         $isPage = $params['isPage'] ?? true;
         $limit = $params['limit'] ?? null;
         $sql = [
-            'SELECT p.id,p.uuid,p.name,p.content,p.cover_image,p.location,p.start_datetime,p.end_datetime,p.is_active,',
-            'p.view_count,p.status,p.sort_index,p.created_at,p.updated_at ',
+            'SELECT p.id,p.uuid,p.name,p.content,p.summary,p.cover_image,p.location,p.poster_image,p.poster_content,',
+            'p.start_datetime,p.end_datetime,p.is_active,p.view_count,p.status,p.sort_index,p.created_at,p.updated_at ',
             'FROM swap_marketing_plan AS p ',
             'WHERE p.deleted_at IS NULL ',
             'AND p.deleted = ? ',
@@ -332,7 +350,14 @@ class MarketingPlanService extends BaseService
             }
             $data['cover_image'] = (int)$media['id'];
         }
-
+        $posterImageName = $data['poster_image'] ?? null;
+        if (!is_null($posterImageName)) {
+            $media = $mediaSvc->getByMediaName($posterImageName);
+            if (empty($media)) {
+                return '无效的海报图';
+            }
+            $data['poster_image'] = (int)$media['id'];
+        }
         if (!is_null($data['start_datetime'] ?? null)) {
             if (!$this->validateDate($data['start_datetime'])) {
                 return '无效的开始时间';
@@ -376,19 +401,35 @@ class MarketingPlanService extends BaseService
      */
     private function mergeMedia(array $list): array
     {
+        $mediaSvc = new MediaService();
         $coverList = [];
         foreach ($list as $item) {
             if (!is_null($item['cover_image'])) {
                 $coverList[] = $item['cover_image'];
             }
         }
-        $mediaSvc = new MediaService();
         if (!empty($coverList)) {
             $imageList = $mediaSvc->getMedia($coverList);
             foreach ($imageList as $img) {
                 foreach ($list as &$item) {
                     if ($img['id'] === $item['cover_image']) {
                         $item['cover_image'] = $img['file_url'];
+                    }
+                }
+            }
+        }
+        $posterList = [];
+        foreach ($list as $item) {
+            if (!is_null($item['poster_image'])) {
+                $posterList[] = $item['poster_image'];
+            }
+        }
+        if (!empty($posterList)) {
+            $imageList = $mediaSvc->getMedia($posterList);
+            foreach ($imageList as $img) {
+                foreach ($list as &$item) {
+                    if ($img['id'] === $item['poster_image']) {
+                        $item['poster_image'] = $img['file_url'];
                     }
                 }
             }

@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: Pony
- * Date: 2024/08/22
- * Time: 14:29 下午
+ * Date: 2024/09/04
+ * Time: 16:50 下午
  */
 declare(strict_types=1);
 
@@ -17,8 +17,11 @@ class MarketingPlan extends Base
     protected string $uuid;
     protected string $name;
     protected int $cover_image;
+    protected string $summary;
     protected string $content;
     protected string $location;
+    protected int $poster_image;
+    protected string $poster_content;
     protected string $start_datetime;
     protected string $end_datetime;
     protected int $is_active;
@@ -129,6 +132,25 @@ class MarketingPlan extends Base
     /**
      * @return string
      */
+    public function getSummary(): string
+    {
+        return $this->summary;
+    }
+
+    /**
+     * @param string $summary
+     * @return $this
+     */
+    public function setSummary(string $summary): MarketingPlan
+    {
+        $this->summary = $summary;
+        $this->attributes['summary'] = $this->summary;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
     public function getContent(): string
     {
         return $this->content;
@@ -161,6 +183,44 @@ class MarketingPlan extends Base
     {
         $this->location = $location;
         $this->attributes['location'] = $this->location;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPosterImage(): int
+    {
+        return $this->poster_image;
+    }
+
+    /**
+     * @param int $poster_image
+     * @return $this
+     */
+    public function setPosterImage(int $poster_image): MarketingPlan
+    {
+        $this->poster_image = $poster_image;
+        $this->attributes['poster_image'] = $this->poster_image;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPosterContent(): string
+    {
+        return $this->poster_content;
+    }
+
+    /**
+     * @param string $poster_content
+     * @return $this
+     */
+    public function setPosterContent(string $poster_content): MarketingPlan
+    {
+        $this->poster_content = $poster_content;
+        $this->attributes['poster_content'] = $this->poster_content;
         return $this;
     }
 
