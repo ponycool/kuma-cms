@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: Pony
- * Date: 2024/08/22
- * Time: 14:30 下午
+ * Date: 2024/09/04
+ * Time: 16:50 下午
  */
 declare(strict_types=1);
 
@@ -19,8 +19,11 @@ class MarketingPlanModel extends BaseModel
         'uuid',
         'name',
         'cover_image',
+        'summary',
         'content',
         'location',
+        'poster_image',
+        'poster_content',
         'start_datetime',
         'end_datetime',
         'is_active',
