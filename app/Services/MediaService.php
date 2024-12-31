@@ -12,7 +12,6 @@ namespace App\Services;
 use App\Entities\Media;
 use App\Enums\DeletedStatus;
 use CodeIgniter\HTTP\Files\UploadedFile;
-use Config\Services;
 use Exception;
 
 class MediaService extends BaseService
@@ -44,7 +43,7 @@ class MediaService extends BaseService
                         if (!is_string($item) && !is_array($item) && !is_int($item)) {
                             throw new Exception('存在无效的媒体ID');
                         }
-                        if (is_string($item)||is_int($item)) {
+                        if (is_string($item) || is_int($item)) {
                             $medias[] = $item;
                             $count++;
                         }
@@ -112,7 +111,7 @@ class MediaService extends BaseService
     public function upload(string $filename): ?array
     {
         try {
-            $request = Services::request();
+            $request = service('request');
             $file = $request->getFile($filename);
             if (is_null($file)) {
                 return null;

@@ -17,7 +17,6 @@ use CodeIgniter\Database\ConnectionInterface;
 use CodeIgniter\Database\Query;
 use CodeIgniter\I18n\Time;
 use Config\Database;
-use Config\Services;
 use Exception;
 use Ramsey\Uuid\Uuid;
 
@@ -138,7 +137,7 @@ class BaseService
      */
     public function verificationData(object $model, object $entity): ?array
     {
-        $validation = Services::validation();
+        $validation = service('validation');
         $validation->setRules($model->getValidationRules(), $model->getValidationMessages());
         $validation->run($entity->toRawArray());
         $errors = $validation->getErrors();

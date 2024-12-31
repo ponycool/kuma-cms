@@ -13,7 +13,6 @@ use App\Entities\Login;
 use App\Enums\DeletedStatus;
 use App\Enums\Status;
 use CodeIgniter\I18n\Time;
-use Config\Services;
 use Exception;
 use PonyCool\Core\Jwt\Jwt;
 
@@ -82,7 +81,7 @@ class LoginService extends BaseService
             log_message('info', $e->getMessage() ?: '登录失败');
             return false;
         }
-        $request = Services::request();
+        $request = service('request');
         $ip = $request->getIPAddress();
         $login->setIp($ip);
         $this->insert($login);

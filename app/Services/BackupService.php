@@ -237,7 +237,7 @@ class BackupService extends BaseService
      */
     public function upload(string $filename): bool
     {
-        $request = Services::request();
+        $request = service('request');
         $file = $request->getFile($filename);
         if (is_null($file)) {
             return false;

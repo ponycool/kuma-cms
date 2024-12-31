@@ -37,7 +37,7 @@ class CustomRoutes
     public function __construct()
     {
         $this->routes = Services::routes();
-        $this->uri = Services::uri();
+        $this->uri = service('uri');
         $this->ns = $this->routes->getDefaultNamespace();
         $this->segments = $this->uri->getSegments();
     }
