@@ -15,7 +15,6 @@ use CodeIgniter\API\ResponseTrait;
 use CodeIgniter\Files\FileCollection;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
-use Config\Services;
 use Exception;
 use OutOfRangeException;
 use Psr\Log\LoggerInterface;
@@ -265,7 +264,7 @@ class Base extends BaseController
                 throw new Exception('无效的JSON格式', Code::INVALID_JSON_FORMAT->value);
             }
             $params = $this->request->getJSON(true);
-            $validation = Services::validation();
+            $validation = service('validation');
             $errors = [];
 
             foreach ($data as $k => $v) {
@@ -348,7 +347,7 @@ class Base extends BaseController
         } else {
             $rules = $data['rules'] ?? [];
         }
-        $validation = Services::validation();
+        $validation = service('validation');
         switch ($type) {
             case 'rules':
                 $validation->setRules($rules);
