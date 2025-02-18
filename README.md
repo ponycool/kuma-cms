@@ -73,68 +73,6 @@ make build
 # docker run -it --rm -p 9000:8080 --name kumacms ponycool/kumacms:latest
 ```
 
-### 镜像已安装模块
-
-```
-[PHP Modules]
-bcmath
-Core
-ctype
-curl
-date
-dom
-fileinfo
-filter
-gd
-hash
-iconv
-intl
-json
-libxml
-mbstring
-mysqlnd
-openssl
-pcre
-PDO
-pdo_sqlite
-Phar
-posix
-random
-readline
-Reflection
-session
-SimpleXML
-sodium
-SPL
-sqlite3
-standard
-tokenizer
-xml
-xmlreader
-xmlwriter
-zlib
-```
-
-## 二次开发
-
-#### 生成实体
-
-```shell
-php spark entity:generate
-```
-
-#### 生成模型
-
-```shell
-php spark model:generate
-```
-
-#### 生成服务
-
-```shell
-php spark service:generate
-```
-
 ## 支持
 
 [Website](https://ponycool.com/cms/index)
