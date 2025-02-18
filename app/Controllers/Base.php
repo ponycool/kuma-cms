@@ -15,6 +15,7 @@ use CodeIgniter\API\ResponseTrait;
 use CodeIgniter\Files\FileCollection;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
+use CodeIgniter\HTTP\UserAgent;
 use Exception;
 use OutOfRangeException;
 use Psr\Log\LoggerInterface;
@@ -24,6 +25,41 @@ class Base extends BaseController
     use CoreTrait, ResponseTrait;
 
     protected readonly string $version;
+    // 用户代理
+    protected UserAgent $userAgent;
+    // 是否是已知的浏览器
+    protected bool $isBrowser;
+
+    // 是否是移动设备
+    protected bool $isMobile;
+
+    // 是否是机器人
+    protected bool $isRobot;
+
+    // 用户代理是否是从林一个站点引用的
+    protected bool $isReferral;
+
+    // 检测到的浏览器
+    protected string $browser;
+
+    // 检测到浏览器版本
+    protected string $browserVersion;
+
+    // 检测到的移动设备品牌
+    protected string $mobile;
+
+    // 检测到的机器人名称
+    protected string $robot;
+
+    // 检测到的操作系统
+    protected string $platform;
+
+    // 检测到的来源网址
+    protected string $referrer;
+
+    // 完整的用户代理信息
+    protected string $agent;
+
     protected array $settings;
 
     // 主题路径
@@ -35,6 +71,11 @@ class Base extends BaseController
         $this->version = 'v1.0.0';
         // 主题路径
         $this->themePath = APPPATH . 'Views/theme/';
+
+        // 初始化用户代理信息
+        $agent = $this->request->getUserAgent();
+        $this->setUserAgent($agent);
+        self::initUserAgent();
 
         // 初始化配置
         self::initSettings();
@@ -48,6 +89,138 @@ class Base extends BaseController
     public function setSettings(array $settings): Base
     {
         $this->settings = $settings;
+        return $this;
+    }
+
+    public function getUserAgent(): UserAgent
+    {
+        return $this->userAgent;
+    }
+
+    public function setUserAgent(UserAgent $userAgent): Base
+    {
+        $this->userAgent = $userAgent;
+        return $this;
+    }
+
+    public function isBrowser(): bool
+    {
+        return $this->isBrowser;
+    }
+
+    public function setIsBrowser(bool $isBrowser): Base
+    {
+        $this->isBrowser = $isBrowser;
+        return $this;
+    }
+
+    public function isMobile(): bool
+    {
+        return $this->isMobile;
+    }
+
+    public function setIsMobile(bool $isMobile): Base
+    {
+        $this->isMobile = $isMobile;
+        return $this;
+    }
+
+    public function isRobot(): bool
+    {
+        return $this->isRobot;
+    }
+
+    public function setIsRobot(bool $isRobot): Base
+    {
+        $this->isRobot = $isRobot;
+        return $this;
+    }
+
+    public function isReferral(): bool
+    {
+        return $this->isReferral;
+    }
+
+    public function setIsReferral(bool $isReferral): Base
+    {
+        $this->isReferral = $isReferral;
+        return $this;
+    }
+
+    public function getBrowser(): string
+    {
+        return $this->browser;
+    }
+
+    public function setBrowser(string $browser): Base
+    {
+        $this->browser = $browser;
+        return $this;
+    }
+
+    public function getBrowserVersion(): string
+    {
+        return $this->browserVersion;
+    }
+
+    public function setBrowserVersion(string $browserVersion): Base
+    {
+        $this->browserVersion = $browserVersion;
+        return $this;
+    }
+
+    public function getMobile(): string
+    {
+        return $this->mobile;
+    }
+
+    public function setMobile(string $mobile): Base
+    {
+        $this->mobile = $mobile;
+        return $this;
+    }
+
+    public function getRobot(): string
+    {
+        return $this->robot;
+    }
+
+    public function setRobot(string $robot): Base
+    {
+        $this->robot = $robot;
+        return $this;
+    }
+
+    public function getPlatform(): string
+    {
+        return $this->platform;
+    }
+
+    public function setPlatform(string $platform): Base
+    {
+        $this->platform = $platform;
+        return $this;
+    }
+
+    public function getReferrer(): string
+    {
+        return $this->referrer;
+    }
+
+    public function setReferrer(string $referrer): Base
+    {
+        $this->referrer = $referrer;
+        return $this;
+    }
+
+    public function getAgent(): string
+    {
+        return $this->agent;
+    }
+
+    public function setAgent(string $agent): Base
+    {
+        $this->agent = $agent;
         return $this;
     }
 
@@ -471,6 +644,26 @@ class Base extends BaseController
     {
         $rules = $this->getPageValidationRules();
         $this->verifyJsonInputByRules($rules);
+    }
+
+    /**
+     * 初始化用户代理信息
+     * @return void
+     */
+    protected function initUserAgent(): void
+    {
+        $userAgent = $this->getUserAgent();
+        $this->setIsBrowser($userAgent->isBrowser())
+            ->setIsMobile($userAgent->isMobile())
+            ->setIsRobot($userAgent->isRobot())
+            ->setIsReferral($userAgent->isReferral())
+            ->setBrowser($userAgent->getBrowser())
+            ->setBrowserVersion($userAgent->getVersion())
+            ->setMobile($userAgent->getMobile())
+            ->setRobot($userAgent->getRobot())
+            ->setPlatform($userAgent->getPlatform())
+            ->setReferrer($userAgent->getReferrer())
+            ->setAgent($userAgent->getAgentString());
     }
 
     /**
