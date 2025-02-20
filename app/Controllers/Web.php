@@ -273,12 +273,24 @@ class Web extends Base
         }
         return array_merge($data,
             [
+                'version' => $this->version,
                 'baseUrl' => base_url(),
                 'page' => $this->getPage(),
                 'assetPath' => '/',
                 'assetRelativePath' => $assetRelativePath,
                 'icpLink' => 'https://beian.miit.gov.cn',
                 'path' => $path,
+                'isBrowser' => self::isBrowser(),
+                'isMobile' => self::isMobile(),
+                'isRobot' => self::isRobot(),
+                'isReferral' => self::isReferral(),
+                'browser' => self::getBrowser(),
+                'browserVersion' => self::getBrowserVersion(),
+                'mobile' => self::getMobile(),
+                'robot' => self::getRobot(),
+                'platform' => self::getPlatform(),
+                'referrer' => self::getReferrer(),
+                'agentString' => self::getAgent(),
                 'settings' => self::getSettings()
             ]
         );
