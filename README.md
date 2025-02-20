@@ -33,8 +33,13 @@
 ```shell
 sudo docker run -d --restart=unless-stopped -p 80:80 -p 443:443 ponycool/kumacms:latest
 
+# 国内源
+sudo docker run -d --restart=unless-stopped -p 80:80 -p 443:443 registry.cn-qingdao.aliyuncs.com/ponycool/kumacms:latest
+
 # 数据持久化，请使用具名挂载的方式进行挂载
 docker run -d -p 80:80 -v kumacms-data:/opt/kumacms/writable/data --name kumacms ponycool/kumacms:latest
+#国内源
+docker run -d -p 80:80 -v kumacms-data:/opt/kumacms/writable/data --name kumacms registry.cn-qingdao.aliyuncs.com/ponycool/kumacms:latest
 ```
 
 ## 使用
