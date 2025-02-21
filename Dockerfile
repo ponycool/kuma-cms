@@ -1,4 +1,4 @@
-FROM php:8.2.22-fpm-alpine
+FROM php:8.2-fpm-alpine
 LABEL maintainer="KumaCMS DOCKER MAINTAINER <pony@ponycool.com>"
 
 ENV TIMEZONE=Asia/Shanghai
