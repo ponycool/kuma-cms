@@ -13,8 +13,6 @@ namespace App\Commands;
 
 use App\Services\BaseService;
 use CodeIgniter\CLI\CLI;
-use CodeIgniter\I18n\Time;
-use Exception;
 
 trait CommandTrait
 {
@@ -67,37 +65,6 @@ trait CommandTrait
                 exit(EXIT_SUCCESS);
             }
         }
-    }
-
-    /**
-     * 构造文件头
-     * @return string
-     */
-    public function structureFileHeader(): string
-    {
-        $fileHeader = '<?php';
-        $fileHeader .= PHP_EOL;
-        $fileHeader .= <<<EOF
-/**
- * Created by PhpStorm.
- * User: Pony
-EOF;
-        $fileHeader .= PHP_EOL;
-        try {
-            $now = Time::now();
-            $fileHeader .= ' * Date: ' . $now->format('Y/m/d') . PHP_EOL;
-            $fileHeader .= ' * Time: ' . $now->format('H:i') . ' ';
-            if ($now->getHour() < 12) {
-                $fileHeader .= '上午';
-            } else {
-                $fileHeader .= '下午';
-            }
-            $fileHeader .= PHP_EOL;
-        } catch (Exception $e) {
-        }
-        $fileHeader .= ' */' . PHP_EOL;
-        $fileHeader .= "declare(strict_types=1);" . PHP_EOL . PHP_EOL;
-        return $fileHeader;
     }
 
     /**
