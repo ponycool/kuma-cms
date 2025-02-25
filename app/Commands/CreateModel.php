@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace App\Commands;
 
 use App\Services\BaseService;
+use App\Services\ScaffoldService;
 use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
 
@@ -39,76 +40,10 @@ class CreateModel extends BaseCommand
         $modelName = $entityName . 'Model';
         $file = $path . '/' . $modelName . '.php';
         $this->detectOverwrite($file);
-        $data = $this->structureFileHeader();
-        $data .= "namespace App\Models;" . PHP_EOL;
-        $data .= PHP_EOL;
-        $data .= sprintf("class %s extends BaseModel", $modelName) . PHP_EOL;
-        $data .= "{" . PHP_EOL;
-        $data .= "    protected $" . "table = '" . $table . "';" . PHP_EOL;
-        if ($this->fieldExists($fields, 'id')) {
-            $data .= "    protected $" . "primaryKey = 'id';" . PHP_EOL;
-        }
-        $data .= "    protected $" . "returnType = 'App\Entities\\" . $entityName . "';" . PHP_EOL;
-        $data .= "    protected $" . "useSoftDeletes = true;" . PHP_EOL;
-        $data .= "    protected $" . "allowedFields = [" . PHP_EOL;
-        foreach ($fields as $field) {
-            switch ($field->name) {
-                case 'id':
-                case 'created_at':
-                case 'updated_at':
-                case 'deleted_at':
-                case 'deleted':
-                    break;
-                default:
-                    $data .= "        '" . $field->name . "'," . PHP_EOL;
-                    break;
-            }
-        }
-        $data .= "    ];" . PHP_EOL;
-        $data .= "    protected $" . "useTimestamps = true;" . PHP_EOL;
-        $data .= "    protected $" . "createdField = 'created_at';" . PHP_EOL;
-        $data .= "    protected $" . "updatedField = 'updated_at';" . PHP_EOL;
-        if ($this->fieldExists($fields, 'deleted_at')) {
-            $data .= "    protected $" . "deletedField = 'deleted_at';" . PHP_EOL;
-        }
-        if ($this->fieldExists($fields, 'datetime')) {
-            $data .= "    protected $" . "dateFormat = 'datetime';" . PHP_EOL;
-        }
-        $data .= "    protected $" . "validationRules = [" . PHP_EOL;
-        if ($this->fieldExists($fields, 'uuid')) {
-            $data .= "        'uuid' => 'required|min_length[36]|max_length[36]'," . PHP_EOL;
-        }
-        if ($table === 'setting') {
-            $data .= <<<EOF
-        'key' => 'required',
-EOF;
-            $data .= PHP_EOL;
-        }
-        $data .= "    ];";
-        $data .= PHP_EOL;
-        $data .= "    protected $" . "validationMessages = [" . PHP_EOL;
-        if ($this->fieldExists($fields, 'uuid')) {
-            $data .= <<<EOF
-        'uuid' => [
-            'required' => 'uuid 列为必填项',
-            'min_length' => 'uuid 长度为36个字符',
-            'max_length' => 'uuid 长度为36个字符',
-        ],
-EOF;
-        }
-        if ($table === 'setting') {
-            $data .= <<<EOF
-        'key' => [
-            'required' => '系统配置项的键为必填项',
-        ],
-EOF;
-            $data .= PHP_EOL;
-        }
-        $data .= PHP_EOL;
-        $data .= "    ];";
-        $data .= PHP_EOL;
-        $data .= "    protected $" . "skipValidation = false;" . PHP_EOL . PHP_EOL;
-        $data .= "}" . PHP_EOL . PHP_EOL;
+        $scaffoldSvc = new ScaffoldService();
+        $data = $scaffoldSvc->structureFileHeader();
+        $data .= $scaffoldSvc->structureModel($table, $modelName, $entityName, $fields);
+
         // 写入数据
         if (write_file($file, $data)) {
             CLI::write(sprintf("%s模型创建成功", $modelName), 'yellow');

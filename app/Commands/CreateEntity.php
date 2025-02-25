@@ -10,11 +10,11 @@ declare(strict_types=1);
 namespace App\Commands;
 
 use App\Services\BaseService;
+use App\Services\ScaffoldService;
 use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
 
-class
-CreateEntity extends BaseCommand
+class CreateEntity extends BaseCommand
 {
     use CommandTrait;
 
@@ -39,127 +39,9 @@ CreateEntity extends BaseCommand
         $entityName = str_replace(' ', '', $entityName);
         $file = $path . '/' . $entityName . '.php';
         $this->detectOverwrite($file);
-        $data = $this->structureFileHeader();
-        $data .= <<<EOF
-namespace App\Entities;
-
-use Exception;
-
-EOF;
-        $data .= PHP_EOL;
-        $data .= sprintf("class %s extends Base", $entityName) . PHP_EOL;
-        $data .= "{" . PHP_EOL;
-        $functions = '';
-        // 生成ID的GET和SET方法
-        if ($this->fieldExists($fields, 'id')) {
-            $functions .= $this->createGet('id', 'int');
-            $functions .= $this->createSet('id', 'int', $entityName);
-        }
-        if ($this->fieldExists($fields, 'uuid')) {
-            $functions .= <<<EOF
-    /**
-     * @return string
-     */
-    public function getUuid(): string
-    {
-EOF;
-            $functions .= PHP_EOL;
-            $functions .= "        return $" . "this->uuid;" . PHP_EOL;
-            $functions .= "    }" . PHP_EOL . PHP_EOL;
-            $functions .= "    /**" . PHP_EOL;
-            $functions .= "     * @param string $" . "uuid" . PHP_EOL;
-            $functions .= "     * @return $" . "this" . PHP_EOL;
-            $functions .= "     * @throws Exception" . PHP_EOL;
-            $functions .= "     */" . PHP_EOL;
-            $functions .= "    public function setUuid(string $" . "uuid = ''): " . $entityName . PHP_EOL;
-            $functions .= "    {" . PHP_EOL;
-            $functions .= "        $" . "this->uuid = $" . "uuid ?: $" . "this->generateUuid();" . PHP_EOL;
-            $functions .= "        $" . "this->attributes['uuid'] = $" . "this->uuid;" . PHP_EOL;
-            $functions .= "        return $" . "this;" . PHP_EOL;
-            $functions .= "    }" . PHP_EOL . PHP_EOL;
-        }
-        $totalSteps = count($fields);
-        $currStep = 1;
-        $dates = [];
-        foreach ($fields as $field) {
-            $fieldType = match (strtolower($field->type)) {
-                'int', 'bigint', 'tinyint', 'smallint', 'mediumint', 'integer', 'bit' => 'int',
-                'float', 'double', 'decimal' => 'float',
-                default => 'string',
-            };
-            // 构造对象属性
-            $data .= match ($field->name) {
-                'id' => '    protected ' . $fieldType . ' $' . $field->name . ' = 0;' . PHP_EOL,
-                default => '    protected ' . $fieldType . ' $' . $field->name . ';' . PHP_EOL,
-            };
-
-            if ($field->type === 'datetime') {
-                $dates[] = $field->name;
-            }
-            // 构造函数
-            switch ($field->name) {
-                case 'id':
-                case 'uuid';
-                    break;
-                case 'created_at':
-                case 'updated_at':
-                case 'deleted_at':
-                case 'deleted':
-                    $functions .= $this->createGet($field->name, $fieldType);
-                    break;
-                default:
-                    $functions .= $this->createGet($field->name, $fieldType);
-                    $functions .= $this->createSet($field->name, $fieldType, $entityName);
-                    break;
-            }
-            CLI::showProgress($currStep++, $totalSteps);
-        }
-        // 构造dates
-        $data .= "    protected $" . "dates = [" . PHP_EOL;
-        foreach ($dates as $item) {
-            $data .= "        '" . $item . "'," . PHP_EOL;
-        }
-        $data .= "    ];" . PHP_EOL;
-
-        // 构造casts
-        $data .= "    protected $" . "casts = [" . PHP_EOL;
-        if ($this->fieldExists($fields, 'deleted')) {
-            $data .= "        'deleted' => 'boolean'" . PHP_EOL;
-        }
-        $data .= "    ];" . PHP_EOL;
-
-        // 构造方法
-        $data .= PHP_EOL;
-        $data .= "    public function __construct(array $" . "data = null)" . PHP_EOL;
-        $data .= "    {" . PHP_EOL;
-        $data .= "        parent::__construct($" . "data);";
-        if ($this->fieldExists($fields, 'gid') || $this->fieldExists($fields, 'uuid')) {
-            $data .= PHP_EOL;
-            $data .= "        try {" . PHP_EOL;
-            if ($this->fieldExists($fields, 'gid')) {
-                $data .= "            $" . "this->setGid();" . PHP_EOL;
-            }
-            if ($this->fieldExists($fields, 'uuid')) {
-                $data .= "            $" . "this->setUuid();" . PHP_EOL;
-            }
-            $data .= "        } catch (Exception $" . "e) {" . PHP_EOL;
-            $data .= <<<EOF
-            log_message(
-                'error',
-EOF;
-            $data .= PHP_EOL;
-            $data .= "                '初始化 " . $entityName . " Entity 失败，error：{msg}'," . PHP_EOL;
-            $data .= "                ['msg' => $" . "e->getMessage()]" . PHP_EOL;
-            $data .= <<<EOF
-            );
-        }
-EOF;
-        }
-        $data .= PHP_EOL . '    }';
-        $data .= PHP_EOL . PHP_EOL;
-        $data .= $functions;
-        $data .= '}' . PHP_EOL;
-        CLI::showProgress(false);
+        $scaffoldSvc = new ScaffoldService();
+        $data = $scaffoldSvc->structureFileHeader();
+        $data .= $scaffoldSvc->structureEntity($entityName, $fields);
 
         // 写入数据
         if (write_file($file, $data)) {
@@ -167,42 +49,5 @@ EOF;
         } else {
             CLI::error(sprintf("%s实体写入失败", $entityName));
         }
-    }
-
-    /**
-     * 创建Get方法
-     * @param string $fieldName
-     * @param string $fieldType
-     * @return string
-     */
-    public function createGet(string $fieldName, string $fieldType): string
-    {
-        $method = ucwords(str_replace('_', ' ', $fieldName));
-        $method = str_replace(' ', '', $method);
-        $getMethod = "    /**" . PHP_EOL;
-        $getMethod .= "     * @return " . $fieldType . PHP_EOL;
-        $getMethod .= "     */" . PHP_EOL;
-        $getMethod .= "    public function get" . $method . "(): " . $fieldType . PHP_EOL;
-        $getMethod .= "    {" . PHP_EOL;
-        $getMethod .= "        return $" . "this->" . $fieldName . ";" . PHP_EOL;
-        $getMethod .= "    }" . PHP_EOL . PHP_EOL;
-        return $getMethod;
-    }
-
-    public function createSet(string $fieldName, string $fieldType, string $entityName): string
-    {
-        $method = ucwords(str_replace('_', ' ', $fieldName));
-        $method = str_replace(' ', '', $method);
-        $setMethod = "    /**" . PHP_EOL;
-        $setMethod .= "     * @param " . $fieldType . " $" . $fieldName . PHP_EOL;
-        $setMethod .= "     * @return $" . "this" . PHP_EOL;
-        $setMethod .= "     */" . PHP_EOL;
-        $setMethod .= "    public function set" . $method . "(" . $fieldType . " $" . $fieldName . "): " . $entityName . PHP_EOL;
-        $setMethod .= "    {" . PHP_EOL;
-        $setMethod .= "        $" . "this->" . $fieldName . " = $" . $fieldName . ";" . PHP_EOL;
-        $setMethod .= "        $" . "this->attributes['" . $fieldName . "'] = $" . "this->" . $fieldName . ";" . PHP_EOL;
-        $setMethod .= "        return $" . "this;" . PHP_EOL;
-        $setMethod .= "    }" . PHP_EOL . PHP_EOL;
-        return $setMethod;
     }
 }
