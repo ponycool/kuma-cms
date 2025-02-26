@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace App\Commands;
 
-use App\Services\BaseService;
+use App\Services\ScaffoldService;
 use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
 
@@ -28,25 +28,18 @@ class CreateService extends BaseCommand
     public function run(array $params): void
     {
         $table = $this->detectTable($params);
-        $service = new BaseService();
-        $db = $service->getDb();
         helper('filesystem');
         $path = APPPATH . 'Services';
         $this->detectPermission($path);
-        $fields = $db->getFieldData($table);
         $entityName = ucwords(str_replace('_', ' ', $table));
         $entityName = str_replace(' ', '', $entityName);
-        $modelName = $entityName . 'Model';
         $serviceName = $entityName . 'Service';
         $file = $path . '/' . $serviceName . '.php';
         $this->detectOverwrite($file);
-        $data = $this->structureFileHeader();
-        $data .= "namespace App\Services;" . PHP_EOL;
-        $data .= PHP_EOL;
-        $data .= sprintf("class %s extends BaseService", $serviceName) . PHP_EOL;
-        $data .= "{" . PHP_EOL;
-        $data .= PHP_EOL;
-        $data .= "}" . PHP_EOL;
+        $scaffoldSvc = new ScaffoldService();
+        $data = $scaffoldSvc->structureFileHeader();
+        $data .= $scaffoldSvc->structureService($serviceName);
+
         // 写入数据
         if (write_file($file, $data)) {
             CLI::write(sprintf("%s服务创建成功", $serviceName), 'yellow');
