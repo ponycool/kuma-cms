@@ -193,9 +193,12 @@ EOF;
         $data .= PHP_EOL;
         $data .= sprintf("class %s extends Base", $entity) . PHP_EOL;
         $data .= "{" . PHP_EOL;
+        $functions = '';
         // 生成ID的GET和SET方法
-        $functions = self::createGet('id', 'int');
-        $functions .= self::createSet('id', 'int', $entity);
+        if ($this->fieldExists($fields, 'id')) {
+            $functions .= $this->createGet('id', 'int');
+            $functions .= $this->createSet('id', 'int', $entity);
+        }
         if (self::fieldExists($fields, 'gid')) {
             $functions .= <<<EOF
     /**
@@ -248,7 +251,7 @@ EOF;
         $currStep = 1;
         $dates = [];
         foreach ($fields as $field) {
-            $fieldType = match ($field->type) {
+            $fieldType = match (strtolower($field->type)) {
                 'int', 'bigint', 'tinyint', 'smallint', 'mediumint', 'integer', 'bit' => 'int',
                 'float', 'double', 'decimal' => 'float',
                 default => 'string',
