@@ -260,6 +260,16 @@ class BaseService
     }
 
     /**
+     * 获取数据库表列表
+     * @return bool|array
+     */
+    public function getTableList(): bool|array
+    {
+        $db = $this->getDb();
+        return $db->listTables();
+    }
+
+    /**
      * 获取查询字段
      * @return array
      */
