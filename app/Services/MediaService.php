@@ -11,6 +11,7 @@ namespace App\Services;
 
 use App\Entities\Media;
 use App\Enums\DeletedStatus;
+use CodeIgniter\Files\FileSizeUnit;
 use CodeIgniter\HTTP\Files\UploadedFile;
 use Exception;
 
@@ -153,7 +154,7 @@ class MediaService extends BaseService
             'ext' => $file->getExtension(),
             'mimeType' => $file->getMimeType(),
             'size' => $file->getSize(),
-            'sizeByUnit' => $file->getSizeByUnit('MB') . 'MB',
+            'sizeByUnit' => $file->getSizeByBinaryUnit(FileSizeUnit::MB) . 'MB',
             'width' => $width ?? 0,
             'height' => $height ?? 0,
             'type' => $fileType,
@@ -196,7 +197,7 @@ class MediaService extends BaseService
                 $media->setFileName($newFileName)
                     ->setType($fileType)
                     ->setSize($file->getSize())
-                    ->setSizeByUnit($file->getSizeByUnit('mb') . 'MB')
+                    ->setSizeByUnit($file->getSizeByBinaryUnit(FileSizeUnit::MB) . 'MB')
                     ->setHash($hash)
                     ->setHashAlg(self::HASH_ALGO)
                     ->setExts($file->getExtension())
