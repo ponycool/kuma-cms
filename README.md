@@ -28,6 +28,8 @@
 我们推荐服务器运行PHP 8.2或更高版本；数据库软件默认SQLite3，也可采用MySQL 5.7或更高版本、MariaDB 10.3或更高版本。
 我们也推荐Apache或Nginx作为运行KumaCMS的可靠选项，但您也可以选择其他HTTP服务器软件。
 
+_⚠ 暂不支持PHP8.4_
+
 ### 使用docker运行
 
 ```shell
