@@ -15,6 +15,7 @@ use App\Services\ArticleService;
 use App\Services\LeadsService;
 use App\Services\ProductService;
 use App\Services\UserService;
+use Carbon\Carbon;
 use PonyCool\Core\SystemUtil;
 
 class Workplace extends Base
@@ -44,8 +45,13 @@ class Workplace extends Base
         $userSvc = new UserService();
         $userCount = $userSvc->getCount();
         // 近一年文章、产品浏览量
-        $articleMonthly = $articleSvc->summarizeAndFillByMonth('view_count');
-        $productMonthly = $productSvc->summarizeAndFillByMonth('view_count');
+        $dt = Carbon::now();
+        $cond = [
+            'created_at >' => $dt->startOfYear()->toDateTimeString(),
+            'created_at <' => $dt->endOfYear()->toDateTimeString(),
+        ];
+        $articleMonthly = $articleSvc->summarizeAndFillByMonth('view_count', where: $cond);
+        $productMonthly = $productSvc->summarizeAndFillByMonth('view_count', where: $cond);
         // 文章、产品浏览Top10
         $topArticle = $articleSvc->getTop();
         $topProduct = $productSvc->getTop();
