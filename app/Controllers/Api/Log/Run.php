@@ -51,9 +51,9 @@ class Run extends Base
 
     /**
      * 下载运行日志
-     * @return ResponseInterface
+     * @return void
      */
-    public function download(): ResponseInterface
+    public function download(): void
     {
         $svc = new RunLogService();
         $logFile = $svc->getLogFile();
@@ -64,18 +64,19 @@ class Run extends Base
 
             $file = new File($logFile);
             $binary = readfile($logFile);
-            return $this->response
+            $this->response
                 ->setHeader('Content-Type', $file->getMimeType())
                 ->setHeader('Content-disposition', 'attachment; filename="' . $file->getBasename() . '"')
                 ->setStatusCode(200)
-                ->setBody($binary);
+                ->setBody($binary)
+                ->download();
         } catch (Exception $e) {
             $data = [
                 'code' => Code::FAIL,
                 'message' => $e->getMessage() ?: '下载系统运行日志失败',
             ];
+            $this->render($data);
         }
-        $this->render($data);
     }
 
     /**
