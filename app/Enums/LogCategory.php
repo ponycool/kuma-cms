@@ -15,9 +15,9 @@ namespace App\Enums;
 enum LogCategory: string
 {
     // 系统
-    case SYSTEM = 'SYSTEM';
+    case SYSTEM = '系统';
     // 应用程序
-    case APPLICATION = 'APPLICATION';
+    case APPLICATION = '应用';
     // 用户
-    case USER = 'USER';
+    case USER = '用户';
 }
