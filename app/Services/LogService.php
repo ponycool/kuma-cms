@@ -209,8 +209,8 @@ class LogService extends BaseService
         $agent = $request->getUserAgent();
         $timestamp = Carbon::now()->getTimestamp();
         $log = new Log();
-        $log->setLevel($level->value)
-            ->setCategory($category->value)
+        $log->setLevel($level->name)
+            ->setCategory($category->name)
             ->setMessage($message)
             ->setIpAddress($ip)
             ->setUserAgent($agent->getAgentString())

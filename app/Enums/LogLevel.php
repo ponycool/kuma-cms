@@ -14,8 +14,8 @@ namespace App\Enums;
  */
 enum LogLevel: string
 {
-    case DEBUG = 'DEBUG';
-    case INFO = 'INFO';
-    case WARN = 'WARN';
-    case ERROR = 'ERROR';
+    case DEBUG = '调试';
+    case INFO = '信息';
+    case WARN = '警告';
+    case ERROR = '错误';
 }
