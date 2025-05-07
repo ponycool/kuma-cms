@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: Pony
- * Date: 2024/04/24
- * Time: 02:52 上午
+ * Date: 2025/05/07
+ * Time: 15:06 下午
  */
 declare(strict_types=1);
 
@@ -21,7 +21,8 @@ class Message extends Base
     protected string $company;
     protected string $subject;
     protected string $content;
-    protected string $source;
+    protected string $registration_source;
+    protected string $traffic_source;
     protected string $status;
     protected string $created_at;
     protected string $updated_at;
@@ -203,19 +204,38 @@ class Message extends Base
     /**
      * @return string
      */
-    public function getSource(): string
+    public function getRegistrationSource(): string
     {
-        return $this->source;
+        return $this->registration_source;
     }
 
     /**
-     * @param string $source
+     * @param string $registration_source
      * @return $this
      */
-    public function setSource(string $source): Message
+    public function setRegistrationSource(string $registration_source): Message
     {
-        $this->source = $source;
-        $this->attributes['source'] = $this->source;
+        $this->registration_source = $registration_source;
+        $this->attributes['registration_source'] = $this->registration_source;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTrafficSource(): string
+    {
+        return $this->traffic_source;
+    }
+
+    /**
+     * @param string $traffic_source
+     * @return $this
+     */
+    public function setTrafficSource(string $traffic_source): Message
+    {
+        $this->traffic_source = $traffic_source;
+        $this->attributes['traffic_source'] = $this->traffic_source;
         return $this;
     }
 

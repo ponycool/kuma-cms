@@ -53,3 +53,6 @@ Events::on('pre_system', static function (): void {
         }
     }
 });
+
+// 持久化SQL
+Events::on('DBQuery', 'App\Events\DBQuery::durable');

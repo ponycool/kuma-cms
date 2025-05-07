@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: Pony
- * Date: 2024/04/24
- * Time: 01:10 上午
+ * Date: 2025/05/07
+ * Time: 14:14 下午
  */
 declare(strict_types=1);
 
@@ -15,7 +15,6 @@ class Leads extends Base
 {
     protected int $id = 0;
     protected string $uuid;
-    protected string $source;
     protected string $company;
     protected string $name;
     protected string $email;
@@ -23,7 +22,9 @@ class Leads extends Base
     protected string $additional_contacts;
     protected string $assigned_to;
     protected string $assigned_at;
+    protected string $registration_source;
     protected string $registration_entry;
+    protected string $traffic_source;
     protected string $group;
     protected string $tags;
     protected string $remark;
@@ -88,25 +89,6 @@ class Leads extends Base
     {
         $this->uuid = $uuid ?: $this->generateUuid();
         $this->attributes['uuid'] = $this->uuid;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSource(): string
-    {
-        return $this->source;
-    }
-
-    /**
-     * @param string $source
-     * @return $this
-     */
-    public function setSource(string $source): Leads
-    {
-        $this->source = $source;
-        $this->attributes['source'] = $this->source;
         return $this;
     }
 
@@ -246,6 +228,25 @@ class Leads extends Base
     /**
      * @return string
      */
+    public function getRegistrationSource(): string
+    {
+        return $this->registration_source;
+    }
+
+    /**
+     * @param string $registration_source
+     * @return $this
+     */
+    public function setRegistrationSource(string $registration_source): Leads
+    {
+        $this->registration_source = $registration_source;
+        $this->attributes['registration_source'] = $this->registration_source;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
     public function getRegistrationEntry(): string
     {
         return $this->registration_entry;
@@ -259,6 +260,25 @@ class Leads extends Base
     {
         $this->registration_entry = $registration_entry;
         $this->attributes['registration_entry'] = $this->registration_entry;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTrafficSource(): string
+    {
+        return $this->traffic_source;
+    }
+
+    /**
+     * @param string $traffic_source
+     * @return $this
+     */
+    public function setTrafficSource(string $traffic_source): Leads
+    {
+        $this->traffic_source = $traffic_source;
+        $this->attributes['traffic_source'] = $this->traffic_source;
         return $this;
     }
 
