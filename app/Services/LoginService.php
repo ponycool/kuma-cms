@@ -12,12 +12,15 @@ namespace App\Services;
 use App\Entities\Login;
 use App\Enums\DeletedStatus;
 use App\Enums\Status;
+use App\Traits\NetworkTrait;
 use CodeIgniter\I18n\Time;
 use Exception;
 use PonyCool\Core\Jwt\Jwt;
 
 class LoginService extends BaseService
 {
+    use NetworkTrait;
+
     /** 账户登录
      * @param string $accountName 账户名称
      * @param string $password 密码
@@ -81,8 +84,8 @@ class LoginService extends BaseService
             log_message('info', $e->getMessage() ?: '登录失败');
             return false;
         }
-        $request = service('request');
-        $ip = $request->getIPAddress();
+
+        $ip = $this->getClientIp();
         $login->setIp($ip);
         $this->insert($login);
         return $token;

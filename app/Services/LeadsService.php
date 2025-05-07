@@ -66,16 +66,22 @@ class LeadsService extends BaseService
                     'valid_date' => '参数分配时间[assignedAt]无效，必须是有效的日期格式',
                 ]
             ],
-            'source' => [
+            'registrationSource' => [
                 'rules' => 'if_exist|max_length[100]',
                 'errors' => [
-                    'max_length' => '参数来源[source]无效，字符长度不能超过100个字符',
+                    'max_length' => '参数注册来源[registrationSource]无效，字符长度不能超过100个字符',
                 ]
             ],
             'registrationEntry' => [
                 'rules' => 'if_exist|max_length[100]',
                 'errors' => [
                     'max_length' => '参数注册入口[registrationEntry]无效，字符长度不能超过100个字符',
+                ]
+            ],
+            'trafficSource' => [
+                'rules' => 'if_exist|max_length[100]',
+                'errors' => [
+                    'max_length' => '参数流量来源[trafficSource]无效，字符长度不能超过100个字符',
                 ]
             ],
             'group' => [
@@ -191,8 +197,9 @@ class LeadsService extends BaseService
         $email = $params['email'] ?? null;
         $phone = $params['phone'] ?? null;
         $assignedTo = $params['assignedTo'] ?? null;
-        $source = $params['source'] ?? null;
+        $registrationSource = $params['registrationSource'] ?? null;
         $registrationEntry = $params['registrationEntry'] ?? null;
+        $trafficSource = $params['trafficSource'] ?? null;
         $group = $params['group'] ?? null;
         $status = $params['status'] ?? null;
         $startTime = $params['startTime'] ?? null;
@@ -202,90 +209,59 @@ class LeadsService extends BaseService
         $keyword = $params['keyword'] ?? null;
         $orderField = $params['orderField'] ?? 'created_at';
         $orderType = $params['orderType'] ?? 'DESC';
-        $sql = [
-            'SELECT l.id,l.uuid,l.company,l.name,l.email,l.phone,l.additional_contacts,l.assigned_to,l.assigned_at,',
-            'l.source,l.registration_entry,l.`group`,l.tags,l.remark,l.status,l.created_at,l.updated_at ',
-            'FROM swap_leads AS l ',
-            'WHERE l.deleted_at IS NULL ',
-            'AND l.deleted = ? '
-        ];
-        $sqlParams = [
-            DeletedStatus::UNDELETED->value
-        ];
-
+        $cond = [];
         if (!is_null($company)) {
-            $sql[] = 'AND l.company = ? ';
-            $sqlParams[] = $company;
+            $cond['company'] = $company;
         }
         if (!is_null($name)) {
-            $sql[] = 'AND l.name = ? ';
-            $sqlParams[] = $name;
+            $cond['name'] = $name;
         }
         if (!is_null($email)) {
-            $sql[] = 'AND l.email = ? ';
-            $sqlParams[] = $email;
+            $cond['email'] = $email;
         }
         if (!is_null($phone)) {
-            $sql[] = 'AND l.phone = ? ';
-            $sqlParams[] = $phone;
+            $cond['phone'] = $phone;
         }
         if (!is_null($assignedTo)) {
-            $sql[] = 'AND l.assigned_to = ? ';
-            $sqlParams[] = $assignedTo;
+            $cond['assigned_to'] = $assignedTo;
         }
-        if (!is_null($source)) {
-            $sql[] = 'AND l.source = ? ';
-            $sqlParams[] = $source;
+        if (!is_null($registrationSource)) {
+            $cond['registration_source'] = $registrationSource;
         }
         if (!is_null($registrationEntry)) {
-            $sql[] = 'AND l.registration_entry = ? ';
-            $sqlParams[] = $registrationEntry;
+            $cond['registration_entry'] = $registrationEntry;
+        }
+        if (!is_null($trafficSource)) {
+            $cond['traffic_source'] = $trafficSource;
         }
         if (!is_null($group)) {
-            $sql[] = 'AND l.`group` = ? ';
-            $sqlParams[] = $group;
+            $cond['group'] = $group;
         }
         if (!is_null($status)) {
-            $sql[] = 'AND l.status = ? ';
-            $sqlParams[] = $status;
+            $cond['status'] = $status;
         }
         if (!is_null($startTime)) {
-            $sql[] = "AND DATE(l.created_at) >= ? ";
-            $sqlParams[] = $startTime;
+            $cond['DATE(created_at) >='] = $startTime;
         }
         if (!is_null($endTime)) {
-            $sql[] = "AND DATE(l.created_at) <= ? ";
-            $sqlParams[] = $endTime;
+            $cond['DATE(created_at) <='] = $endTime;
         }
         if (!is_null($assignedStartTime)) {
-            $sql[] = "AND DATE(l.assigned_at) >= ? ";
-            $sqlParams[] = $assignedStartTime;
+            $cond['DATE(assigned_at) >='] = $assignedStartTime;
         }
         if (!is_null($assignedEndTime)) {
-            $sql[] = "AND DATE(l.assigned_at) <= ? ";
-            $sqlParams[] = $assignedEndTime;
+            $cond['DATE(assigned_at) <='] = $assignedEndTime;
         }
         if (!is_null($keyword)) {
-            $sql = array_merge($sql, [
-                'AND ( ',
-                'l.name LIKE ? ',
-                'OR l.email LIKE ? ',
-                'OR l.phone LIKE ? ',
-                'OR l.company LIKE ? ',
-                'OR l.additional_contacts LIKE ? ',
-                ')'
-            ]);
-            $sqlParams = array_merge($sqlParams, [
-                '%' . $keyword . '%',
-                '%' . $keyword . '%',
-                '%' . $keyword . '%',
-                '%' . $keyword . '%',
-                '%' . $keyword . '%',
-            ]);
+            $cond['orLike'] = [
+                'name' => $keyword,
+                'email' => $keyword,
+                'phone' => $keyword,
+                'company' => $keyword,
+                'additional_contacts' => $keyword,
+            ];
         }
-        $sql[] = sprintf('ORDER BY `%s` %s', $orderField, $orderType);
-        $sql = $this->assembleSql($sql);
-        return $this->getPageByQuery($sql, $sqlParams, $page, $pageSize);
+        return $this->getPage($page, $pageSize, $cond, $orderField, $orderType);
     }
 
     /**
@@ -424,7 +400,7 @@ class LeadsService extends BaseService
         }
 
         // 通过管理后台创建的线索，来源、注册入口使用默认值
-        $data['source'] = 'Control Panel';
+        $data['registration_source'] = 'Control Panel';
         $data['registration_entry'] = 'Control Panel';
 
         $leads = new Leads();

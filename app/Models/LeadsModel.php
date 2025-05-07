@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: Pony
- * Date: 2024/04/24
- * Time: 01:10 上午
+ * Date: 2025/05/07
+ * Time: 14:14 下午
  */
 declare(strict_types=1);
 
@@ -17,7 +17,6 @@ class LeadsModel extends BaseModel
     protected $useSoftDeletes = true;
     protected $allowedFields = [
         'uuid',
-        'source',
         'company',
         'name',
         'email',
@@ -25,7 +24,9 @@ class LeadsModel extends BaseModel
         'additional_contacts',
         'assigned_to',
         'assigned_at',
+        'registration_source',
         'registration_entry',
+        'traffic_source',
         'group',
         'tags',
         'remark',
@@ -35,6 +36,7 @@ class LeadsModel extends BaseModel
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
     protected $deletedField = 'deleted_at';
+    protected $dateFormat = 'datetime';
     protected $validationRules = [
         'uuid' => 'required|min_length[36]|max_length[36]',
     ];

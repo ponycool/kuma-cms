@@ -11,6 +11,7 @@ namespace App\Controllers;
 use App\Enums\Code;
 use App\Services\SettingService;
 use App\Traits\CoreTrait;
+use App\Traits\NetworkTrait;
 use CodeIgniter\API\ResponseTrait;
 use CodeIgniter\Files\FileCollection;
 use CodeIgniter\HTTP\RequestInterface;
@@ -22,7 +23,7 @@ use Psr\Log\LoggerInterface;
 
 class Base extends BaseController
 {
-    use CoreTrait, ResponseTrait;
+    use CoreTrait, ResponseTrait, NetworkTrait;
 
     protected readonly string $version;
     // 用户代理

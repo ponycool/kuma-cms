@@ -60,16 +60,22 @@ class MessageService extends BaseService
                     'max_length' => '参数留言正文[content]无效，字符长度不能超过1000个字符',
                 ]
             ],
-            'source' => [
+            'registrationSource' => [
                 'rules' => 'if_exist|max_length[100]',
                 'errors' => [
-                    'max_length' => '参数来源[source]无效，字符长度不能超过100个字符',
+                    'max_length' => '参数注册来源[registrationSource]无效，字符长度不能超过100个字符',
                 ]
             ],
             'registrationEntry' => [
                 'rules' => 'if_exist|max_length[100]',
                 'errors' => [
                     'max_length' => '参数注册入口[registrationEntry]无效，字符长度不能超过100个字符',
+                ]
+            ],
+            'trafficSource' => [
+                'rules' => 'if_exist|max_length[100]',
+                'errors' => [
+                    'max_length' => '参数流量来源[trafficSource]无效，字符长度不能超过100个字符',
                 ]
             ],
             'status' => [
@@ -115,67 +121,43 @@ class MessageService extends BaseService
         $email = $params['email'] ?? null;
         $phone = $params['phone'] ?? null;
         $company = $params['company'] ?? null;
-        $source = $params['source'] ?? null;
+        $registrationSource = $params['registrationSource'] ?? null;
         $status = $params['status'] ?? null;
         $leads = $params['leads'] ?? null;
         $keyword = $params['keyword'] ?? null;
-        $sql = [
-            'SELECT m.id,m.uuid,m.name,m.email,m.phone,m.company,m.subject,m.content,m.source,m.status,',
-            'm.created_at,m.updated_at ',
-            'FROM swap_message AS m ',
-            'WHERE m.deleted_at IS NULL ',
-            'AND m.deleted = ? '
-        ];
-        $sqlParams = [
-            DeletedStatus::UNDELETED->value
-        ];
-
+        $cond = [];
         if (!is_null($name)) {
-            $sql[] = 'AND m.name = ? ';
-            $sqlParams[] = $name;
+            $cond['name'] = $name;
         }
         if ($leads === 'true') {
-            $sql = array_merge($sql, [
-                'AND ( ',
-                'm.email LIKE ? ',
-                'OR m.phone LIKE ? ',
-                'OR m.company LIKE ? ',
-                ') '
-            ]);
-            $sqlParams = array_merge($sqlParams, [
-                '%' . $email . '%',
-                '%' . $phone . '%',
-                '%' . $company . '%'
-            ]);
+            $cond['orLike'] = [
+                'email' => $email,
+                'phone' => $phone,
+                'company' => $company
+            ];
         } else {
             if (!is_null($email)) {
-                $sql[] = 'AND m.email = ? ';
-                $sqlParams[] = $email;
+                $cond['email'] = $email;
             }
             if (!is_null($phone)) {
-                $sql[] = 'AND m.phone = ? ';
-                $sqlParams[] = $phone;
+                $cond['phone'] = $phone;
             }
             if (!is_null($company)) {
-                $sql[] = 'AND m.company = ? ';
-                $sqlParams[] = $company;
+                $cond['company'] = $company;
             }
         }
-        if (!is_null($source)) {
-            $sql[] = 'AND m.source = ? ';
-            $sqlParams[] = $source;
+        if (!is_null($registrationSource)) {
+            $cond['registration_source'] = $registrationSource;
         }
         if (!is_null($status)) {
-            $sql[] = 'AND m.status = ? ';
-            $sqlParams[] = $status;
+            $cond['status'] = $status;
         }
         if (!is_null($keyword)) {
-            $sql[] = 'AND m.subject LIKE ? ';
-            $sqlParams[] = '%' . $keyword . '%';
+            $cond['orLike'] = [
+                'subject' => $keyword
+            ];
         }
-        $sql[] = 'ORDER BY m.created_at DESC';
-        $sql = $this->assembleSql($sql);
-        return $this->getPageByQuery($sql, $sqlParams, $page, $pageSize);
+        return $this->getPage($page, $pageSize, $cond, 'created_at');
     }
 
     /**
@@ -233,8 +215,9 @@ class MessageService extends BaseService
         $leads = new Leads();
         $name = $data['name'] ?? null;
         $company = $data['company'] ?? null;
-        $source = $data['source'] ?? null;
+        $registrationSource = $data['registration_source'] ?? null;
         $registrationEntry = $data['registration_entry'] ?? null;
+        $trafficSource = $data['traffic_source'] ?? null;
 
         $cond = [];
         if (!is_null($email)) {
@@ -276,11 +259,14 @@ class MessageService extends BaseService
                 if (!is_null($company)) {
                     $leads->setCompany($company);
                 }
-                if (!is_null($source)) {
-                    $leads->setSource($source);
+                if (!is_null($registrationSource)) {
+                    $leads->setRegistrationSource($registrationSource);
                 }
                 if (!is_null($registrationEntry)) {
                     $leads->setRegistrationEntry($registrationEntry);
+                }
+                if (!is_null($trafficSource)) {
+                    $leads->setTrafficSource($trafficSource);
                 }
                 $leadsSvc->insert($leads);
             }
