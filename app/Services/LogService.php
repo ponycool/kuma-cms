@@ -13,10 +13,12 @@ use App\Entities\Log;
 use App\Enums\DeletedStatus;
 use App\Enums\LogCategory;
 use App\Enums\LogLevel;
+use App\Traits\NetworkTrait;
 use Carbon\Carbon;
 
 class LogService extends BaseService
 {
+    use NetworkTrait;
     /**
      * DEBUG级别日志
      * @param string $message
@@ -205,8 +207,8 @@ class LogService extends BaseService
             $uid = $user['id'] ?? null;
         }
         $request = service('request');
-        $ip = $request->getIPAddress();
         $agent = $request->getUserAgent();
+        $ip = $this->getClientIp();
         $timestamp = Carbon::now()->getTimestamp();
         $log = new Log();
         $log->setLevel($level->name)
