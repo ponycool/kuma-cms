@@ -26,6 +26,7 @@ trait NetworkTrait
                 $trimmedIp = trim($ip);
                 if (filter_var($trimmedIp, FILTER_VALIDATE_IP,
                     FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                    log_message('error','HTTP_X_FORWARDED_FOR,{ip}',['ip'=>$_SERVER['HTTP_X_FORWARDED_FOR']]);
                     return $trimmedIp;
                 }
             }
@@ -34,12 +35,14 @@ trait NetworkTrait
         // 检查 HTTP_CLIENT_IP 头部
         if (isset($_SERVER['HTTP_CLIENT_IP'])
             && filter_var($_SERVER['HTTP_CLIENT_IP'], FILTER_VALIDATE_IP)) {
+            log_message('error','HTTP_CLIENT_IP,{ip}',['ip'=>$_SERVER['HTTP_CLIENT_IP']]);
             return $_SERVER['HTTP_CLIENT_IP'];
         }
 
         // 使用 REMOTE_ADDR
         if (isset($_SERVER['REMOTE_ADDR'])
             && filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP)) {
+            log_message('error','REMOTE_ADDR,{ip}',['ip'=>$_SERVER['REMOTE_ADDR']]);
             return $_SERVER['REMOTE_ADDR'];
         }
 
