@@ -27,9 +27,6 @@ trait NetworkTrait
                 if (filter_var($trimmedIp, FILTER_VALIDATE_IP,
                     FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
                     log_message('error','HTTP_X_FORWARDED_FOR,{ip}',['ip'=>$_SERVER['HTTP_X_FORWARDED_FOR']]);
-                    $req=service('request');
-                    $ip=$req->getIPAddress();
-                    log_message('error','ip,{ip}',['ip'=>$ip]);
                     return $trimmedIp;
                 }
             }
@@ -49,6 +46,9 @@ trait NetworkTrait
             return $_SERVER['REMOTE_ADDR'];
         }
 
+        $req=service('request');
+        $ip=$req->getIPAddress();
+        log_message('error','ip,{ip}',['ip'=>$ip]);
         // 默认返回未知
         return '0.0.0.0';
     }
