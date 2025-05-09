@@ -217,7 +217,8 @@ class MessageService extends BaseService
         $company = $data['company'] ?? null;
         $registrationSource = $data['registration_source'] ?? null;
         $registrationEntry = $data['registration_entry'] ?? null;
-        $trafficSource = $data['traffic_source'] ?? null;
+        $trafficSvc = new TrafficService();
+        $trafficSource = $trafficSvc->getTrafficSource();
 
         $cond = [];
         if (!is_null($email)) {

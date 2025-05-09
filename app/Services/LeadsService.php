@@ -496,6 +496,10 @@ class LeadsService extends BaseService
      */
     private function prepare(array $data): string|array
     {
-        return $this->convertParamsToSnakeCase($data);
+        $data = $this->convertParamsToSnakeCase($data);
+        $trafficSvc = new TrafficService();
+        $trafficSource = $trafficSvc->getTrafficSource();
+        $data['traffic_source'] = $trafficSource;
+        return $data;
     }
 }
