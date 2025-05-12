@@ -163,5 +163,5 @@ CREATE TABLE m_marketing_channel (
                                      updated_at   TEXT,
                                      deleted_at   TEXT,
                                      deleted      INTEGER NOT NULL
-                                         AS (0)
+                                         DEFAULT (0)
 );
