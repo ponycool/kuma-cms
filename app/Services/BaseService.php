@@ -348,7 +348,42 @@ class BaseService
                 break;
             }
             if (is_array($v)) {
-                $builder->whereIn($k, $v);
+                // 如果条件是而多维数组，则直接跳过
+                if (count($v) !== count($v, 1)) {
+                    continue;
+                }
+                $opts = [
+                    'orWhere',
+                    'like',
+                    'orLike',
+                    'notLike',
+                    'orNotLike'
+                ];
+                if (in_array($k, $opts, true)) {
+                    foreach ($v as $field => $value) {
+                        switch ($k) {
+                            case 'orWhere':
+                                $builder->orWhere($field, $value);
+                                break;
+                            case 'like':
+                                $builder->like($field, $value);
+                                break;
+                            case 'orLike':
+                                $builder->orLike($field, $value);
+                                break;
+                            case 'notLike':
+                                $builder->notLike($field, $value);
+                                break;
+                            case 'orNotLike':
+                                $builder->orNotLike($field, $value);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                } else {
+                    $builder->whereIn($k, $v);
+                }
                 continue;
             }
             $builder->where($k, $v);
@@ -395,27 +430,22 @@ class BaseService
      * @param array $cond
      * @param string|null $orderField
      * @param string $order
+     * @param int|null $limit
      * @return array
      */
-    public function getByCond(array $cond, ?string $orderField = null, string $order = 'DESC'): array
+    public function getByCond(array $cond, ?string $orderField = null, string $order = 'DESC', ?int $limit = null): array
     {
         $model = $this->getModel();
         $builder = $model->asArray();
-        foreach ($cond as $k => $v) {
-            if (is_object($v)) {
-                break;
-            }
-            if (is_array($v)) {
-                $builder->whereIn($k, $v);
-                continue;
-            }
-            $builder->where($k, $v);
-        }
+        $builder = $this->buildConditions($builder, $cond);
         if (is_null($orderField)) {
             $orderField = 'created_at';
         }
-        $res = $builder->orderBy($orderField, $order)
-            ->findAll();
+        $builder->orderBy($orderField, $order);
+        if (!is_null($limit)) {
+            $builder->limit($limit);
+        }
+        $res = $builder->findAll();
         return (array)$res;
     }
 
@@ -552,54 +582,7 @@ class BaseService
         ];
         $builder->select($this->getSelectFields());
         if (!is_null($cond)) {
-            foreach ($cond as $k => $v) {
-                if (is_null($v)) {
-                    continue;
-                }
-                if (is_object($v)) {
-                    break;
-                }
-                if (is_array($v)) {
-                    // 如果条件是而多维数组，则直接跳过
-                    if (count($v) !== count($v, 1)) {
-                        continue;
-                    }
-                    $opts = [
-                        'orWhere',
-                        'like',
-                        'orLike',
-                        'notLike',
-                        'orNotLike'
-                    ];
-                    if (in_array($k, $opts, true)) {
-                        foreach ($v as $field => $value) {
-                            switch ($k) {
-                                case 'orWhere':
-                                    $builder->orWhere($field, $value);
-                                    break;
-                                case 'like':
-                                    $builder->like($field, $value);
-                                    break;
-                                case 'orLike':
-                                    $builder->orLike($field, $value);
-                                    break;
-                                case 'notLike':
-                                    $builder->notLike($field, $value);
-                                    break;
-                                case 'orNotLike':
-                                    $builder->orNotLike($field, $value);
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                    } else {
-                        $builder->whereIn($k, $v);
-                    }
-                    continue;
-                }
-                $builder->where($k, $v);
-            }
+            $builder = $this->buildConditions($builder, $cond);
         }
         $builder->where('deleted_at')
             ->where('deleted', DeletedStatus::UNDELETED->value);
