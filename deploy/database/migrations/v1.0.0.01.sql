@@ -147,3 +147,22 @@ FROM sqlitestudio_temp_table;
 DROP TABLE sqlitestudio_temp_table;
 
 PRAGMA foreign_keys = 1;
+
+
+CREATE TABLE m_marketing_channel
+(
+    id           INTEGER PRIMARY KEY AUTOINCREMENT
+        UNIQUE
+                         NOT NULL,
+    uuid         TEXT UNIQUE
+                         NOT NULL,
+    channel_name TEXT    NOT NULL,
+    channel_type TEXT    NOT NULL,
+    description  TEXT,
+    source_code  TEXT    NOT NULL,
+    created_at   TEXT    NOT NULL,
+    updated_at   TEXT,
+    deleted_at   TEXT,
+    [ deleted]   INTEGER NOT NULL
+        AS (0)
+);
