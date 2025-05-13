@@ -1,5 +1,8 @@
 <?php
 
+use CodeIgniter\Boot;
+use Config\Paths;
+
 /*
  *---------------------------------------------------------------
  * CHECK PHP VERSION
@@ -11,7 +14,7 @@ if (version_compare(PHP_VERSION, $minPhpVersion, '<')) {
     $message = sprintf(
         'Your PHP version must be %s or higher to run CodeIgniter. Current version: %s',
         $minPhpVersion,
-        PHP_VERSION
+        PHP_VERSION,
     );
 
     header('HTTP/1.1 503 Service Unavailable.', true, 503);
@@ -48,9 +51,9 @@ if (getcwd() . DIRECTORY_SEPARATOR !== FCPATH) {
 require FCPATH . '../app/Config/Paths.php';
 // ^^^ Change this line if you move your application folder
 
-$paths = new Config\Paths();
+$paths = new Paths();
 
 // LOAD THE FRAMEWORK BOOTSTRAP FILE
 require $paths->systemDirectory . '/Boot.php';
 
-exit(CodeIgniter\Boot::bootWeb($paths));
+exit(Boot::bootWeb($paths));
