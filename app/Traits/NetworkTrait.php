@@ -43,8 +43,7 @@ trait NetworkTrait
         }
 
         $request = service('request');
-        $ip = $request->getIPAddress();
         // 默认返回未知
-        return $ip ?? '0.0.0.0';
+        return $request->getIPAddress() ?? '0.0.0.0';
     }
 }
