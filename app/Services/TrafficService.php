@@ -43,7 +43,7 @@ class TrafficService extends BaseService
             return TrafficSource::UNKNOWN->name;
         }
         // 如果不是来自其他网站的推荐
-        $trafficSource = $request->getGet('traffic_source');
+        $trafficSource = $request->getGetPost('traffic_source');
         if (!empty($trafficSource)) {
             return $trafficSource;
         }
