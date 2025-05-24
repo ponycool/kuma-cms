@@ -45,13 +45,13 @@ deploy:
     - apk update && apk upgrade
     - 'which ssh-agent || ( apk update && apk add openssh-client git )'
     - eval $(ssh-agent -s)
-    - echo "$DEMO_SERVER_KEY" | tr -d '\r' | ssh-add -
+    - echo "$SERVER_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
-    - ssh-keyscan $DEMO_SERVER_HOST >> ~/.ssh/known_hosts
+    - ssh-keyscan $SERVER_HOST >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
   script:
-    - ssh $DEMO_SERVER_USER@$DEMO_SERVER_HOST
+    - ssh $SERVER_USER@$SERVER_HOST
       "cd /opt/ponycool/docker-compose && sudo docker compose pull && sudo docker compose down && sudo docker compose up -d"
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
