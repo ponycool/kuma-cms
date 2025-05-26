@@ -450,14 +450,18 @@ class Base extends BaseController
                     }
                 }
                 foreach ($rules as $rule) {
-                    if (!str_contains($rule, '[')) {
-                        $error = [
-                            $rule => $rule !== 'if_exist' ? $v['errors'][$rule] : ''
-                        ];
-                    } else {
-                        $error = [
-                            strchr($rule, '[', true) => $v['errors'][strchr($rule, '[', true)]
-                        ];
+                    $error = [];
+                    // 如果存在自定义错误信息，则使用自定义错误信息
+                    if (!is_null($v['errors'] ?? null)) {
+                        if (!str_contains($rule, '[')) {
+                            $error = [
+                                $rule => $rule !== 'if_exist' ? $v['errors'][$rule] : ''
+                            ];
+                        } else {
+                            $error = [
+                                strchr($rule, '[', true) => $v['errors'][strchr($rule, '[', true)]
+                            ];
+                        }
                     }
                     $validation->check($param, $rule, $error);
                     if ($validation->hasError('check')) {
