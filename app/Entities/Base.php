@@ -79,7 +79,8 @@ class Base extends Entity
         return array_diff_key($properties, [
             'id' => '',
             'gid' => '',
-            'uuid' => ''
+            'uuid' => '',
+            'ulid' => '',
         ]);
     }
 
