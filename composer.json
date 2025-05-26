@@ -11,13 +11,14 @@
   },
   "require": {
     "php": "^8.2",
+    "ext-bcmath": "*",
+    "ext-iconv": "*",
     "codeigniter4/framework": "^4.0",
     "nesbot/carbon": "^3.0",
     "ponycool/ponycool-library": "^1.0",
     "ramsey/uuid": "^4.7",
-    "twig/twig": "^3.8",
-    "ext-bcmath": "*",
-    "ext-iconv": "*"
+    "symfony/uid": "^7.2",
+    "twig/twig": "^3.8"
   },
   "require-dev": {
     "fakerphp/faker": "^1.9",

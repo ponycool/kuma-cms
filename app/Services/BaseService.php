@@ -515,6 +515,21 @@ class BaseService
     }
 
     /**
+     * 根据ULID获取一条数据
+     * @param string $ulid
+     * @return array
+     */
+    public function getFirstByUlid(string $ulid): array
+    {
+        $model = $this->getModel();
+        $res = $model->asArray()
+            ->select($this->getSelectFields())
+            ->where('ulid', $ulid)
+            ->first();
+        return (array)$res;
+    }
+
+    /**
      * @param $where
      * @return array
      */
@@ -855,7 +870,8 @@ class BaseService
             $data = array_diff_key($data, [
                 'id' => '',
                 'gid' => '',
-                'uuid' => ''
+                'uuid' => '',
+                'ulid' => '',
             ]);
             $data['updated_at'] = $currentTime;
             $builder->where('id', $id)
@@ -912,7 +928,8 @@ class BaseService
             $data = array_diff_key($data, [
                 'id' => '',
                 'gid' => '',
-                'uuid' => ''
+                'uuid' => '',
+                'ulid' => '',
             ]);
             $data['updated_at'] = $currentTime;
             $builder->where('uuid', $uuid)
@@ -970,6 +987,9 @@ class BaseService
             }
             if (array_key_exists('uuid', $data)) {
                 unset($data['uuid']);
+            }
+            if (array_key_exists('ulid', $data)) {
+                unset($data['ulid']);
             }
             $builder->update($data);
             $rows = $db->affectedRows();
@@ -1047,6 +1067,9 @@ class BaseService
                 }
                 if (array_key_exists('uuid', $item) && $indexField !== 'uuid') {
                     unset($item['uuid']);
+                }
+                if (array_key_exists('ulid', $item) && $indexField !== 'ulid') {
+                    unset($item['ulid']);
                 }
             }
 

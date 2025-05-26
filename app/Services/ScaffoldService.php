@@ -196,8 +196,8 @@ EOF;
         $functions = '';
         // 生成ID的GET和SET方法
         if ($this->fieldExists($fields, 'id')) {
-            $functions .= $this->createGet('id', 'int');
-            $functions .= $this->createSet('id', 'int', $entity);
+            $functions .= self::createGet('id', 'int');
+            $functions .= self::createSet('id', 'int', $entity);
         }
         if (self::fieldExists($fields, 'gid')) {
             $functions .= <<<EOF
@@ -245,8 +245,32 @@ EOF;
             $functions .= "        $" . "this->uuid = $" . "uuid ?: $" . "this->generateUuid();" . PHP_EOL;
             $functions .= "        $" . "this->attributes['uuid'] = $" . "this->uuid;" . PHP_EOL;
             $functions .= "        return $" . "this;" . PHP_EOL;
-            $functions .= "    }" . PHP_EOL . PHP_EOL;
+            $functions .= "    }" . PHP_EOL;
         }
+        if (self::fieldExists($fields, 'ulid')) {
+            $functions .= <<<EOF
+    /**
+     * @return string
+     */
+    public function getUlid(): string
+    {
+EOF;
+            $functions .= PHP_EOL;
+            $functions .= "        return $" . "this->ulid;" . PHP_EOL;
+            $functions .= "    }" . PHP_EOL . PHP_EOL;
+            $functions .= "    /**" . PHP_EOL;
+            $functions .= "     * @param string $" . "ulid" . PHP_EOL;
+            $functions .= "     * @return $" . "this" . PHP_EOL;
+            $functions .= "     * @throws Exception" . PHP_EOL;
+            $functions .= "     */" . PHP_EOL;
+            $functions .= "    public function setUlid(string $" . "ulid = ''): " . $entity . PHP_EOL;
+            $functions .= "    {" . PHP_EOL;
+            $functions .= "        $" . "this->ulid = $" . "ulid ?: $" . "this->generateUlid();" . PHP_EOL;
+            $functions .= "        $" . "this->attributes['ulid'] = $" . "this->ulid;" . PHP_EOL;
+            $functions .= "        return $" . "this;" . PHP_EOL;
+            $functions .= "    }" . PHP_EOL;
+        }
+        $functions .= PHP_EOL;
         $totalSteps = count($fields);
         $currStep = 1;
         $dates = [];
@@ -270,6 +294,7 @@ EOF;
                 case 'id':
                 case 'gid':
                 case 'uuid':
+                case 'ulid':
                     break;
                 case 'created_at':
                 case 'updated_at':
@@ -308,7 +333,11 @@ EOF;
         $data .= "    public function __construct(array $" . "data = null)" . PHP_EOL;
         $data .= "    {" . PHP_EOL;
         $data .= "        parent::__construct($" . "data);";
-        if (self::fieldExists($fields, 'gid') || self::fieldExists($fields, 'uuid')) {
+        if (
+            self::fieldExists($fields, 'gid')
+            || self::fieldExists($fields, 'uuid')
+            || self::fieldExists($fields, 'ulid')
+        ) {
             $data .= PHP_EOL;
             $data .= "        try {" . PHP_EOL;
             if (self::fieldExists($fields, 'gid')) {
@@ -316,6 +345,9 @@ EOF;
             }
             if (self::fieldExists($fields, 'uuid')) {
                 $data .= "            $" . "this->setUuid();" . PHP_EOL;
+            }
+            if (self::fieldExists($fields, 'ulid')) {
+                $data .= "            $" . "this->setUlid();" . PHP_EOL;
             }
             $data .= "        } catch (Exception $" . "e) {" . PHP_EOL;
             $data .= <<<EOF
@@ -387,6 +419,9 @@ EOF;
         if (self::fieldExists($fields, 'uuid')) {
             $data .= "        'uuid' => 'required|min_length[36]|max_length[36]'," . PHP_EOL;
         }
+        if (self::fieldExists($fields, 'ulid')) {
+            $data .= "        'ulid' => 'required|min_length[26]|max_length[26]'," . PHP_EOL;
+        }
         if ($table === 'system_config') {
             $data .= <<<EOF
         'conf_key' => 'required',
@@ -413,6 +448,17 @@ EOF;
             'max_length' => 'uuid 长度为36个字符',
         ],
 EOF;
+            $data .= PHP_EOL;
+        }
+        if (self::fieldExists($fields, 'ulid')) {
+            $data .= <<<EOF
+        'ulid' => [
+            'required' => 'ulid 列为必填项',
+            'min_length' => 'ulid 长度为26个字符',
+            'max_length' => 'ulid 长度为26个字符',
+        ],
+EOF;
+            $data .= PHP_EOL;
         }
         if ($table === 'system_config') {
             $data .= <<<EOF
@@ -422,6 +468,8 @@ EOF;
 EOF;
             $data .= PHP_EOL;
         }
+        // 移除多余的PHP_EOL
+        $data = rtrim($data, PHP_EOL);
         $data .= PHP_EOL;
         $data .= "    ];";
         $data .= PHP_EOL;

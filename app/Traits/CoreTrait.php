@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Exception;
 use PonyCool\Core\Jwt\Jwt;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\Uid\Ulid;
 
 trait CoreTrait
 {
@@ -178,6 +179,24 @@ trait CoreTrait
             );
             return false;
         }
+    }
+
+    /**
+     * 生成ULID
+     * @return string
+     */
+    public function generateUlid(): string
+    {
+        $ulid = '';
+        try {
+            $generator = new Ulid();
+            $ulid = $generator->toString();
+        } catch (Exception $e) {
+            log_message('error', 'ulid 生成器异常，error：{error}',
+                ['error' => $e->getMessage()]
+            );
+        }
+        return $ulid;
     }
 
     /**
