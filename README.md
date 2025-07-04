@@ -2,7 +2,7 @@
 
 基于Codeigniter4和React的快速企业建站系统
 
-[官网](https://ponycool.com/cms/index)
+[官网](https://cms.ponycool.com)
 
 [Demo](http://kumacms.com)
 
