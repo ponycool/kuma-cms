@@ -195,7 +195,7 @@ EOF;
         $data .= "{" . PHP_EOL;
         $functions = '';
         // 生成ID的GET和SET方法
-        if ($this->fieldExists($fields, 'id')) {
+        if (self::fieldExists($fields, 'id')) {
             $functions .= self::createGet('id', 'int');
             $functions .= self::createSet('id', 'int', $entity);
         }
