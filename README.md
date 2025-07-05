@@ -1,3 +1,21 @@
+<p align="center">
+  <a href="https://cms.ponycool.com">
+    <img src="https://cdn.static.ponycool.com/img/cms/favicon/favicon.0e7c7f8f.svg" width="130" />
+  </a>
+  <br />
+  <b>酷码 CMS</b>
+  <p align="center">基于Codeigniter4和React的快速企业建站系统</p>
+  <p align="center">借助成熟的 Codeigniter4 与 React 技术栈，结合后端框架的高效数据处理能力与前端框架的出色交互体验，极大缩短开发周期，让企业能迅速拥有功能完备的网站，打造专业且优质的企业网站。</p>
+  <p align="center">
+    <a href="README_EN.md"><img alt="english" src="https://img.shields.io/static/v1.svg?label=&message=English&style=flat-square&color=ff5000"></a>
+    <img src="https://img.shields.io/github/v/release/ponycool/kuma-cms" />
+    <a href="https://github.com/ponycool/kuma-cms/stargazers"><img src="https://img.shields.io/github/stars/ponycool/kuma-cms" alt="Stars"/></a>
+    <img alt="Codeigniter4" src="https://img.shields.io/static/v1.svg?label=&message=Codeigniter4&style=flat-square&color=C82B38">
+    <img alt="React" src="https://img.shields.io/static/v1.svg?label=&message=React&style=flat-square&color=C82B38">
+    <img src="https://img.shields.io/github/license/ponycool/kuma-cms" />
+  </p>
+</p>
+
 ## 酷码CMS
 
 基于Codeigniter4和React的快速企业建站系统
@@ -15,11 +33,11 @@
 
 #### WEB端
 
-<img src="https://cdn.static.ponycool.com/img/cms/screenshot/web.png" width="100%">
+<img src="https://cdn.static.ponycool.com/img/cms/screenshot/web_screenshot_compressed.jpg" width="100%">
 
 #### 管理后台
 
-<img src="https://cdn.static.ponycool.com/img/cms/screenshot/admin.png" width="100%">
+<img src="https://cdn.static.ponycool.com/img/cms/screenshot/admin_screenshot_compressed.png" width="100%">
 
 ## 安装
 
