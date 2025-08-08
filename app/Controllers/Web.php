@@ -291,7 +291,10 @@ class Web extends Base
                 'platform' => self::getPlatform(),
                 'referrer' => self::getReferrer(),
                 'agentString' => self::getAgent(),
-                'settings' => self::getSettings()
+                'settings' => self::getSettings(),
+                'css' => '/css/',
+                'js' => '/js/',
+                'img' => '/img/',
             ]
         );
     }

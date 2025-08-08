@@ -232,6 +232,7 @@ class Base extends BaseController
      */
     protected function syncStaticAssets(string $theme): void
     {
+        $gitKeep = sprintf('.%s', strtolower('GitKeep'));
         try {
             $themePath = $this->themePath . $theme;
             if (!file_exists($themePath)) {
@@ -253,11 +254,17 @@ class Base extends BaseController
                         throw new Exception(sprintf('目录%s没有删除权限', $item));
                     }
                     $files->add($dir);
+                } else {
+                    if (mkdir($dir, 0755, true)) {
+                        file_put_contents($dir . '/' . $gitKeep, '');
+                    } else {
+                        throw new Exception(sprintf('目录%s创建失败', $item));
+                    }
                 }
             }
             // 清空静态文件目录
             foreach ($files as $file) {
-                if ($file->getBasename() !== '.gitkeep') {
+                if ($file->getBasename() !== $gitKeep) {
                     if (!unlink($file->getPathname())) {
                         throw new Exception(sprintf('删除文件%s失败', $file->getBasename()));
                     }
@@ -267,7 +274,7 @@ class Base extends BaseController
             foreach ($staticDirList as $item) {
                 $source = $themePath . DIRECTORY_SEPARATOR . $item;
                 $dest = FCPATH . $item;
-                if (file_exists($dest) && is_dir($dest)) {
+                if (file_exists($source) && file_exists($dest) && is_dir($dest)) {
                     $this->copyDirectory($source, $dest);
                 }
             }
