@@ -448,6 +448,7 @@ class Base extends BaseController
             $validation = service('validation');
             $errors = [];
 
+            $data = self::buildRules($data);
             foreach ($data as $k => $v) {
                 $param = $params[$k] ?? '';
                 $rules = explode('|', $v['rules']);
@@ -676,6 +677,39 @@ class Base extends BaseController
             ->setPlatform($userAgent->getPlatform())
             ->setReferrer($userAgent->getReferrer())
             ->setAgent($userAgent->getAgentString());
+    }
+
+    /**
+     * 重新构建规则，兼容下划线和驼峰命名校验规则
+     * @param array $rules
+     * @return array
+     */
+    private function buildRules(array $rules): array
+    {
+        foreach ($rules as $k => $v) {
+            // 如果含有下划线
+            if (str_contains($k, "_")) {
+                $k = str_replace("_", " ", $k);
+                $k = ucwords($k);
+                $k = str_replace(" ", "", $k);
+                if (str_contains($v['rules'], 'required')) {
+                    $v['rules'] = str_replace('required', 'if_exist', $v['rules']);
+                    unset($v['errors']['required']);
+                }
+                $rules[$k] = $v;
+            }
+            // 如果含有大写字母
+            if (preg_match("/[A-Z]/", $k)) {
+                $k = preg_replace('/([A-Z])/', '_$1', $k);
+                $k = strtolower($k);
+                if (str_contains($v['rules'], 'required')) {
+                    $v['rules'] = str_replace('required', 'if_exist', $v['rules']);
+                    unset($v['errors']['required']);
+                }
+                $rules[$k] = $v;
+            }
+        }
+        return $rules;
     }
 
     /**

@@ -12,6 +12,8 @@ namespace App\Entities;
 use CodeIgniter\Entity\Entity;
 use Exception;
 use Ramsey\Uuid\Uuid;
+use ReflectionClass;
+use ReflectionProperty;
 use Symfony\Component\Uid\Ulid;
 
 class Base extends Entity
@@ -117,6 +119,21 @@ class Base extends Entity
                 case 'deleted':
                     unset($data[$key]);
                     break;
+            }
+        }
+        // 自动转换类型
+        $reflectionClass = new ReflectionClass($this);
+        // 获取类的所有属性，包括公共、受保护属性
+        $properties = $reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED);
+        foreach ($properties as $property) {
+            foreach ($data as $key => &$value) {
+                if ($property->getName() === $key) {
+                    // 判断数据类型是否一致，如果不一致转换为目标类型
+                    $declaredType = (string)$property->getType();
+                    if ($declaredType !== gettype($value)) {
+                        settype($value, $declaredType);
+                    }
+                }
             }
         }
         $this->fill($data);

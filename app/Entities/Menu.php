@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: Pony
- * Date: 2025/08/08
- * Time: 11:49 上午
+ * Date: 2025/08/11
+ * Time: 16:43 下午
  */
 declare(strict_types=1);
 
@@ -22,7 +22,7 @@ class Menu extends Base
     protected string $type;
     protected int $level;
     protected string $link_url;
-    protected string $link_type;
+    protected int $link_type;
     protected int $single_page_id;
     protected int $visible;
     protected int $enabled;
@@ -224,18 +224,18 @@ class Menu extends Base
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getLinkType(): string
+    public function getLinkType(): int
     {
         return $this->link_type;
     }
 
     /**
-     * @param string $link_type
+     * @param int $link_type
      * @return $this
      */
-    public function setLinkType(string $link_type): Menu
+    public function setLinkType(int $link_type): Menu
     {
         $this->link_type = $link_type;
         $this->attributes['link_type'] = $this->link_type;
