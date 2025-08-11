@@ -72,7 +72,7 @@ class ArticleCategoryService extends BaseService
     {
         $data = $this->convertParamsToSnakeCase($params);
         // 准备数据
-        $data = $this->prepareData($data);
+        $data = $this->prepare($data);
         if (is_string($data)) {
             return $data;
         }
@@ -95,7 +95,7 @@ class ArticleCategoryService extends BaseService
     {
         $data = $this->convertParamsToSnakeCase($params);
         // 准备数据
-        $data = $this->prepareData($data);
+        $data = $this->prepare($data);
         if (is_string($data)) {
             return $data;
         }
@@ -149,7 +149,7 @@ class ArticleCategoryService extends BaseService
      * @param array $data
      * @return string|array 处理后的数据或错误消息
      */
-    public function prepareData(array $data): string|array
+    public function prepare(array $data): string|array
     {
         // 校验图片
         $mediaSvc = new MediaService();

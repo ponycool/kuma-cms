@@ -39,10 +39,11 @@ trait CoreTrait
     {
         $data = [];
         foreach ($params as $key => $value) {
+            // 漏洞已经在校验规则修复
             // 修复漏洞，当传递参数为小写加下划线时，会绕过参数验证规则
-            if (str_contains($key, "_")) {
-                continue;
-            }
+            // if (str_contains($key, "_")) {
+            //    continue;
+            // }
 
             if (!is_null($value)) {
                 $data[$this->camelCaseToSnakeCase($key)] = $value;
@@ -200,6 +201,41 @@ trait CoreTrait
     }
 
     /**
+     * 预处理数据
+     * @param array $data
+     * @return array
+     */
+    public function prepareData(array $data): array
+    {
+        $data = self::convertParamsToSnakeCase($data);
+        if (!is_null($data['page'] ?? null)) {
+            $data['page'] = intval($data['page']);
+        }
+        if (!is_null($data['page_size'] ?? null)) {
+            $data['page_size'] = intval($data['page_size']);
+        }
+        if (!is_null($data['is_page'] ?? null)) {
+            $data['is_page'] = intval($data['is_page']);
+        }
+        if (!is_null($data['limit'] ?? null)) {
+            $data['limit'] = intval($data['limit']);
+        }
+        if (!is_null($data['count'] ?? null)) {
+            $data['count'] = intval($data['count']);
+        }
+        if (!is_null($data['sort_index'] ?? null)) {
+            $data['sort_index'] = intval($data['sort_index']);
+        }
+        if (!is_null($data['status'] ?? null)) {
+            $data['status'] = intval($data['status']);
+        }
+        if (!is_null($data['keyword'] ?? null)) {
+            $data['keyword'] = $this->filterKeyword($data['keyword']);
+        }
+        return $data;
+    }
+
+    /**
      * 根据MimeType获取文件类型
      * @param string $mimeType
      * @return string
@@ -289,5 +325,17 @@ trait CoreTrait
         }
         $payload = $jwt->getPayload($token);
         return (int)$payload['account_id'] ?? null;
+    }
+
+    /**
+     * 过滤关键词
+     * @param string $keyword
+     * @return string
+     */
+    protected function filterKeyword(string $keyword): string
+    {
+        $preg = '/[^a-zA-Z0-9\x{4e00}-\x{9fa5}\p{P}\s]/u';
+        $keyword = preg_replace($preg, '', $keyword);
+        return trim($keyword);
     }
 }
