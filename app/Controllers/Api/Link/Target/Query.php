@@ -7,13 +7,13 @@
  */
 declare(strict_types=1);
 
-namespace App\Controllers\Api\Link;
+namespace App\Controllers\Api\Link\Target;
 
 use App\Controllers\Api\Base;
 use App\Enums\Code;
 use App\Enums\LinkTarget;
 
-class Target extends Base
+class Query extends Base
 {
     /**
      * 获取链接打开方式列表
