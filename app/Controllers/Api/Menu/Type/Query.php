@@ -7,13 +7,13 @@
  */
 declare(strict_types=1);
 
-namespace App\Controllers\Api\Menu;
+namespace App\Controllers\Api\Menu\Type;
 
 use App\Controllers\Api\Base;
 use App\Enums\Code;
 use App\Enums\MenuType;
 
-class Type extends Base
+class Query extends Base
 {
     public function index(): void
     {
