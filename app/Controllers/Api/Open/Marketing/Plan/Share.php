@@ -36,7 +36,7 @@ class Share extends Base
             if (is_null($phone) && is_null($email)) {
                 throw new Exception('手机号、邮箱至少需要填写一项');
             }
-            if ($this->validateUUID($planUuid) !== true) {
+            if ($this->validateUuid($planUuid) !== true) {
                 throw new Exception('营销计划无效');
             }
             $planSvc = new MarketingPlanService();

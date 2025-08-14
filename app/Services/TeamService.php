@@ -175,7 +175,7 @@ class TeamService extends BaseService
      */
     public function getByUUID(string $uuid): ?array
     {
-        if ($this->validateUUID($uuid) !== true) {
+        if ($this->validateUuid($uuid) !== true) {
             return null;
         }
         $res = $this->getFirstByUuid($uuid);

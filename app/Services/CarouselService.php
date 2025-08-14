@@ -193,7 +193,7 @@ class CarouselService extends BaseService
      */
     public function getCarouselByUUID(string $uuid): ?array
     {
-        if ($this->validateUUID($uuid) !== true) {
+        if ($this->validateUuid($uuid) !== true) {
             return null;
         }
         $res = $this->getFirstByUuid($uuid);
