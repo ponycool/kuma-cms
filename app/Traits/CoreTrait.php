@@ -66,6 +66,16 @@ trait CoreTrait
     }
 
     /**
+     * 校验UUID是否合法
+     * @param string $uuid
+     * @return bool
+     */
+    protected function isValidUuid(string $uuid): bool
+    {
+        return Uuid::isValid($uuid);
+    }
+
+    /**
      * 用于验证字符串是否是指定格式的日期
      * @param string $date
      * @param string $format 默认格式：Y-m-d H:i:s

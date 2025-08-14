@@ -126,6 +126,27 @@ class MenuService extends BaseService
     }
 
     /**
+     * 更新菜单状态
+     * @throws Exception
+     */
+    public function updateStatus(string $uuid, string $statueField, bool $status): bool
+    {
+        $record = $this->getFirstByUuid($uuid);
+        if (!$record) {
+            throw new Exception('菜单不存在');
+        }
+        $id = (int)$record['id'];
+        $data = [
+            $statueField => intval($status)
+        ];
+        $res = $this->updateByCond($data, ['id' => $id]);
+        if ($res !== true) {
+            throw new Exception('更新菜单失败');
+        }
+        return true;
+    }
+
+    /**
      * 检查菜单
      * @param array $menu
      * @return bool
