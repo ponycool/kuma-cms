@@ -112,39 +112,32 @@ class PageService extends BaseService
 
     /**
      * 获取分页列表
-     * @param array $params
+     * @param array $data
      * @return array
      */
-    public function getList(array $params): array
+    public function getList(array $data): array
     {
-        $page = (int)($params['page'] ?? 1);
-        $pageSize = (int)($params['pageSize'] ?? 10);
-        $keyword = $params['keyword'] ?? null;
-        $sql = [
-            'SELECT p.id,p.uuid,p.title,p.code,p.seo_title,p.seo_description,p.seo_keywords,p.content,p.status,',
-            'p.created_at,p.updated_at ',
-            'FROM swap_page AS p ',
-            'WHERE p.deleted_at IS NULL ',
-            'AND p.deleted = ? '
-        ];
-        $sqlParams = [
-            DeletedStatus::UNDELETED->value
-        ];
+        $data = self::prepare($data);
+        $page = (int)($data['page'] ?? 1);
+        $pageSize = (int)($data['page_size'] ?? 10);
+        $isPage = $data['is_page'] ?? true;
+        $limit = $data['limit'] ?? null;
+        $keyword = $data['keyword'] ?? null;
+        $sortField = $data['sort_field'] ?? null;
+        $sortOrder = $data['sort_order'] ?? 'DESC';
+        $cond = [];
         if (!is_null($keyword)) {
-            $sql = array_merge($sql, [
-                'AND ( ',
-                'p.title LIKE ? ',
-                'OR p.code LIKE ? ',
-                ') ',
-            ]);
-            $sqlParams = array_merge($sqlParams, [
-                '%' . $keyword . '%',
-                '%' . $keyword . '%'
-            ]);
+            $keyword = '%' . $keyword . '%';
+            $where = sprintf("(title LIKE '%s' OR code LIKE '%s' )", $keyword, $keyword);
+            $cond[] = $where;
         }
-        $sql[] = 'ORDER BY p.created_at DESC';
-        $sql = $this->assembleSql($sql);
-        return $this->getPageByQuery($sql, $sqlParams, $page, $pageSize);
+        if (!is_null($limit)) {
+            $limit = min(intval($limit), 1000);
+        }
+        if ($isPage) {
+            return $this->getPage($page, $pageSize, $cond, $sortField, $sortOrder);
+        }
+        return $this->getByCond($cond, $sortField, $sortOrder, $limit);
     }
 
     /**
@@ -268,7 +261,7 @@ class PageService extends BaseService
      */
     private function prepare(array $data): string|array
     {
-        $data = $this->convertParamsToSnakeCase($data);
+        $data = parent::prepareData($data);
 
         // 处理发布状态和发布时间
         if (!is_null($data['status'] ?? null)) {

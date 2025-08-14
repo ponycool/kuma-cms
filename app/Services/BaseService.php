@@ -344,6 +344,10 @@ class BaseService
             if (is_null($v)) {
                 continue;
             }
+            if (is_int($k) && is_string($v)) {
+                $builder->where($v);
+                continue;
+            }
             if (is_object($v)) {
                 break;
             }
