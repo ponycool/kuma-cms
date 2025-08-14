@@ -236,7 +236,7 @@ class MarketingPlanService extends BaseService
      */
     public function getPlanByUuid(string $uuid): ?array
     {
-        if ($this->validateUUID($uuid) !== true) {
+        if ($this->validateUuid($uuid) !== true) {
             return null;
         }
         $res = $this->getFirstByUuid($uuid);

@@ -22,7 +22,7 @@ class Article extends Web
     {
         // 获取当前文章的UUID
         $uuid = $this->getParam('uuid');
-        if ($this->validateUUID($uuid) === true) {
+        if ($this->validateUuid($uuid) === true) {
             self::detail($uuid);
         } else {
             self::list();

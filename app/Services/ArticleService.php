@@ -268,7 +268,7 @@ class ArticleService extends BaseService
      */
     public function getArticleByUUID(string $uuid): ?array
     {
-        if ($this->validateUUID($uuid) !== true) {
+        if ($this->validateUuid($uuid) !== true) {
             return null;
         }
         $res = $this->getFirstByUuid($uuid);
@@ -285,7 +285,7 @@ class ArticleService extends BaseService
      */
     public function getPublishedArticleByUuid(string $uuid): ?array
     {
-        if ($this->validateUUID($uuid) !== true) {
+        if ($this->validateUuid($uuid) !== true) {
             return null;
         }
         $cond = [

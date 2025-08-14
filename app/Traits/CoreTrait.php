@@ -57,7 +57,7 @@ trait CoreTrait
      * @param string|null $uuid
      * @return bool|string
      */
-    protected function validateUUID(?string $uuid): bool|string
+    protected function validateUuid(?string $uuid): bool|string
     {
         if (is_null($uuid) || !Uuid::isValid($uuid)) {
             return '无效的UUID';

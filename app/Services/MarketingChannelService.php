@@ -166,7 +166,7 @@ class MarketingChannelService extends BaseService
      */
     public function getChannelByUuid(string $uuid): ?array
     {
-        if ($this->validateUUID($uuid) !== true) {
+        if ($this->validateUuid($uuid) !== true) {
             return null;
         }
         return $this->getFirstByUuid($uuid);

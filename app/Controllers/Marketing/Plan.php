@@ -23,7 +23,7 @@ class Plan extends Web
     public function index(): void
     {
         $uuid = $this->getParam('uuid');
-        if ($this->validateUUID($uuid) === true) {
+        if ($this->validateUuid($uuid) === true) {
             self::detail($uuid);
         } else {
             self::list();

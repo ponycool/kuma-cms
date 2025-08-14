@@ -26,7 +26,7 @@ class Delete extends Base
         try {
             $params = $this->getJsonInputParams();
             $uuid = $params['uuid'] ?? null;
-            if ($this->validateUUID($uuid) !== true) {
+            if ($this->validateUuid($uuid) !== true) {
                 throw new Exception('无效的营销渠道UUID');
             }
             $svc = new MarketingChannelService();

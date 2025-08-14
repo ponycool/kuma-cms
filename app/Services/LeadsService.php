@@ -271,7 +271,7 @@ class LeadsService extends BaseService
      */
     public function getByUUID(string $uuid): ?array
     {
-        if ($this->validateUUID($uuid) !== true) {
+        if ($this->validateUuid($uuid) !== true) {
             return null;
         }
         return $this->getFirstByUuid($uuid);

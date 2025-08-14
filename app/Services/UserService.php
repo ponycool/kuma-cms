@@ -195,7 +195,7 @@ class UserService extends BaseService
      */
     public function getUserProfile(?string $uuid): ?array
     {
-        if (!is_null($uuid) && !$this->validateUUID($uuid)) {
+        if (!is_null($uuid) && !$this->validateUuid($uuid)) {
             return null;
         }
         if (is_null($uuid)) {
