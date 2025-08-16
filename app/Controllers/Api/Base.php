@@ -11,6 +11,7 @@ namespace App\Controllers\Api;
 
 use App\Controllers\Base as BaseController;
 use App\Enums\Code;
+use App\Traits\ValidationRuleTrait;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Exception;
@@ -19,6 +20,8 @@ use Psr\Log\LoggerInterface;
 
 class Base extends BaseController
 {
+    use ValidationRuleTrait;
+
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger): void
     {
         parent::initController($request, $response, $logger);
