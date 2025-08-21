@@ -6,7 +6,7 @@ CREATE TABLE m_menu (
                                                  NOT NULL,
                         pid            INTEGER   NOT NULL,
                         name           TEXT      NOT NULL,
-                        code           TEXT      UNIQUE,
+                        code           TEXT,
                         icon           INTEGER,
                         type           TEXT      NOT NULL,
                         level          INTEGER   NOT NULL
