@@ -19,16 +19,14 @@ class Visible extends Base
     public function index(): void
     {
         $this->postFilter();
+        $svc = new MenuService();
+        $rules = $svc->getUpdateRules();
+        $this->verifyJsonInputByRules($rules);
         try {
-            $uuid = $this->getJsonInputParam('uuid');
-            if ($this->validateUuid($uuid) !== true) {
-                throw new Exception('无效的菜单UUID');
-            }
-            $svc = new MenuService();
-            $res = $svc->updateStatus($uuid, 'visible', true);
-            if ($res !== true) {
-                throw new Exception('更新菜单可见状态失败');
-            }
+            $params = $this->getJsonInputParams();
+            $params['field'] = 'visible';
+            $params['status'] = true;
+            $svc->updateStatus($params);
             $data = [
                 'code' => Code::OK,
                 'message' => '更新菜单可见状态成功',

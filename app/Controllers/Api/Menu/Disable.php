@@ -19,16 +19,14 @@ class Disable extends Base
     public function index(): void
     {
         $this->postFilter();
+        $svc = new MenuService();
+        $rules = $svc->getUpdateRules();
+        $this->verifyJsonInputByRules($rules);
         try {
-            $uuid = $this->getJsonInputParam('uuid');
-            if ($this->validateUuid($uuid) !== true) {
-                throw new Exception('无效的菜单UUID');
-            }
-            $svc = new MenuService();
-            $res = $svc->updateStatus($uuid, 'enabled', false);
-            if ($res !== true) {
-                throw new Exception('禁用菜单失败');
-            }
+            $params = $this->getJsonInputParams();
+            $params['field'] = 'enabled';
+            $params['status'] = false;
+            $svc->updateStatus($params);
             $data = [
                 'code' => Code::OK,
                 'message' => '禁用菜单成功',

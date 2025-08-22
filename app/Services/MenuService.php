@@ -11,6 +11,7 @@ namespace App\Services;
 
 use App\Entities\Menu;
 use App\Enums\LinkTarget;
+use App\Enums\LinkType;
 use App\Enums\MenuType;
 use App\Enums\ModuleLink;
 use App\Models\MenuModel;
@@ -18,28 +19,42 @@ use Exception;
 
 class MenuService extends BaseService
 {
-    public function getBaseRules(): array
+    public function getCreateRules(): array
     {
-        return [
-            'menu' => [
-                'rules' => 'if_exist|valid_json|max_length[10000]',
+        $rules = [
+            'name' => [
+                'rules' => 'required|max_length[20]',
                 'errors' => [
-                    'valid_json' => '参数站点菜单[menu]必须为JSON格式',
-                    'max_length' => '参数站点菜单[menu]最大字符长度为10000个字符',
+                    'required' => '参数菜单名称[name]为必填项',
+                    'max_length' => '参数菜单名称[name]最大字符长度为20个字符'
                 ]
-            ]
+            ],
+            'type' => [
+                'rules' => 'required|max_length[20]',
+                'errors' => [
+                    'required' => '参数菜单类型[type]为必填项',
+                    'max_length' => '参数菜单类型[type]最大字符长度为20个字符'
+                ]
+            ],
         ];
+        return array_merge(
+            self::getBaseRules(),
+            $rules
+        );
     }
 
+    /**
+     * 获取更新规则
+     * @return array
+     */
     public function getUpdateRules(): array
     {
         $rules = [
-            'menu' => [
-                'rules' => 'required|valid_json|max_length[10000]',
+            'uuid' => [
+                'rules' => 'required|uuid',
                 'errors' => [
-                    'required' => '参数站点菜单[menu]为必填项',
-                    'valid_json' => '参数站点菜单[menu]必须为JSON格式',
-                    'max_length' => '参数站点菜单[menu]最大字符长度为10000个字符',
+                    'required' => '参数菜单uuid[uuid]为必填项',
+                    'uuid' => '参数菜单uuid[uuid]必须为UUID格式'
                 ]
             ]
         ];
@@ -49,16 +64,167 @@ class MenuService extends BaseService
         );
     }
 
+    public function getDeleteRules(): array
+    {
+        $rules = [
+            'uuid' => [
+                'rules' => 'required|uuid',
+                'errors' => [
+                    'required' => '参数菜单uuid[uuid]为必填项',
+                    'uuid' => '参数菜单uuid[uuid]必须为UUID格式'
+                ]
+            ]
+        ];
+        return array_merge(
+            self::getBaseRules(),
+            $rules
+        );
+    }
+
+
+    /**
+     * 获取基本规则
+     * @return array
+     */
+    protected function getBaseRules(): array
+    {
+        $rules = [
+            'pid' => [
+                'rules' => 'if_exist|is_natural',
+                'errors' => [
+                    'is_natural' => '参数父级菜单[pid]必须为自然数'
+                ]
+            ],
+            'name' => [
+                'rules' => 'if_exist|max_length[20]',
+                'errors' => [
+                    'max_length' => '参数菜单名称[name]最大字符长度为20个字符'
+                ]
+            ],
+            'code' => [
+                'rules' => 'if_exist|max_length[20]',
+                'errors' => [
+                    'max_length' => '参数菜单编码[code]最大字符长度为20个字符'
+                ]
+            ],
+            'icon' => [
+                'rules' => 'if_exist|max_length[255]',
+                'errors' => [
+                    'max_length' => '参数菜单图标[icon]最大字符长度为255个字符'
+                ]
+            ],
+            'type' => [
+                'rules' => 'if_exist|max_length[20]',
+                'errors' => [
+                    'max_length' => '参数菜单类型[type]最大字符长度为20个字符'
+                ]
+            ],
+            'level' => [
+                'rules' => 'if_exist|is_natural_no_zero',
+                'errors' => [
+                    'is_natural_no_zero' => '参数菜单层级[level]必须为非零自然数'
+                ]
+            ],
+            'target' => [
+                'rules' => 'if_exist|max_length[20]',
+                'errors' => [
+                    'max_length' => '参数菜单打开方式[target]最大字符长度为20个字符'
+                ]
+            ],
+            'linkUrl' => [
+                'rules' => 'if_exist|max_length[255]',
+                'errors' => [
+                    'max_length' => '参数菜单链接[linkUrl]最大字符长度为255个字符'
+                ]
+            ],
+            'linkType' => [
+                'rules' => 'if_exist|is_natural',
+                'errors' => [
+                    'is_natural' => '参数菜单链接类型[linkType]必须为自然数'
+                ]
+            ],
+            'singlePageId' => [
+                'rules' => 'if_exist|is_natural_no_zero',
+                'errors' => [
+                    'is_natural_no_zero' => '参数单页面ID[singlePageId]必须为非零自然数'
+                ]
+            ],
+            'visible' => [
+                'rules' => 'if_exist|is_bool',
+                'errors' => [
+                    'is_bool' => '参数菜单可见状态[visible]必须为布尔值'
+                ]
+            ],
+            'enabled' => [
+                'rules' => 'if_exist|is_bool',
+                'errors' => [
+                    'is_bool' => '参数菜单启用状态[enabled]必须为布尔值'
+                ]
+            ],
+        ];
+        return array_merge(
+            parent::getBaseRules(),
+            $rules
+        );
+    }
+
     public function getMenu(): array
     {
         $db = $this->getDb();
         $model = new MenuModel($db);
-        return $model->asArray()
+        $res = $model->asArray()
             ->select($this->getSelectFields())
             ->orderBy('level', 'ASC')
             ->orderBy('sort_index', 'ASC')
             ->orderBy('created_at', 'ASC')
+            ->limit(100)
             ->findAll();
+        return self::mergeData($res);
+    }
+
+    public function getVisibleMenu(): array
+    {
+        $db = $this->getDb();
+        $model = new MenuModel($db);
+        $res = $model->asArray()
+            ->select($this->getSelectFields())
+            ->where('visible', true)
+            ->where('enabled', true)
+            ->orderBy('level', 'ASC')
+            ->orderBy('sort_index', 'ASC')
+            ->orderBy('created_at', 'ASC')
+            ->limit(100)
+            ->findAll();
+        return self::mergeData($res);
+    }
+
+    /**
+     * 创建菜单
+     * @param array $data
+     * @return bool
+     * @throws Exception
+     */
+    public function create(array $data): bool
+    {
+        $data = self::prepare($data);
+        $code = $data['code'] ?? null;
+        if (!is_null($code)) {
+            $cond = [
+                'code' => $code
+            ];
+            $record = $this->getFirstByCond($cond);
+            if ($record) {
+                throw new Exception('菜单编码已存在');
+            }
+        }
+        $menu = new Menu();
+        $menu->fillData($data)
+            ->filterInvalidProperties();
+        $res = $this->insert($menu);
+        if ($res !== true) {
+            throw new Exception('创建菜单失败');
+        }
+        return true;
     }
 
     /**
@@ -69,58 +235,29 @@ class MenuService extends BaseService
     public function update(array $data): bool
     {
         $data = self::prepare($data);
-        $menu = $data['menu'];
-        // 将数据填充到实体列表
-        $list = [];
-        $updateList = [];
-        foreach ($menu as $item) {
-            $data = [];
-            foreach ($item as $key => $value) {
-                if (!is_null($value)) {
-                    $data[$this->camelCaseToSnakeCase($key)] = $value;
-                }
-                if (is_bool($value)) {
-                    $data[$key] = (int)$value;
-                }
-            }
-            $entity = new Menu();
-            $entity->fillData($data)
-                ->filterInvalidProperties();
-            if ($entity->getId() === 0) {
-                $list[] = $entity;
-            } else {
-                $updateList[] = $entity;
+        $uuid = $data['uuid'];
+        $record = $this->getFirstByUuid($uuid);
+        if (!$record) {
+            throw new Exception('菜单不存在');
+        }
+        $id = (int)$record['id'];
+        $code = $data['code'] ?? null;
+        if (!is_null($code)) {
+            $cond = [
+                'uuid !=' => $uuid,
+                'code' => $code
+            ];
+            $record = $this->getFirstByCond($cond);
+            if ($record) {
+                throw new Exception('菜单编码已存在');
             }
         }
-
-        // 计算删除列表
-        $deleteList = $this->calculateDeleteList($updateList);
-
-        // 重新递归计算更新列表和删除列表
-        $res = $this->recalculateDeleteAndUpdateList([$updateList, $deleteList]);
-        $updateList = $res[0];
-        $deleteList = $res[1];
-
-        // 批量插入
-        if (count($list) > 0) {
-            $res = $this->insertBatch($list);
-            if ($res === false) {
-                throw new Exception('批量新增菜单失败');
-            }
-        }
-
-        // 批量更新
-        $res = $this->batchUpdateMenu($updateList);
+        $menu = new Menu();
+        $menu->fillData($data)
+            ->filterInvalidProperties();
+        $res = $this->updateById($menu, $id);
         if ($res !== true) {
-            throw new Exception('批量更新菜单失败');
-        }
-
-        // 批量删除
-        if (count($deleteList) > 0) {
-            $res = $this->batchDelByIds($deleteList);
-            if ($res === false) {
-                throw new Exception('批量删除菜单失败');
-            }
+            throw new Exception('更新站点菜单失败');
         }
         return true;
     }
@@ -129,15 +266,22 @@ class MenuService extends BaseService
      * 更新菜单状态
      * @throws Exception
      */
-    public function updateStatus(string $uuid, string $statueField, bool $status): bool
+    public function updateStatus(array $data): bool
     {
+        $data = self::prepare($data);
+        $uuid = $data['uuid'];
+        $field = $data['field'];
+        $status = $data['status'];
+        if (!in_array($field, ['visible', 'enabled'], true)) {
+            throw new Exception('更新字段错误');
+        }
         $record = $this->getFirstByUuid($uuid);
         if (!$record) {
             throw new Exception('菜单不存在');
         }
         $id = (int)$record['id'];
         $data = [
-            $statueField => intval($status)
+            $field => $status
         ];
         $res = $this->updateByCond($data, ['id' => $id]);
         if ($res !== true) {
@@ -147,224 +291,114 @@ class MenuService extends BaseService
     }
 
     /**
-     * 检查菜单
-     * @param array $menu
+     * 删除
+     * @param array $data
      * @return bool
      * @throws Exception
      */
-    public function checkMenu(array $menu): bool
+    public function del(array $data): bool
     {
-        $types = [];
-        foreach (MenuType::cases() as $case) {
-            $types[] = $case->value;
+        $data = self::prepare($data);
+        $uuid = $data['uuid'];
+        $record = $this->getFirstByUuid($uuid);
+        if (!$record) {
+            throw new Exception('菜单不存在');
         }
-        $linkTargets = [];
-        foreach (LinkTarget::cases() as $case) {
-            $linkTargets[] = $case->value;
-        }
-        $moduleLinks = [];
-        foreach (ModuleLink::cases() as $case) {
-            $moduleLinks[] = $case->value;
-        }
-        foreach ($menu as $item) {
-            if (!is_null($item['id'] ?? null) && !is_numeric($item['id'])) {
-                throw new Exception('菜单ID必须为数字类型');
-            }
-            if (is_null($item['pid'] ?? null)) {
-                throw new Exception('菜单父级ID为必填项');
-            }
-            if (!is_numeric($item['pid'])) {
-                throw new Exception('菜单父级ID必须为数字类型');
-            }
-            if (is_null($item['name'] ?? null)) {
-                throw new Exception('菜单名称为必填项');
-            }
-            if (mb_strlen($item['name']) > 20) {
-                throw new Exception('菜单名称最大限制为20个字符');
-            }
-            if (!is_null($item['code'] ?? null) && mb_strlen($item['code']) > 20) {
-                throw new Exception('菜单编码最大限制为20个字符');
-            }
-            if (!is_null($item['icon'] ?? null) && !is_numeric($item['icon'])) {
-                throw new Exception('菜单ICON为必填项');
-            }
-            if (!in_array($item['type'] ?? null, $types, true)) {
-                throw new Exception('菜单类型无效');
-            }
-            if (is_null($item['level'] ?? null)) {
-                throw new Exception('菜单层级为必填项');
-            }
-            if (!is_numeric($item['level'])) {
-                throw new Exception('菜单层级必须为数字类型');
-            }
-            if (!is_null($item['target'] ?? null) &&
-                !in_array($item['target'] ?? null, $linkTargets, true)) {
-                throw new Exception('菜单链接打开方式无效');
-            }
-            if ($item['type'] === MenuType::LINK->value
-                || $item['type'] === MenuType::MODULE->value) {
-                if (is_null($item['linkUrl'] ?? null)) {
-                    throw new Exception('菜单链接为必填项');
-                }
-                if (mb_strlen($item['linkUrl']) > 200) {
-                    throw new Exception('菜单链接最大限制为200个字符');
-                }
-                if ($item['type'] === MenuType::LINK->value &&
-                    !array_key_exists($item['linkType'] ?? null, [0, 1])) {
-                    throw new Exception('菜单链接类型无效');
-                }
-                if ($item['type'] === MenuType::MODULE->value &&
-                    !in_array($item['linkUrl'], $moduleLinks, true)) {
-                    throw new Exception('菜单链接无效');
-                }
-            }
-            if ($item['type'] === MenuType::SINGLE_PAGE->value) {
-                if (is_null($item['singlePageId'] ?? null)) {
-                    throw new Exception('菜单单页ID为必填项');
-                }
-                if (!is_numeric($item['singlePageId'])) {
-                    throw new Exception('菜单单页ID必须为数字类型');
-                }
-            }
-            if (!is_null($item['sortIndex'] ?? null) &&
-                !is_numeric($item['sortIndex'])) {
-                throw new Exception('菜单排序索引必须为数字类型');
-            }
-            if (!is_null($item['visible'] ?? null) &&
-                !is_bool($item['visible'])) {
-                throw new Exception('菜单可见状态必须为布尔类型');
-            }
-            if (!is_null($item['disabled'] ?? null) &&
-                !is_bool($item['disabled'])) {
-                throw new Exception('菜单启用状态必须为布尔类型');
-            }
+        $id = (int)$record['id'];
+        $cond = [
+            'id' => $id,
+            'pid' => $id
+        ];
+        $list = $this->getOrWhere($cond);
+        $ids = array_column($list, 'id');
+        $res = $this->batchDelByIds($ids);
+        if ($res !== true) {
+            throw new Exception('删除菜单失败');
         }
         return true;
     }
 
     /**
-     * 计算删除列表
-     * @param array $list
-     * @return array
-     */
-    private function calculateDeleteList(array $list): array
-    {
-        // 获取已存在的记录
-        $menuList = $this->get();
-
-        $ids = [];
-        foreach ($menuList as $item) {
-            $ids[] = (int)$item['id'];
-        }
-
-        $updateIds = [];
-        foreach ($list as $item) {
-            if (!in_array($item->getId(), $ids)) {
-                log_message('warning', '待更新数据ID{id}不存在，更新失败',
-                    [
-                        'id' => $item->getId()
-                    ]
-                );
-                continue;
-            }
-            $updateIds[] = $item->getId();
-        }
-
-        // 获取已删除列表
-        $deleteList = [];
-        foreach ($ids as $id) {
-            if (!in_array($id, $updateIds, true)) {
-                $deleteList[] = $id;
-            }
-        }
-        return $deleteList;
-    }
-
-    /**
-     * 重新递归计算更新列表和删除列表
-     * @param array $arr
-     * @return array
-     */
-    private function recalculateDeleteAndUpdateList(array $arr): array
-    {
-        $updateList = $arr[0];
-        $deleteList = $arr[1];
-        foreach ($updateList as $key => $value) {
-            if (in_array($value->getPid(), $deleteList, true)) {
-                $deleteList[] = (int)$value->getPid();
-                unset($updateList[$key]);
-                self::recalculateDeleteAndUpdateList([$updateList, $deleteList]);
-            }
-        }
-        return [$updateList, $deleteList];
-    }
-
-    /**
-     * 批量更新菜单
-     * @param array $menuList
-     * @return bool
-     * @throws Exception
-     */
-    private function batchUpdateMenu(array $menuList): bool
-    {
-        if (count($menuList) > 0) {
-            $linkList = [];
-            $moduleList = [];
-            $singlePageList = [];
-            foreach ($menuList as $item) {
-                if ($item->getId())
-                    switch ($item->getType()) {
-                        case MenuType::LINK->value:
-                            unset($item->single_page_id);
-                            $linkList[] = $item;
-                            break;
-                        case MenuType::MODULE->value:
-                            unset($item->single_page_id);
-                            $moduleList[] = $item;
-                            break;
-                        case MenuType::SINGLE_PAGE->value:
-                            $singlePageList[] = $item;
-                            break;
-                        default:
-                            break;
-                    }
-            }
-            if (count($linkList) > 0) {
-                $res = $this->updateBatch($linkList, 'id');
-                if ($res === false) {
-                    throw new Exception('更新链接类型菜单失败');
-                }
-            }
-            if (count($moduleList) > 0) {
-                $res = $this->updateBatch($moduleList, 'id');
-                if ($res === false) {
-                    throw new Exception('更新模块类型菜单失败');
-                }
-            }
-            if (count($singlePageList) > 0) {
-                $res = $this->updateBatch($singlePageList, 'id');
-                if ($res === false) {
-                    throw new Exception('更新单页类型菜单失败');
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
+     * 预处理数据
      * @throws Exception
      */
     private function prepare(array $data): array
     {
         $data = parent::prepareData($data);
-        $menu = $data['menu'] ?? null;
-        if (!is_null($menu)) {
-            $menu = json_decode($menu, true);
-            if (json_last_error() != JSON_ERROR_NONE) {
-                throw new Exception('菜单数据格式错误，必须为JSON格式');
+        $data['pid'] = intval($data['pid'] ?? 0);
+        $icon = $data['icon'] ?? null;
+        if (!is_null($icon)) {
+            $mediaSvc = new MediaService();
+            $media = $mediaSvc->getByMediaName($icon);
+            if (!$media) {
+                throw new Exception('图标不存在');
             }
-            $this->checkMenu($menu);
-            $data['menu'] = $menu;
+            $data['icon'] = (int)$media['id'];
+        }
+        $list = array_map(fn($case) => $case->value, MenuType::cases());
+        $type = $data['type'] ?? null;
+        if (!is_null($type) && !in_array($type, $list, true)) {
+            throw new Exception('菜单类型无效');
+        }
+        $data['level'] = intval($data['level'] ?? 1);
+        $list = array_map(fn($case) => $case->value, LinkTarget::cases());
+        $target = $data['target'] ?? null;
+        if (!is_null($target) && !in_array($target, $list, true)) {
+            throw new Exception('菜单打开方式无效');
+        }
+        if ($type === MenuType::LINK->value || $type === MenuType::MODULE->value) {
+            $linkUrl = $data['link_url'] ?? null;
+            $linkType = $data['link_type'] ?? null;
+            if (is_null($linkUrl)) {
+                throw new Exception('菜单链接地址不能为空');
+            }
+            if (mb_strlen($linkUrl) > 255) {
+                throw new Exception('菜单链接地址过长');
+            }
+            if ($type === MenuType::LINK->value) {
+                $list = array_map(fn($case) => $case->value, LinkType::cases());
+                if (!in_array($linkType, $list, true)) {
+                    throw new Exception('菜单链接类型无效');
+                }
+            }
+            if ($type === MenuType::MODULE->value) {
+                $list = array_map(fn($case) => $case->value, ModuleLink::cases());
+                if (!in_array($linkUrl, $list, true)) {
+                    throw new Exception('菜单模块链接无效');
+                }
+            }
+        }
+        if ($type === MenuType::SINGLE_PAGE->value) {
+            $singlePageId = $data['single_page_id'] ?? null;
+            if (is_null($singlePageId)) {
+                throw new Exception('菜单单页ID不能为空');
+            }
+            if (!is_numeric($singlePageId)) {
+                throw new Exception('菜单单页ID无效,必须为非零自然数');
+            }
+            $data['single_page_id'] = intval($singlePageId);
+        }
+        $data['sort_index'] = intval($data['sort_index'] ?? 1);
+        $data['visible'] = ($data['visible'] ?? true) === true;
+        $data['enabled'] = ($data['enabled'] ?? false) === true;
+        return $data;
+    }
+
+    private function mergeData(array $data): array
+    {
+        $ids = array_column($data, 'icon');
+        $ids = array_filter($ids);
+        if (!$ids) {
+            return $data;
+        }
+        $mediaSvc = new MediaService();
+        $list = $mediaSvc->getMedia($ids);
+        $list = array_column($list, null, 'id');
+        foreach ($data as &$item) {
+            $icon = $item['icon'] ?? null;
+            if ($icon && isset($list[$icon])) {
+                $item['icon'] = $list[$icon]['file_url'];
+            }
         }
         return $data;
     }

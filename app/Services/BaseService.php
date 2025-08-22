@@ -12,6 +12,7 @@ namespace App\Services;
 
 use App\Enums\DeletedStatus;
 use App\Traits\CoreTrait;
+use App\Traits\ValidationRuleTrait;
 use CodeIgniter\Database\BaseConnection;
 use CodeIgniter\Database\ConnectionInterface;
 use CodeIgniter\Database\Query;
@@ -32,7 +33,7 @@ class BaseService
     //返回结果数据类型，object、array
     protected string $resultType = 'object';
 
-    use CoreTrait;
+    use CoreTrait, ValidationRuleTrait;
 
     public function __construct()
     {
