@@ -1,1 +1,0 @@
-import{j as o,ab as r,a as e,ac as s,B as a,q as n}from"./index.1f4442a4.js";function c({children:t}){return Array.isArray(t)?t.length<3?o(r,{children:t}):e(r,{children:[t.slice(0,2),o(s,{position:"bottom",content:o(r,{direction:"vertical",children:t.slice(2)}),children:o(a,{type:"text",icon:o(n,{})})})]}):o(r,{children:t})}export{c as C};
