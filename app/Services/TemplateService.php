@@ -180,7 +180,8 @@ class TemplateService extends AbstractExtension
      */
     public function getMenu(): array
     {
-        return [];
+        $svc = new MenuService();
+        return $svc->getVisibleMenu();
     }
 
     /**
