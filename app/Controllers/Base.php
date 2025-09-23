@@ -69,7 +69,7 @@ class Base extends BaseController
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger): void
     {
         parent::initController($request, $response, $logger);
-        $this->version = 'v1.0.01';
+        $this->version = 'v1.1.0';
         // 主题路径
         $this->themePath = APPPATH . 'Views/theme/';
 
