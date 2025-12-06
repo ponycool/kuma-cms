@@ -154,15 +154,17 @@ class ProductService extends BaseService
      */
     public function getList(array $params): array
     {
-        $page = (int)($params['page'] ?? 1);
-        $pageSize = (int)($params['pageSize'] ?? 10);
-        $cid = $params['cid'] ?? null;
-        $name = $params['name'] ?? null;
-        $categoryCode = $params['categoryCode'] ?? null;
-        $keyword = $params['keyword'] ?? null;
-        $isPage = $params['isPage'] ?? true;
-        $limit = $params['limit'] ?? null;
-        $sort = $params['sort'] ?? null;
+        $data=$this->prepare($params);
+        $page = (int)($data['page'] ?? 1);
+        $pageSize = (int)($data['page_size'] ?? 10);
+        $cid = $data['cid'] ?? null;
+        $name = $data['name'] ?? null;
+        $categoryCode = $data['category_code'] ?? null;
+        $keyword = $data['keyword'] ?? null;
+        $isPage = $data['isPage'] ?? true;
+        $limit = $data['limit'] ?? null;
+        $sort = $data['sort'] ?? null;
+        $status = $data['status'] ?? null;
         $sql = [
             'SELECT p.id,p.uuid,p.cid,p.name,p.cover_image,p.detail_images,p.seo_title,p.seo_desc,p.seo_keywords,',
             'p.description,p.price,p.stock_quantity,p.sort_index,p.status,p.view_count,p.created_at,p.updated_at,',
@@ -171,7 +173,6 @@ class ProductService extends BaseService
             'LEFT JOIN swap_product_category AS c ON p.cid=c.id ',
             'WHERE p.deleted_at IS NULL ',
             'AND p.deleted = ? ',
-            'AND p.status=1 '
         ];
         $sqlParams = [
             DeletedStatus::UNDELETED->value
@@ -187,6 +188,10 @@ class ProductService extends BaseService
         if (!is_null($categoryCode)) {
             $sql[] = 'AND c.code = ? ';
             $sqlParams[] = $categoryCode;
+        }
+        if (!is_null($status)) {
+            $sql[] = 'AND p.status = ? ';
+            $sqlParams[] = $status;
         }
         if (!is_null($keyword)) {
             $sql[] = 'AND p.name LIKE ? ';
@@ -495,7 +500,7 @@ class ProductService extends BaseService
      */
     private function prepare(array $data): string|array
     {
-        $data = $this->convertParamsToSnakeCase($data);
+        $data = parent::prepareData($data);
 
         if (!is_null($data['price'] ?? null)) {
             $data['price'] = (string)$data['price'];
