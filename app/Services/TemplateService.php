@@ -250,6 +250,7 @@ class TemplateService extends AbstractExtension
             'isPage' => $isPage,
             'limit' => $limit,
             'keyword' => $this->getKeyword(),
+            'status' => 1,
             'sort' => $this->sort
         ];
         $svc = new ProductService();
