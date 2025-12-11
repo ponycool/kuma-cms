@@ -346,6 +346,23 @@ class BaseService
                 continue;
             }
             if (is_int($k) && is_string($v)) {
+                $opts = [
+                    'groupStart',
+                    'orGroupStart',
+                    'notGroupStart',
+                    'orNotGroupStart',
+                    'groupEnd',
+                ];
+                if (in_array($v, $opts, true)) {
+                    match ($v) {
+                        'groupStart' => $builder->groupStart(),
+                        'orGroupStart' => $builder->orGroupStart(),
+                        'notGroupStart' => $builder->notGroupStart(),
+                        'orNotGroupStart' => $builder->orNotGroupStart(),
+                        'groupEnd' => $builder->groupEnd(),
+                    };
+                    continue;
+                }
                 $builder->where($v);
                 continue;
             }
