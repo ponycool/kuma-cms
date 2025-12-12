@@ -194,6 +194,7 @@ class ArticleService extends BaseService
         }
         if (!is_null($publishStatus)){
             $sql[] = 'AND a.is_published = ? ';
+            $sqlParams[] = $publishStatus;
         }
         if (is_null($sortField)) {
             $sql[] = 'ORDER BY a.sort_index DESC,a.id DESC';
