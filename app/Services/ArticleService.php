@@ -162,6 +162,7 @@ class ArticleService extends BaseService
         $pageSize = (int)($params['pageSize'] ?? 10);
         $cid = $params['cid'] ?? null;
         $categoryCode = $params['categoryCode'] ?? null;
+        $publishStatus = $params['publishStatus'] ?? null;
         $keyword = $params['keyword'] ?? null;
         $sortField = $params['sortField'] ?? null;
         $sortType = $params['sortType'] ?? 'ASC';
@@ -175,11 +176,9 @@ class ArticleService extends BaseService
             'LEFT JOIN swap_article_category AS c ON a.cid=c.id ',
             'WHERE a.deleted_at IS NULL ',
             'AND a.deleted = ? ',
-            'AND a.is_published = ? '
         ];
         $sqlParams = [
             DeletedStatus::UNDELETED->value,
-            PublishStatus::PUBLISHED->value
         ];
         if (!is_null($cid)) {
             $sql[] = 'AND a.cid = ? ';
@@ -192,6 +191,9 @@ class ArticleService extends BaseService
         if (!is_null($categoryCode)) {
             $sql[] = 'AND c.code = ? ';
             $sqlParams[] = $categoryCode;
+        }
+        if (!is_null($publishStatus)){
+            $sql[] = 'AND a.is_published = ? ';
         }
         if (is_null($sortField)) {
             $sql[] = 'ORDER BY a.sort_index DESC,a.id DESC';

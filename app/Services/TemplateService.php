@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\Language;
+use App\Enums\PublishStatus;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -199,6 +200,7 @@ class TemplateService extends AbstractExtension
             'pageSize' => $this->getPageSize(),
             'cid' => $this->getCid(),
             'categoryCode' => $categoryCode,
+            'publishStatus' => PublishStatus::PUBLISHED->value,
             'isPage' => $isPage,
             'limit' => $limit,
         ];
