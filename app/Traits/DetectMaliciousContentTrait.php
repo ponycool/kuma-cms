@@ -240,6 +240,16 @@ trait DetectMaliciousContentTrait
             ],
             'message' => '特殊字符注入'
         ],
+        // 特殊符号攻击
+        'special_symbol_attack' => [
+            'patterns' => [
+                // 检测连续的两个@符号
+                '/@@/iS',
+                // 检测连续的两个特殊符号组合
+                '/[\x27\x22\)\(\);|\\\[\]\*\{%\}]{2,}/iS'
+            ],
+            'message' => '特殊符号攻击'
+        ],
         // 服务器端模板注入攻击（SSTI）
         'ssti_injection' => [
             'patterns' => [
