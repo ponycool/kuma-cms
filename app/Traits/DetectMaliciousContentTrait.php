@@ -25,13 +25,13 @@ trait DetectMaliciousContentTrait
                 '/\.\./\.\./etc/passwd/iS',
                 '/\.\./\.\./windows/win\.ini/iS',
                 '/\.\.\\\.\./windows/win\.ini/iS',
-                '/(\.\.\\){2,}windows\\win\.ini/iS',
+                '/(\.\.\\){2,}windows\win\.ini/iS',
                 '/%2e%2e%2f%2e%2e%2fetc/passwd/iS',
                 '/file:\/\/\/etc\/shadow/iS',
-                '/WEB-INF[\/]web\.xml/iS',
+                '/WEB-INF[\/]/web\.xml/iS',
                 '/web\.xml/iS',
                 '/(\.\.\/|\.\.\\|\.\.\.){2,}/iS',
-                '/windows[\/]win\.ini/iS',
+                '/windows[\/]/win\.ini/iS',
                 '/windows%5cwin\.ini/iS',
                 '/etc\/passwd/iS',
                 '/etc\/shells/iS',
@@ -108,6 +108,23 @@ trait DetectMaliciousContentTrait
             ],
             'message' => 'PHP代码注入'
         ],
+        // 4. 代码注入（通用代码注入，包括Ruby、Python、Node.js等）
+        'code_injection' => [
+            'patterns' => [
+                '/\.concat\(/iS',
+                '/require\'socket\'/iS',
+                '/Socket\.gethostbyname/iS',
+                '/to_s/iS',
+                '/hitov/iS',
+                '/\+\([^)]+\)/iS',
+                // 检测response.write()及其变体
+                '/response\.write\(/iS',
+                '/res\.write\(/iS',
+                '/http\.createServer/iS',
+                '/fs\.readFile/iS'
+            ],
+            'message' => '通用代码注入'
+        ],
         // 4. 代码注入（通用代码注入，包括Ruby、Python等）
         'code_injection' => [
             'patterns' => [
@@ -124,20 +141,16 @@ trait DetectMaliciousContentTrait
         // 5. XSS跨站脚本（正则定界符闭合，无语法错误）
         'xss_attack' => [
             'patterns' => [
-                '/\\<script\\>alert\(1\)\\<\\/script\\>/iS',
-                '/onclick=javascript:alert\(1\)/iS',
-                '/onmouseover=alert\(1\)/iS',
-                '/onerror=alert\(1\)/iS',
-                '/onload=alert\(1\)/iS',
-                '/\\<iframe src=javascript:alert\(1\)\\>/iS',
-                '/\\<img src=x onerror=alert\(1\)\\>/iS',
-                '/\\<a href=javascript:alert\(1\)\\>/iS',
-                '/document\.write\(.*?\\<script\\>.*?\\)/iS',
-                '/document\.location=.*?alert\(1\)/iS',
-                '/eval\(.*?alert\(1\)\)/iS',
-                '/\\<ScRiPt.*?\\>/iS',
-                '/\\<\/ScRiPt\\>/iS',
-                '/[\'"\(\)\&\%]+\\<.*?script/iS',
+                '/\<script\>.*?<\/script\>/iS',
+                '/on[a-zA-Z]+=javascript:/iS',
+                '/on[a-zA-Z]+=alert\(/iS',
+                '/\<iframe[^>]*javascript:/iS',
+                '/document\.write\(.*?\<script/iS',
+                '/document\.location=.*?alert\(/iS',
+                '/eval\(.*?alert\(/iS',
+                '/\<script/iS',
+                '/\<\/script\>/iS',
+                '/[\'"\(\)\&\%]+\<.*?script/iS',
                 '/data:text\/html;base64,/iS',
                 '/vbscript:/iS',
                 '/livescript:/iS'
@@ -148,42 +161,41 @@ trait DetectMaliciousContentTrait
         // 6. SQL注入（正则无语法问题，仅匹配高风险特征）
         'sql_injection' => [
             'patterns' => [
-                '/UNION\\s+SELECT\\s+1,2,3/iS',
-                '/UNION\\s+ALL\\s+SELECT/iS',
-                '/SELECT\\s+\*/iS',
-                '/(OR|AND)\\s+\\d+\\s*=\\s*\\(SELECT\\s+\\d+\\s+FROM/iS',
-                '/(OR|AND)\\s+\\d+[\\+\\-\\*\\/\\s\\d]{1,20}[=<>!]=?\\s*[\\d\\(\\)\\+\\-\\*\\/\\s]{1,20}/iS',
-                '/(OR|AND)\\s+1=1\\s+--/iS',
-                '/(OR|AND)\\s+1=1\\s+#/iS',
-                '/(OR|AND)\\s+\\d+\\s*=\\s*\\d+\\s+--/iS',
-                '/sleep\\(\\d+\\)/iS',
-                '/select\\(\\d+\\)from\\(select\\(sleep\\(/iS',
-                '/PG_SLEEP\\(\\d+\\)/iS',
-                '/waitfor\\s+delay\\s+[\\x27\\x22\\s]\\d+:\\d+:\\d+[\\x27\\x22\\s]/iS',
-                '/updatexml\\(1,concat\\(0x7e,version\\(\\)\\),1\\)/iS',
-                '/extractvalue\\(1,concat\\(0x7e,version\\(\\)\\)\\)/iS',
-                '/DBMS_PIPE\\.RECEIVE_MESSAGE/iS',
-                '/CHR\\(/iS',
-                '/ASCII\\(/iS',
-                '/SUBSTRING\\(/iS',
-                '/MID\\(/iS',
-                '/ORD\\(/iS',
-                '/[\\x27\\x22\\)\\(\\);|\\\\]+\\d+$/iS',
-                '/\\x27\\x22\\\\\\x27\\x22\\\\/iS',
+                '/UNION\s+SELECT/iS',
+                '/UNION\s+ALL\s+SELECT/iS',
+                '/SELECT\s+\*/iS',
+                '/(OR|AND)\s+\d+\s*=\s*\(SELECT\s+\d+\s+FROM/iS',
+                '/(OR|AND)\s+\d+[\+\-\*\/\s\d]{1,20}[=<>!]=?\s*[\d\(\)\+\-\*\/\s]{1,20}/iS',
+                '/(OR|AND)\s+1=1\s+--/iS',
+                '/(OR|AND)\s+1=1\s+#/iS',
+                '/sleep\(\d+\)/iS',
+                '/select\(\d+\)from\(select\(sleep\(/iS',
+                '/PG_SLEEP\(\d+\)/iS',
+                '/waitfor\s+delay\s+[\x27\x22\s]\d+:\d+:\d+[\x27\x22\s]/iS',
+                '/updatexml\(1,concat\(0x7e,version\(\)\),1\)/iS',
+                '/extractvalue\(1,concat\(0x7e,version\(\)\)\)/iS',
+                '/DBMS_PIPE\.RECEIVE_MESSAGE/iS',
+                '/CHR\(/iS',
+                '/ASCII\(/iS',
+                '/SUBSTRING\(/iS',
+                '/MID\(/iS',
+                '/ORD\(/iS',
+                '/[\x27\x22\)\(\);|\\]+\d+$/iS',
+                '/\x27\x22\\\x27\x22\\/iS',
                 '/%27.*?%27/iS',
                 '/%22.*?%22/iS',
-                '/;DROP\\s+TABLE/iS',
-                '/;DELETE\\s+FROM/iS',
-                '/;TRUNCATE\\s+TABLE/iS'
+                '/;DROP\s+TABLE/iS',
+                '/;DELETE\s+FROM/iS',
+                '/;TRUNCATE\s+TABLE/iS'
             ],
             'message' => 'SQL注入'
         ],
         // 7. SSRF攻击（仅匹配高风险组合，语法合规）
         'ssrf_attack' => [
             'patterns' => [
-                '/curl\\s+http:\/\/169\\.254\\.169\\.254/iS',
-                '/http:\/\/127\\.0\\.0\\.1:8080\\/admin/iS',
-                '/gopher:\/\/127\\.0\\.0\\.1:6379/iS',
+                '/curl\s+http:\/\/169\.254\.169\.254/iS',
+                '/http:\/\/127\.0\.0\.1:8080\/admin/iS',
+                '/gopher:\/\/127\.0\.0\.1:6379/iS',
                 '/<esi:include/iS',
                 '/<esi:include.*?src=/iS',
             ],
@@ -193,15 +205,15 @@ trait DetectMaliciousContentTrait
         // 8. 文件上传攻击（正则无冲突，匹配恶意文件特征）
         'file_upload' => [
             'patterns' => [
-                '/\\.php\\.jpg$/iS',
-                '/\\.php\\.png$/iS',
-                '/\\.php\\.gif$/iS',
-                '/\\.php3$/iS',
-                '/\\.php4$/iS',
-                '/\\.php5$/iS',
-                '/\\.phtml$/iS',
-                '/content-type:\\s+application/x-php/iS',
-                '/<\\?php\\s+eval\\(\\$_POST\\[.*?\\]\\)\\?>/iS'
+                '/\.php\.jpg$/iS',
+                '/\.php\.png$/iS',
+                '/\.php\.gif$/iS',
+                '/\.php3$/iS',
+                '/\.php4$/iS',
+                '/\.php5$/iS',
+                '/\.phtml$/iS',
+                '/content-type:\s+application/x-php/iS',
+                '/<\?php\s+eval\(\$_POST\[.*?\]\)\?>/iS'
             ],
             'message' => '恶意文件上传'
         ],
@@ -209,16 +221,16 @@ trait DetectMaliciousContentTrait
         // 9. 反序列化攻击（正则定界符/花括号正确转义）
         'unserialize_attack' => [
             'patterns' => [
-                '/O:\\d+:"[a-zA-Z0-9_]+":\\d+:\{/iS',
-                '/unserialize\\(\\$_GET\\[.*?\\]\\)/iS',
-                '/unserialize\\(\\$_POST\\[.*?\\]\\)/iS'
+                '/O:\d+:"[a-zA-Z0-9_]+":\d+:\{/iS',
+                '/unserialize\(\$_GET\[.*?\]\)/iS',
+                '/unserialize\(\$_POST\[.*?\]\)/iS'
             ],
             'message' => 'PHP反序列化攻击'
         ],
         // 10. 特殊字符注入（正则无语法错误，仅匹配高风险组合）
         'special_char_injection' => [
             'patterns' => [
-                '/[\\^#!@$()*+\\-./:;\\<=>?@[\\\\]^_`\\{|}~]{5,}/iS',
+                '/[\^#!@$()*+\-./:;\<=>?@[\\]^_`\{|}~]{5,}/iS',
                 '/\(\(\)\)\)\)/iS',
                 '/\*\*\*\*\*\*/iS',
                 '/\^\(#.*?\)\(\(\)\)\)\*\*\*\*/iS',
@@ -226,8 +238,17 @@ trait DetectMaliciousContentTrait
                 '/%0d%0a/iS',
                 '/%bf/iS',
                 '/<%00>/iS',
-                '/[\\x27\\x22\\)\\(\\);|\\\\\\[\\]\\*\\{%\\}]+{5,}/iS',
-                '/\|\]/iS'
+                '/[\x27\x22\)\(\);|\\\[\]\*\{%\}]+{5,}/iS',
+                '/\|\]/iS',
+                // 检测连续的两个@符号
+                '/@@/iS',
+                // 检测连续的两个特殊符号组合
+                '/[\x27\x22\)\(\);|\\\[\]\*\{%\}]{2}/iS',
+                // 检测特定的危险符号组合
+                '/\);/iS',
+                '/\];/iS',
+                '/\}\);/iS',
+                '/\}\\);/iS'
             ],
             'message' => '特殊字符注入'
         ]
@@ -236,10 +257,10 @@ trait DetectMaliciousContentTrait
     // 白名单关键词（支持正则）
     private array $whiteList = [
         '/^_ga(_[A-Z0-9]+)?$/iS',
-        '/GA1\\.\\d+\\.\\d+\\.\\d+/iS',
-        '/172\\.18\\.0\\.\\d+/iS',
-        '/192\\.168\\.\\d+\\.\\d+/iS',
-        '/127\\.0\\.0\\.1/iS',
+        '/GA1\.\d+\.\d+\.\d+/iS',
+        '/172\.18\.0\.\d+/iS',
+        '/192\.168\.\d+\.\d+/iS',
+        '/127\.0\.0\.1/iS',
         // '/合法业务关键词1/i',
         // '/合法业务关键词2/i'
     ];
