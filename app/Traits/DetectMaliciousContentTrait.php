@@ -151,7 +151,8 @@ trait DetectMaliciousContentTrait
             'patterns' => [
                 '/UNION\s+SELECT/iS',
                 '/UNION\s+ALL\s+SELECT/iS',
-                '/SELECT\s+\*/iS',
+                // 仅匹配可能的SQL注入场景中的SELECT *
+                '/(\'|\")\s*SELECT\s+\*/iS',
                 '/(OR|AND)\s+\d+\s*=\s*\(SELECT\s+\d+\s+FROM/iS',
                 '/(OR|AND)\s+\d+[\+\-\*\/\s\d]{1,20}[=<>!]=?\s*[\d\(\)\+\-\*\/\s]{1,20}/iS',
                 '/(OR|AND)\s+1=1\s+--/iS',
@@ -249,8 +250,8 @@ trait DetectMaliciousContentTrait
             'patterns' => [
                 // 检测连续的两个@符号
                 '/@@/iS',
-                // 检测连续的两个特殊符号组合
-                '/[\x27\x22\)\(\);|\\\[\]\*\{%\}]{2,}/iS'
+                // 检测连续的特殊符号组合（排除JSON/HTML合法语法）
+                '/(?:[^\{]|^)[\x27\x22\)\(\);|\\\[\]\*\{%\}]{3,}(?:[^\"]|$)/iS'
             ],
             'message' => '特殊符号攻击'
         ],
@@ -398,8 +399,9 @@ trait DetectMaliciousContentTrait
                 continue;
             }
 
-            // 对于合法JSON或HTML，跳过某些严格的特殊字符检测
-            if (($isValidJson || $isValidHtml) && $attackType === 'special_char_injection') {
+            // 对于合法JSON或HTML，跳过某些严格的特殊字符检测和可能误判的SQL注入规则
+            if (($isValidJson || $isValidHtml) && 
+                in_array($attackType, ['special_char_injection', 'special_symbol_attack'])) {
                 continue;
             }
 
