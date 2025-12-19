@@ -125,18 +125,6 @@ trait DetectMaliciousContentTrait
             ],
             'message' => '通用代码注入'
         ],
-        // 4. 代码注入（通用代码注入，包括Ruby、Python等）
-        'code_injection' => [
-            'patterns' => [
-                '/\.concat\(/iS',
-                '/require\'socket\'/iS',
-                '/Socket\.gethostbyname/iS',
-                '/to_s/iS',
-                '/hitov/iS',
-                '/\+\([^)]+\)/iS'
-            ],
-            'message' => '通用代码注入'
-        ],
 
         // 5. XSS跨站脚本（正则定界符闭合，无语法错误）
         'xss_attack' => [
