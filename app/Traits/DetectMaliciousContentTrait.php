@@ -19,7 +19,7 @@ trait DetectMaliciousContentTrait
 {
     // 攻击类型与对应特征库（结构化管理，便于维护），可将ATTACK_RULES从常量改为配置文件/数据库存储，支持动态更新规则
     private array $attackRules = [
-        // 1. 路径遍历（仅匹配高风险组合，正则定界符/引号无冲突）
+        // 路径遍历（仅匹配高风险组合，正则定界符/引号无冲突）
         'path_traversal' => [
             'patterns' => [
                 '/\.\./\.\./etc/passwd/iS',
@@ -28,10 +28,10 @@ trait DetectMaliciousContentTrait
                 '/(\.\.\\){2,}windows\win\.ini/iS',
                 '/%2e%2e%2f%2e%2e%2fetc/passwd/iS',
                 '/file:\/\/\/etc\/shadow/iS',
-                '/WEB-INF[\/]/web\.xml/iS',
+                '/WEB-INF[\\\/]/web\.xml/iS',
                 '/web\.xml/iS',
                 '/(\.\.\/|\.\.\\|\.\.\.){2,}/iS',
-                '/windows[\/]/win\.ini/iS',
+                '/windows[\\\/]/win\.ini/iS',
                 '/windows%5cwin\.ini/iS',
                 '/etc\/passwd/iS',
                 '/etc\/shells/iS',
@@ -42,7 +42,7 @@ trait DetectMaliciousContentTrait
                 '/\.\.\\.*?\.\.\\.*?windows/iS',
                 '/(\.\.){5,}/iS',
                 '/\.\.\\win\.ini/iS',
-                '/windows\\win\.ini/iS',
+                '/windows\win\.ini/iS',
                 '/\.\.\\/iS',
                 '/%c0%ae/iS',
                 '/%c0%af/iS',
@@ -69,7 +69,7 @@ trait DetectMaliciousContentTrait
             'message' => '路径遍历/系统文件读取'
         ],
 
-        // 2. 命令执行（正则无语法错误，仅匹配高风险组合）
+        // 命令执行（正则无语法错误，仅匹配高风险组合）
         'command_injection' => [
             'patterns' => [
                 '/;\s*curl\s+bxss\.me/iS',
@@ -98,7 +98,7 @@ trait DetectMaliciousContentTrait
             'message' => '系统命令注入'
         ],
 
-        // 3. PHP代码注入（引号/括号正确转义，无语法冲突）
+        // PHP代码注入（引号/括号正确转义，无语法冲突）
         'php_injection' => [
             'patterns' => [
                 '/eval\(\$_GET\[.*?\]\)/iS',
@@ -108,7 +108,7 @@ trait DetectMaliciousContentTrait
             ],
             'message' => 'PHP代码注入'
         ],
-        // 4. 代码注入（通用代码注入，包括Ruby、Python、Node.js等）
+        // 代码注入（通用代码注入，包括Ruby、Python、Node.js等）
         'code_injection' => [
             'patterns' => [
                 '/\.concat\(/iS',
@@ -126,7 +126,7 @@ trait DetectMaliciousContentTrait
             'message' => '通用代码注入'
         ],
 
-        // 5. XSS跨站脚本（正则定界符闭合，无语法错误）
+        // XSS跨站脚本（正则定界符闭合，无语法错误）
         'xss_attack' => [
             'patterns' => [
                 '/\<script\>.*?<\/script\>/iS',
@@ -136,7 +136,7 @@ trait DetectMaliciousContentTrait
                 '/document\.write\(.*?\<script/iS',
                 '/document\.location=.*?alert\(/iS',
                 '/eval\(.*?alert\(/iS',
-                '/\<script/iS',
+                '/\<script\s+[^>]*>/iS',
                 '/\<\/script\>/iS',
                 '/[\'"\(\)\&\%]+\<.*?script/iS',
                 '/data:text\/html;base64,/iS',
@@ -146,7 +146,7 @@ trait DetectMaliciousContentTrait
             'message' => 'XSS跨站脚本'
         ],
 
-        // 6. SQL注入（正则无语法问题，仅匹配高风险特征）
+        // SQL注入（正则无语法问题，仅匹配高风险特征）
         'sql_injection' => [
             'patterns' => [
                 '/UNION\s+SELECT/iS',
@@ -178,7 +178,7 @@ trait DetectMaliciousContentTrait
             ],
             'message' => 'SQL注入'
         ],
-        // 7. SSRF攻击（仅匹配高风险组合，语法合规）
+        // SSRF攻击（仅匹配高风险组合，语法合规）
         'ssrf_attack' => [
             'patterns' => [
                 '/curl\s+http:\/\/169\.254\.169\.254/iS',
@@ -190,7 +190,7 @@ trait DetectMaliciousContentTrait
             'message' => 'SSRF服务器端请求伪造'
         ],
 
-        // 8. 文件上传攻击（正则无冲突，匹配恶意文件特征）
+        // 文件上传攻击（正则无冲突，匹配恶意文件特征）
         'file_upload' => [
             'patterns' => [
                 '/\.php\.jpg$/iS',
@@ -206,7 +206,7 @@ trait DetectMaliciousContentTrait
             'message' => '恶意文件上传'
         ],
 
-        // 9. 反序列化攻击（正则定界符/花括号正确转义）
+        // 反序列化攻击（正则定界符/花括号正确转义）
         'unserialize_attack' => [
             'patterns' => [
                 '/O:\d+:"[a-zA-Z0-9_]+":\d+:\{/iS',
@@ -215,7 +215,7 @@ trait DetectMaliciousContentTrait
             ],
             'message' => 'PHP反序列化攻击'
         ],
-        // 10. 特殊字符注入（正则无语法错误，仅匹配高风险组合）
+        // 特殊字符注入（正则无语法错误，仅匹配高风险组合）
         'special_char_injection' => [
             'patterns' => [
                 '/[\^#!@$()*+\-./:;\<=>?@[\\]^_`\{|}~]{5,}/iS',
@@ -231,7 +231,7 @@ trait DetectMaliciousContentTrait
                 // 检测连续的两个@符号
                 '/@@/iS',
                 // 检测连续的两个特殊符号组合
-                '/[\x27\x22\)\(\);|\\\[\]\*\{%\}]{2}/iS',
+                '/[\x27\x22\)\(\);|\\\[\]\*\{%\}]{2,}/iS',
                 // 检测特定的危险符号组合
                 '/\);/iS',
                 '/\];/iS',
@@ -239,6 +239,31 @@ trait DetectMaliciousContentTrait
                 '/\}\\);/iS'
             ],
             'message' => '特殊字符注入'
+        ],
+        // 服务器端模板注入攻击（SSTI）
+        'ssti_injection' => [
+            'patterns' => [
+                '/\{\{2}.*?\}{2}/iS', // Jinja2模板语法
+                '/\{%.*?%\}/iS', // Django模板语法
+                '/\${.*?}/iS', // Velocity模板语法
+                '/\#.*?}/iS', // JSP EL表达式
+                '/\<%.*?%\>/iS' // ASP/PHP标签
+            ],
+            'message' => '服务器端模板注入攻击'
+        ],
+        // Webshell后门检测
+        'webshell_detection' => [
+            'patterns' => [
+                '/eval\(\$_POST/iS', // 常见的PHP一句话木马
+                '/assert\(\$_POST/iS', // 常见的PHP一句话木马
+                '/system\(\$_GET/iS', // 常见的PHP一句话木马
+                '/passthru\(\$_REQUEST/iS', // 常见的PHP一句话木马
+                '/@eval\(/iS', // 带@符号的eval调用
+                '/base64_decode\(/iS', // Base64解码
+                '/str_rot13\(/iS', // ROT13编码
+                '/gzuncompress\(/iS' // Gzip解压
+            ],
+            'message' => 'Webshell后门检测'
         ]
     ];
 
@@ -274,7 +299,7 @@ trait DetectMaliciousContentTrait
             '/google-analytics\.com/iS',
             '/www\.googletagmanager\.com/iS'
         ];
-        
+
         foreach ($gaPatterns as $pattern) {
             if ($this->validateRegexPattern($pattern) && preg_match($pattern, $content)) {
                 return true;
@@ -342,6 +367,12 @@ trait DetectMaliciousContentTrait
             return ['isMalicious' => false, 'reason' => ''];
         }
 
+        // 检测是否为合法JSON，对合法JSON放宽特殊字符检测
+        $isValidJson = json_decode($content) !== null;
+
+        // 检测是否为合法HTML，对合法HTML放宽特殊字符检测
+        $isValidHtml = preg_match('/^<!DOCTYPE html>|\<html|\<body|\<div|\<p/iS', $content) === 1;
+
         // 多维度内容预处理（抗绕过：覆盖各类编码/变形）
         $contentVariants = $this->generateContentVariants($content);
 
@@ -350,6 +381,11 @@ trait DetectMaliciousContentTrait
             // 宽松模式（$strict=false）：跳过低风险/易误判的规则（如XSS/SSRF）
             // 严格模式（$strict=true）：执行全量规则检测（无跳过）
             if (!$strict && in_array($attackType, $this->looseModeSkipRules)) {
+                continue;
+            }
+
+            // 对于合法JSON或HTML，跳过某些严格的特殊字符检测
+            if (($isValidJson || $isValidHtml) && $attackType === 'special_char_injection') {
                 continue;
             }
 
@@ -550,16 +586,16 @@ trait DetectMaliciousContentTrait
         $semanticRules = [
             [
                 // 仅匹配 路径遍历符号 + 系统文件名（必须同时满足）
-                'patterns' => ['/(\.\/|\.\.\\)+/iS', '/(etc\/passwd|win\.ini)/iS'],
+                'patterns' => ['/(\.\/|\.\.\)+/iS', '/(etc\/passwd|win\.ini)/iS'],
                 'message' => '路径遍历+系统文件读取组合攻击'
             ],
             [
                 // 仅匹配 命令 + 延时函数（必须同时满足）
-                'patterns' => ['/\\b(nslookup|curl)\\b/iS', '/\\b(sleep|pg_sleep)\\b/iS'],
+                'patterns' => ['/\b(nslookup|curl)\b/iS', '/\b(sleep|pg_sleep)\b/iS'],
                 'message' => '命令执行+延时盲注组合攻击'
             ],
             [
-                'patterns' => ['/(\\$\\{@|print)/iS', '/(md5|eval|assert)/iS'],
+                'patterns' => ['/(\$\{@|print)/iS', '/(md5|eval|assert)/iS'],
                 'message' => 'PHP代码注入+执行函数组合攻击'
             ],
             [
