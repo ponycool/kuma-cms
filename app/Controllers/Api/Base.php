@@ -11,7 +11,8 @@ namespace App\Controllers\Api;
 
 use App\Controllers\Base as BaseController;
 use App\Enums\Code;
-use App\Traits\ValidationRuleTrait;
+use App\Services\LogService;
+use App\Traits\DetectMaliciousContentTrait;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Exception;
@@ -20,14 +21,58 @@ use Psr\Log\LoggerInterface;
 
 class Base extends BaseController
 {
-    use ValidationRuleTrait;
+    use DetectMaliciousContentTrait;
 
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger): void
     {
         parent::initController($request, $response, $logger);
 
+        // 拦截恶意请求
+        $this->interceptMaliciousRequest();
+
         // API鉴权
         $this->apiAuth();
+    }
+
+    /**
+     * 拦截恶意请求
+     * @param int $statusCode
+     * @return void
+     */
+    private function interceptMaliciousRequest(int $statusCode = 403): void
+    {
+        $detectResult = $this->detectMaliciousRequest();
+        // 只有当检测到恶意内容时才拦截
+        if ($detectResult['isMalicious']) {
+            http_response_code($statusCode);
+            header('Content-Type: application/json; charset=utf-8');
+            $reason = $detectResult['reason'];
+            $source = $detectResult['source'];
+            $timestamp = date('Y-m-d H:i:s');
+            $requestId = uniqid('req_', true);
+            $response = [
+                'code' => $statusCode,
+                'message' => '非法请求拦截',
+                'detail' => [
+                    'reason' => $reason,
+                    'source' => $source,
+                    'timestamp' => $timestamp,
+                    'request_id' => $requestId
+                ]
+            ];
+            echo json_encode($response, JSON_UNESCAPED_UNICODE);
+
+            $logSvc = new LogService();
+            $message = sprintf(
+                '系统拦截到非法请求！拦截原因：%s，请求源：%s，时间：%s，请求ID：%s',
+                $reason,
+                $source,
+                $timestamp,
+                $requestId
+            );
+            $logSvc->warn($message);
+            exit;
+        }
     }
 
     /**
