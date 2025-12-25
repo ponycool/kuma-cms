@@ -7,8 +7,8 @@ build:
   stage: build
   image: 10.0.0.20/ponycool/php-docker-8.2:latest
   # 使用docker in docker
-  # services:
-  #  - docker:dind
+  services:
+    - 10.0.0.20/library/docker:26-dind
   variables:
     DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   before_script:
