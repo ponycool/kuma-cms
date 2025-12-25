@@ -18,7 +18,7 @@ build:
     - CONTAINER_NAME=dind-service
     # 尝试删除容器，如果不存在则忽略错误
     - docker container rm -f $CONTAINER_NAME || true
-    - docker run --name $CONTAINER_NAME -d --privileged e DOCKER_TLS_CERTDIR="" -p 127.0.0.1:2375:2375  docker:dind
+    - docker run --name $CONTAINER_NAME -d --privileged -e DOCKER_TLS_CERTDIR="" -p 127.0.0.1:2375:2375  docker:dind
   script:
     - export DOCKER_HOST=tcp://127.0.0.1:2375
     # docker in docker跨平台编译遇到无法解决的错误，暂时使用手动编译
