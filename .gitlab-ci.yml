@@ -27,12 +27,14 @@ build:
   services:
     - name: "$HARBOR_REGISTRY/library/docker:29-dind"
       alias: docker
+      # 将域名加入 insecure-registries
+      command: [ "--insecure-registry=$HARBOR_REGISTRY" ]
   variables:
     DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
     DOCKER_HOST: tcp://docker:2376
     DOCKER_TLS_CERTDIR: ""
   before_script:
-    - docker login "$CI_REGISTRY_SERVER" -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
+    - echo "$CI_REGISTRY_PASSWORD" | docker login "$CI_REGISTRY_SERVER" -u "$CI_REGISTRY_USER" --password-stdin
   script:
     # docker in docker跨平台编译遇到无法解决的错误，暂时使用手动编译
     - docker build -t "$DOCKER_IMAGE_NAME" .
