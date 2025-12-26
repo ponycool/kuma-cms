@@ -31,7 +31,8 @@ build:
       command: [ "--insecure-registry=$HARBOR_REGISTRY" ]
   variables:
     DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-    DOCKER_HOST: tcp://docker:2376
+    # 注意：如果禁用 TLS，通常建议改用 2375 端口（非加密）
+    DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login "$CI_REGISTRY_SERVER" -u "$CI_REGISTRY_USER" --password-stdin
