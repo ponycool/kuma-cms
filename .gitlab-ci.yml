@@ -28,7 +28,9 @@ build:
     - name: "$HARBOR_REGISTRY/library/docker:29-dind"
       alias: docker
       # 将域名加入 insecure-registries
-      command: ["--tls=false", "--insecure-registry=$HARBOR_REGISTRY" ]
+      command:
+        - "--host=tcp://0.0.0.0:2375"
+        - "-insecure-registry=$HARBOR_REGISTRY"
   variables:
     DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
     # 注意：如果禁用 TLS，通常建议改用 2375 端口（非加密）
@@ -37,7 +39,7 @@ build:
   before_script:
     - timeout 10s docker info || echo "docker info failed"
     - echo "Attempting login to http://$HARBOR_REGISTRY"
-    - echo "$CI_REGISTRY_PASSWORD" | docker login "http://$HARBOR_REGISTRY" -u "$CI_REGISTRY_USER" --password-stdin
+    - echo "$CI_REGISTRY_PASSWORD" | docker login "http://$HARBOR_REGISTRY" -u "$CI_REGISTRY_USER" --password-stdin --tls-verify=false
   script:
     # docker in docker跨平台编译遇到无法解决的错误，暂时使用手动编译
     - docker build -t "$DOCKER_IMAGE_NAME" .
