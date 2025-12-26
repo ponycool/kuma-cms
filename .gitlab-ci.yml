@@ -6,7 +6,7 @@ stages:
 # 安装
 install:
   stage: install
-  image: "$HARBOR_REGISTRY/ponycool/php-docker:8.2"
+  image: "$HARBOR_REGISTRY/ponycool/php-deploy:8.2"
   script:
     - composer install
   cache:
