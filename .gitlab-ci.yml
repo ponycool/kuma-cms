@@ -28,7 +28,7 @@ build:
     - name: "$HARBOR_REGISTRY/library/docker:29-dind"
       alias: docker
       # 将域名加入 insecure-registries
-      command: [ "--insecure-registry=$HARBOR_REGISTRY" ]
+      command: ["--tls=false", "--insecure-registry=$HARBOR_REGISTRY" ]
   variables:
     DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
     # 注意：如果禁用 TLS，通常建议改用 2375 端口（非加密）
