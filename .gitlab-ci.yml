@@ -35,11 +35,7 @@ build:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   before_script:
-    # 在 Client 端也禁用对该仓库的 TLS 验证
-    - |
-      mkdir -p /etc/docker
-      echo "{\"insecure-registries\":[\"$CI_REGISTRY_SERVER\"]}" > /etc/docker/daemon.json
-    - echo "$CI_REGISTRY_PASSWORD" | docker login "http://$CI_REGISTRY_SERVER" -u "$CI_REGISTRY_USER" --password-stdin
+    - echo "$CI_REGISTRY_PASSWORD" | docker login "$HARBOR_REGISTRY" -u "$CI_REGISTRY_USER" --password-stdin
   script:
     # docker in docker跨平台编译遇到无法解决的错误，暂时使用手动编译
     - docker build -t "$DOCKER_IMAGE_NAME" .
