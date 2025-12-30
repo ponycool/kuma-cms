@@ -75,8 +75,8 @@ COPY spark "$APP_PATH/spark"
 COPY .env.dev "$APP_PATH/.env"
 
 # 文件夹授权
-RUN chown -R www.www /var/www/html && \
-    chown -R www.www "$APP_PATH" && \
+RUN chown -R www:www /var/www/html && \
+    chown -R www:www "$APP_PATH" && \
     chmod -R 777 "$APP_PATH/public/css" && \
     chmod -R 777 "$APP_PATH/public/js" && \
     chmod -R 777 "$APP_PATH/writable" && \
