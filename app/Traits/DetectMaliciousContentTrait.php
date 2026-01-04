@@ -260,7 +260,8 @@ trait DetectMaliciousContentTrait
                 '/\{\{2}.*?\}{2}/iS', // Jinja2模板语法
                 '/\{%.*?%\}/iS', // Django模板语法
                 '/\${.*?}/iS', // Velocity模板语法
-                '/\#.*?}/iS', // JSP EL表达式
+                // 优化JSP EL表达式规则，避免误判JSON数据中的#符号
+                '/\#\{[a-zA-Z0-9_\.\(\)\[\]\+\-\*\/\%\&\|\^\<\>\=\!\s]+\}/iS',
                 '/\<%.*?%\>/iS' // ASP/PHP标签
             ],
             'message' => '服务器端模板注入攻击'
