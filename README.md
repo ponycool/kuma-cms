@@ -31,13 +31,9 @@
 
 ## 预览
 
-#### WEB端
+<img src="https://cdn.static.ponycool.com/img/cms/screenshot/screenshot.gif" width="100%">
 
-<img src="https://cdn.static.ponycool.com/img/cms/screenshot/web_screenshot_compressed.jpg" width="100%">
-
-#### 管理后台
-
-<img src="https://cdn.static.ponycool.com/img/cms/screenshot/admin_screenshot_compressed.png" width="100%">
+> 预览图由 [PicRoll (瞬动)](http://tools.dev.local/pic-roll/index) 创建
 
 ## 安装
 
