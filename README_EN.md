@@ -33,7 +33,7 @@ Password: kumacms
 
 <img src="https://cdn.static.ponycool.com/img/cms/screenshot/screenshot.gif" width="100%">
 
-> Preview created by [PicRoll (瞬动)](http://tools.dev.local/pic-roll/index)
+> Preview created by [PicRoll (瞬动)](https://tools.ponycool.com/pic-roll/index)
 
 ## Installation
 
