@@ -89,6 +89,29 @@ trait ValidationRuleTrait
                 'errors' => [
                     'valid_date' => '参数结束日期[endDate]无效，必须为"Y-m-d"格式的日期字符串',
                 ]
+            ],
+            'sortType' => [
+                'rules' => 'if_exist|in_list[ASC,DESC]',
+                'errors' => [
+                    'in_list' => '参数排序方式[sortType]无效，必须为"ASC"或"DESC"',
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * 获取排序字段验证规则
+     * @param array $allowedFields 允许的排序字段白名单
+     * @return array[]
+     */
+    protected function getSortFieldRule(array $allowedFields): array
+    {
+        return [
+            'sortField' => [
+                'rules' => 'if_exist|in_list[' . implode(',', $allowedFields) . ']',
+                'errors' => [
+                    'in_list' => '参数排序字段[sortField]无效',
+                ]
             ]
         ];
     }

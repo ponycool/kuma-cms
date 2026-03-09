@@ -689,13 +689,15 @@ class BaseService
             'WHERE `deleted` = 0 ',
             'AND deleted_at IS NULL ',
         ];
+        $queryParams = [];
         if (!is_null($where)) {
             foreach ($where as $k => $v) {
                 if (!strpos($k, '>') && !strpos($k, '<')) {
-                    $sql [] = sprintf("AND `%s` = '%s' ", $k, $v);
+                    $sql[] = 'AND ' . $this->db->escapeIdentifier($k) . ' = ? ';
                 } else {
-                    $sql [] = sprintf("AND %s '%s' ", $k, $v);
+                    $sql[] = sprintf('AND %s ? ', $k);
                 }
+                $queryParams[] = $v;
             }
         }
         array_push($sql,
@@ -704,7 +706,7 @@ class BaseService
             'ORDER BY mt.month'
         );
         $sql = $this->assembleSql($sql);
-        return $this->query($sql);
+        return $this->query($sql, $queryParams ?: null);
     }
 
     /**
@@ -759,13 +761,15 @@ class BaseService
             'WHERE `deleted` = 0 ',
             'AND deleted_at IS NULL ',
         ];
+        $queryParams = [];
         if (!is_null($where)) {
             foreach ($where as $k => $v) {
                 if (!strpos($k, '>') && !strpos($k, '<')) {
-                    $sql [] = sprintf("AND `%s` = '%s' ", $k, $v);
+                    $sql[] = 'AND ' . $this->db->escapeIdentifier($k) . ' = ? ';
                 } else {
-                    $sql [] = sprintf("AND %s '%s' ", $k, $v);
+                    $sql[] = sprintf('AND %s ? ', $k);
                 }
+                $queryParams[] = $v;
             }
         }
         // 兼容性
@@ -778,7 +782,7 @@ class BaseService
             'ORDER BY month_table.month'
         );
         $sql = $this->assembleSql($sql);
-        $res = $this->query($sql);
+        $res = $this->query($sql, $queryParams ?: null);
         if (count($res) === 0) {
             return [];
         }

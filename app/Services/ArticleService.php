@@ -22,7 +22,7 @@ class ArticleService extends BaseService
      */
     public function getBaseRules(): array
     {
-        return [
+        $rules = [
             'cid' => [
                 'rules' => 'required|is_natural_no_zero',
                 'errors' => [
@@ -99,6 +99,10 @@ class ArticleService extends BaseService
                 ]
             ],
         ];
+        return array_merge(
+            $rules,
+            $this->getSortFieldRule(['sort_index', 'created_at', 'updated_at', 'view_count', 'published_at', 'custom_date', 'title', 'id'])
+        );
     }
 
     /**
@@ -192,7 +196,7 @@ class ArticleService extends BaseService
             $sql[] = 'AND c.code = ? ';
             $sqlParams[] = $categoryCode;
         }
-        if (!is_null($publishStatus)){
+        if (!is_null($publishStatus)) {
             $sql[] = 'AND a.is_published = ? ';
             $sqlParams[] = $publishStatus;
         }

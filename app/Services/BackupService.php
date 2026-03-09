@@ -242,7 +242,6 @@ class BackupService extends BaseService
         if (is_null($file)) {
             return false;
         }
-        echo $file->guessExtension();
         $filename = $file->getName();
         if (!preg_match('/^cms_[0-9]{1,18}\.db$/', $filename)) {
             return false;
