@@ -17,4 +17,23 @@ enum Language: string
     case ENGLISH = 'en-US';
     // 俄文
     case RUSSIAN = 'ru-RU';
+
+    public function getLabel(): string
+    {
+        return match ($this) {
+            self::SIMPLIFIED_CHINESE => '中文简体',
+            self::ENGLISH => 'English',
+            self::RUSSIAN => 'Русский',
+        };
+    }
+
+    public static function getLabels(): array
+    {
+        return [
+            self::SIMPLIFIED_CHINESE->value => self::SIMPLIFIED_CHINESE->getLabel(),
+            self::ENGLISH->value => self::ENGLISH->getLabel(),
+            self::RUSSIAN->value => self::RUSSIAN->getLabel(),
+        ];
+    }
+
 }
