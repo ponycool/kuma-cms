@@ -21,7 +21,7 @@ class MarketingPlanService extends BaseService
      */
     public function getBaseRules(): array
     {
-        return [
+        $rules = [
             'name' => [
                 'rules' => 'if_exist|max_length[200]',
                 'errors' => [
@@ -95,6 +95,10 @@ class MarketingPlanService extends BaseService
                 ]
             ],
         ];
+        return array_merge(
+            $rules,
+            $this->getSortFieldRule(['sort_index', 'created_at', 'updated_at', 'view_count', 'start_datetime', 'end_datetime', 'name', 'id'])
+        );
     }
 
     /**
