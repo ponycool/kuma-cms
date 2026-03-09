@@ -128,3 +128,4 @@ nb-configuration.xml
 /phpunit*.xml
 /.phpunit.*.cache
 public/sitemap.*
+.claude/settings.local.json
