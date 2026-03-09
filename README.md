@@ -33,7 +33,7 @@
 
 <img src="https://cdn.static.ponycool.com/img/cms/screenshot/screenshot.gif" width="100%">
 
-> 预览图由 [PicRoll (瞬动)](http://tools.dev.local/pic-roll/index) 创建
+> 预览图由 [PicRoll (瞬动)](https://tools.ponycool.com/pic-roll/index) 创建
 
 ## 安装
 
