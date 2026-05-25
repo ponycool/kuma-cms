@@ -3,9 +3,7 @@
 use CodeIgniter\Router\RouteCollection;
 use Config\CustomRoutes;
 
-/**
- * @var RouteCollection $routes
- */
+/** @var RouteCollection $routes */
 $routes->get('/', 'Home::index');
 
 // 自定义路由策略
